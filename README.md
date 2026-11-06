@@ -21,6 +21,16 @@ Projeleri **Başlık → Alt başlık → Görev** hiyerarşisiyle planlar ve il
 - Her seviyede ilerleme çubuğu.
 - Projeyi JSON olarak dışa aktarma.
 
+### Yeni özellikler
+- **Tema düğmesi:** Otomatik (sistem) → Açık → Koyu, seçim saklanır.
+- **Geri al:** Silinen görev, başlık, alt başlık, proje ve arşivleme işlemi için 8 saniye "Geri al" düğmesi (Ctrl+Z de çalışır). Silme artık onay sormaz.
+- **Arşiv:** Biten projeler 📦 ile ana sayfadan gizlenir; üstteki "Arşiv" düğmesinden görülür/geri alınır. Genel istatistiklere dahil edilmez.
+- **Görev ayrıntıları (✎):** not, bitiş tarihi, sorumlu, öncelik (yüksek/orta/düşük), renkli etiketler, durum. Geciken görevler kırmızı görünür.
+- **Filtre:** Öncelik, etiket ve kişiye göre (liste, Kanban ve takvimde geçerli).
+- **Sürükleme:** Görevler başka alt başlığa da taşınır (alt başlığın üstüne bırakınca sona eklenir). Dokunmatik ekranlarda tutamaçtan (⠿) sürüklenir.
+- **Ana sayfa:** "Bu hafta ve geciken işler" listesi.
+- **Görünümler:** Liste, Kanban (Yapılacak / Sürüyor / Bitti; ◀ ▶ ile taşı) ve aylık takvim.
+
 ### Hazır şablonlar
 Mobil Oyun, Mobil Uygulama, Web Sitesi / Web Uygulaması, Yazılım Ürünü (MVP), Kurumsal Proje Yönetimi, Pazarlama Kampanyası.
 
@@ -57,7 +67,7 @@ Sınırlar: Ortak hesap yönteminde kimin ne değiştirdiği izlenemez; birini �
 ## Teknik notlar
 
 - Yapı: `index.html` içinde CSS ve JavaScript bir arada.
-- Veri modeli: `{ cur, projects: [{ id, name, phases: [{ id, name, open, subs: [{ id, name, open, tasks: [{ id, t, done }] }] }] }] }`
+- Veri modeli: `{ cur, theme, projects: [{ id, name, archived, phases: [{ id, name, open, subs: [{ id, name, open, tasks: [{ id, t, done, note, due, who, pri, tags, st }] }] }] }] }`
 - İçe aktarma, eski biçimleri (`asamalar`, `altbasliklar`, `gorevler`) de okuyacak şekilde normalleştirilir.
-- Sürükle-bırak HTML5 Drag and Drop kullanır; dokunmatik ekranlarda çalışmayabilir.
+- Sürükle-bırak: fare için HTML5 Drag and Drop, dokunmatik/kalem için pointer olayları.
 - Ad sorma işlemleri `prompt()` yerine sayfa içi pencere kullanır (bazı önizleme ortamları `prompt()` çağrısını engeller).

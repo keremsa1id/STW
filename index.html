@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Proje Takip</title>
 <style>
-:root{--bg:#eef1fb;--card:#fff;--ink:#1c2230;--mut:#6b7385;--line:#e0e5f1;--acc:#4f6df5;--ok:#22a06b;--sub:#f3f5fc;--c1:#4f6df5;--c2:#8b5cf6;--c3:#14b8a6;--c4:#f59e0b;--c5:#ec4899}
-@media(prefers-color-scheme:dark){:root{--bg:#12151c;--card:#1a1f2a;--ink:#e8ebf2;--mut:#8f98ab;--line:#2a3140;--acc:#7b94ff;--ok:#3ec48c;--sub:#212837;--bg:#12151c;--c1:#7b94ff;--c2:#a78bfa;--c3:#2dd4bf;--c4:#fbbf24;--c5:#f472b6}}
+:root{--bg:#eef1fb;--card:#fff;--ink:#1c2230;--mut:#6b7385;--line:#e0e5f1;--acc:#4f6df5;--ok:#22a06b;--sub:#f3f5fc;--c1:#4f6df5;--c2:#8b5cf6;--c3:#14b8a6;--c4:#f59e0b;--c5:#ec4899;--bad:#e5484d}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#12151c;--card:#1a1f2a;--ink:#e8ebf2;--mut:#8f98ab;--line:#2a3140;--acc:#7b94ff;--ok:#3ec48c;--sub:#212837;--c1:#7b94ff;--c2:#a78bfa;--c3:#2dd4bf;--c4:#fbbf24;--c5:#f472b6;color-scheme:dark}}
+:root[data-theme=dark]{--bg:#12151c;--card:#1a1f2a;--ink:#e8ebf2;--mut:#8f98ab;--line:#2a3140;--acc:#7b94ff;--ok:#3ec48c;--sub:#212837;--c1:#7b94ff;--c2:#a78bfa;--c3:#2dd4bf;--c4:#fbbf24;--c5:#f472b6;color-scheme:dark}
+:root[data-theme=light]{color-scheme:light}
 *{box-sizing:border-box}
 body{margin:0;background:linear-gradient(180deg,color-mix(in srgb,var(--c1) 12%,var(--bg)),var(--bg) 260px) no-repeat,var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
 main{max-width:800px;margin:0 auto;padding:20px 16px 80px}
@@ -42,7 +44,46 @@ input[type=text],textarea{background:var(--card);border:1px solid var(--line);bo
 .sb .hd .nm{font-size:14px}
 .t{display:flex;gap:8px;align-items:flex-start;padding:3px 0}
 .t input{margin-top:4px;width:18px;height:18px;accent-color:var(--ok);flex:none}
-.t label{flex:1;cursor:pointer;word-break:break-word}
+.t label{display:block;cursor:pointer;word-break:break-word}
+.tb{flex:1;min-width:0}
+.note{color:var(--mut);font-size:13px;word-break:break-word}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.chip{font-size:12px;line-height:1.5;padding:0 8px;border-radius:99px;background:var(--sub);border:1px solid var(--line);color:var(--ink);white-space:nowrap}
+.chip.late{color:var(--bad);border-color:var(--bad)}
+.chip.p-high{background:color-mix(in srgb,var(--bad) 18%,transparent);border-color:var(--bad)}
+.chip.p-mid{background:color-mix(in srgb,var(--c4) 22%,transparent);border-color:var(--c4)}
+.chip.p-low{background:color-mix(in srgb,var(--c3) 20%,transparent);border-color:var(--c3)}
+.tabs,.flt{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.form{display:grid;gap:10px}
+.form .fld{display:grid;gap:3px;font-size:13px;color:var(--mut)}
+.form input,.form select,.form textarea{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 10px;width:100%;color:var(--ink)}
+dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);border-radius:10px;padding:8px 12px;display:flex;gap:12px;align-items:center;box-shadow:0 4px 16px #0004;z-index:10}
+#toast[hidden]{display:none}
+#toast button{background:none;border:1px solid currentColor;color:inherit}
+.up{display:flex;gap:8px;align-items:center;padding:4px 0;cursor:pointer;flex-wrap:wrap}
+.up:hover .ut{color:var(--acc)}
+.up .ut{flex:1;min-width:120px}
+.kan{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:start}
+.kcol{background:var(--sub);border-radius:12px;padding:10px;min-height:80px}
+.kcol h3{margin:0 0 8px;font-size:14px;color:var(--mut)}
+.kc{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px}
+.kc.d .kt{color:var(--mut);text-decoration:line-through}
+.kc .ka{display:flex;justify-content:flex-end;gap:2px}
+.calnav{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.calnav b{flex:1;text-align:center;text-transform:capitalize}
+.calw{overflow-x:auto}
+.calg{display:grid;grid-template-columns:repeat(7,minmax(78px,1fr));gap:4px;min-width:560px}
+.cwd{text-align:center;color:var(--mut);font-size:12px}
+.cd{background:var(--card);border:1px solid var(--line);border-radius:8px;min-height:84px;padding:4px}
+.cd.today{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
+.cd .dn{font-size:12px;color:var(--mut)}
+.ct{font-size:12px;border-left:3px solid var(--line);background:var(--sub);border-radius:4px;padding:1px 5px;margin-top:3px;cursor:pointer;word-break:break-word}
+.ct small{display:block;color:var(--mut);font-size:11px;line-height:1.3}
+.ct.p-high{border-color:var(--bad)}.ct.p-mid{border-color:var(--c4)}.ct.p-low{border-color:var(--c3)}
+.ct.d{text-decoration:line-through;color:var(--mut)}
+.ct.late{color:var(--bad)}
+@media(max-width:640px){.kan{grid-template-columns:1fr}}
 .t.d label{color:var(--mut);text-decoration:line-through}
 .add{display:flex;gap:8px;margin-top:6px}
 dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(600px,92vw)}
@@ -84,6 +125,7 @@ dialog textarea{height:260px;font-family:ui-monospace,monospace;font-size:13px}
   <div id="dlgB"></div>
   <div class="row"><button id="dlgX">Kapat</button><button id="dlgOk" class="pri">Tamam</button></div>
 </dialog>
+<div id="toast" hidden></div>
 
 <script>
 const KEY = 'proje-takip-v2', OLD = 'proje-takip-v1';
@@ -190,7 +232,9 @@ const TEMPLATES = [
   ]}
 ];
 
-const mk = (t, done) => ({id: uid(), t, done: !!done});
+// Görev: açıklama (note), bitiş (due, YYYY-AA-GG), sorumlu (who), öncelik (pri: high|mid|low), etiketler (tags), durum (st: todo|doing; done ayrı)
+const mk = (t, done, x = {}) => ({id: uid(), t, done: !!done, note: String(x.note || ''), due: String(x.due || ''), who: String(x.who || ''),
+  pri: ['high', 'mid', 'low'].includes(x.pri) ? x.pri : '', tags: Array.isArray(x.tags) ? x.tags.map(String) : [], st: x.st === 'doing' ? 'doing' : 'todo'});
 function fromTemplate(tpl, name) {
   return {id: uid(), name: name || tpl.name, phases: tpl.data.map(([pn, subs]) => ({
     id: uid(), name: pn, open: true,
@@ -202,7 +246,7 @@ function fromTemplate(tpl, name) {
 // Eski ve yeni biçimleri (aşama > alt başlık > görev) ortak yapıya çevirir
 function normalize(o) {
   const ph = Array.isArray(o.phases) ? o.phases : Array.isArray(o.asamalar) ? o.asamalar : [];
-  const task = t => typeof t === 'string' ? mk(t) : mk(String(t.t || t.gorev || t.name || ''), t.done || t.bitti);
+  const task = t => typeof t === 'string' ? mk(t) : mk(String(t.t || t.gorev || t.name || ''), t.done || t.bitti, t);
   return {id: uid(), name: String(o.name || o.ad || 'İsimsiz proje'), phases: ph.map(p => {
     const subs = p.subs || p.altbasliklar;
     return {id: uid(), name: String(p.name || p.ad || 'Başlık'), open: true,
@@ -225,6 +269,18 @@ const stat = ts => { const n = ts.length, d = ts.filter(x => x.done).length; ret
 const move = (arr, i, d) => { const j = i + d; if (j < 0 || j >= arr.length) return; [arr[i], arr[j]] = [arr[j], arr[i]]; save(); render(); };
 const rename = (obj, key, label) => ask(label, obj[key], n => { obj[key] = n; save(); render(); });
 
+const applyTheme = () => { if (db.theme === 'light' || db.theme === 'dark') document.documentElement.dataset.theme = db.theme; else delete document.documentElement.dataset.theme; };
+const pad = n => String(n).padStart(2, '0');
+const iso = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const today = () => iso(new Date());
+const fmt = s => new Date(s + 'T00:00').toLocaleDateString('tr-TR', {day: 'numeric', month: 'short'});
+const isLate = t => !t.done && t.due && t.due < today();
+const PRI = {high: 'Yüksek', mid: 'Orta', low: 'Düşük'};
+const allTasks = p => p.phases.flatMap(ph => ph.subs.flatMap(sb => sb.tasks.map(t => ({t, ph, sb}))));
+const COLS = {todo: 'Yapılacak', doing: 'Sürüyor', done: 'Bitti'};
+const colOf =t => t.done ? 'done' : t.st === 'doing' ? 'doing' : 'todo';
+const setStatus = (t, s) => { t.done = s === 'done'; if (s !== 'done') t.st = s; };
+
 /* ---------- Arayüz ---------- */
 function el(tag, attrs, ...kids) {
   const e = document.createElement(tag);
@@ -238,28 +294,77 @@ function el(tag, attrs, ...kids) {
 const ic = (txt, title, fn, cls, dis) => el('button', {className: 'ic ' + (cls || ''), textContent: txt, title, disabled: !!dis, on: {click: fn}});
 const bar = pct => el('div', {className: 'bar'}, el('i', {style: 'width:' + pct + '%'}));
 
-// Başlık satırı: aç/kapat, ad, sayaç, sırala, düzenle, sil
-// Sürükle-bırak: tutamaçtan (⠿) basılı tutup taşı, başka satırın üstüne bırak
-let drag = null;
-function grip(arr, i, getBox) {
-  return el('span', {className: 'grip', textContent: '⠿', title: 'Basılı tutup sürükle', draggable: true, on: {
-    click: e => e.stopPropagation(),
-    dragstart: e => { e.stopPropagation(); drag = {arr, i}; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'x'); const b = getBox(); if (b) e.dataTransfer.setDragImage(b, 10, 10); },
-    dragend: () => { drag = null; document.querySelectorAll('.over').forEach(n => n.classList.remove('over')); }}});
+/* --- Geri al: silme/arşivleme öncesi anlık görüntü alınır, 8 sn "Geri al" düğmesi çıkar (Ctrl+Z de çalışır) --- */
+let undoCb = null, toastT = 0;
+function hideToast() { $('#toast').hidden = true; undoCb = null; clearTimeout(toastT); }
+function toast(msg, cb) {
+  const t = $('#toast'); undoCb = cb; clearTimeout(toastT);
+  t.replaceChildren(el('span', {textContent: msg}), el('button', {textContent: 'Geri al', on: {click: () => { cb(); hideToast(); }}}));
+  t.hidden = false; toastT = setTimeout(hideToast, 8000);
 }
-function dropZone(row, arr, i) {
-  const ok = () => drag && drag.arr === arr;
-  row.addEventListener('dragover', e => { if (ok()) { e.preventDefault(); e.stopPropagation(); row.classList.add('over'); } });
-  row.addEventListener('dragleave', () => row.classList.remove('over'));
-  row.addEventListener('drop', e => {
-    if (!ok()) return; e.preventDefault(); e.stopPropagation();
-    const from = drag.i; drag = null;
-    if (from !== i) { const [x] = arr.splice(from, 1); arr.splice(i, 0, x); save(); }
-    render();
-  });
-  return row;
+function withUndo(msg, fn) {
+  const snap = JSON.stringify({cur: db.cur, projects: db.projects});
+  fn(); save(); render();
+  toast(msg, () => { const o = JSON.parse(snap); db.projects = o.projects; db.cur = o.cur; save(); render(); });
+}
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && undoCb && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); undoCb(); hideToast(); }
+});
+
+// Sürükle-bırak: tutamaçtan (⠿) basılı tutup taşı, başka satırın üstüne bırak.
+// Fare: HTML5 drag&drop. Dokunmatik/kalem: pointer olayları (elementFromPoint ile hedef bulunur).
+// Görevler başka alt başlığa da taşınabilir; başlık ve alt başlıklar yalnızca kendi grubunda.
+const COARSE = matchMedia('(pointer:coarse)').matches;
+let drag = null;
+const clearOver = () => document.querySelectorAll('.over').forEach(n => n.classList.remove('over'));
+function touchDrag(e, d) {
+  if (e.pointerType === 'mouse') return;
+  e.preventDefault(); drag = d;
+  const g = e.currentTarget; let tgt = null;
+  try { g.setPointerCapture(e.pointerId); } catch (x) {}
+  const move = ev => {
+    if (ev.clientY < 70) scrollBy(0, -14); else if (ev.clientY > innerHeight - 70) scrollBy(0, 14);
+    const n = document.elementFromPoint(ev.clientX, ev.clientY), z = n && n.closest('.dz');
+    clearOver(); tgt = z && z._dz.ok() ? z : null; if (tgt) tgt.classList.add('over');
+  };
+  const end = ev => {
+    g.removeEventListener('pointermove', move); g.removeEventListener('pointerup', end); g.removeEventListener('pointercancel', end);
+    clearOver();
+    if (tgt && ev.type === 'pointerup') tgt._dz.go(); else drag = null;
+  };
+  g.addEventListener('pointermove', move); g.addEventListener('pointerup', end); g.addEventListener('pointercancel', end);
+}
+function grip(arr, i, getBox, kind) {
+  return el('span', {className: 'grip', textContent: '⠿', title: 'Basılı tutup sürükle', draggable: !COARSE, on: {
+    click: e => e.stopPropagation(),
+    pointerdown: e => touchDrag(e, {arr, i, kind}),
+    dragstart: e => { e.stopPropagation(); drag = {arr, i, kind}; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'x'); const b = getBox(); if (b) e.dataTransfer.setDragImage(b, 10, 10); },
+    dragend: () => { drag = null; clearOver(); }}});
+}
+function bindDz(node, dz) {
+  node.classList.add('dz'); node._dz = dz;
+  node.addEventListener('dragover', e => { if (dz.ok()) { e.preventDefault(); e.stopPropagation(); node.classList.add('over'); } });
+  node.addEventListener('dragleave', () => node.classList.remove('over'));
+  node.addEventListener('drop', e => { if (!dz.ok()) return; e.preventDefault(); e.stopPropagation(); dz.go(); });
+  return node;
+}
+function dropZone(row, arr, i, kind) {
+  return bindDz(row, {
+    ok: () => drag && (drag.arr === arr || (kind === 'task' && drag.kind === 'task')),
+    go: () => {
+      const fa = drag.arr, from = drag.i; drag = null;
+      if (fa !== arr || from !== i) { const [x] = fa.splice(from, 1); arr.splice(i, 0, x); save(); }
+      render();
+    }});
+}
+// Alt başlık kutusuna bırakılan görev, o alt başlığın sonuna eklenir (boş/kapalı alt başlıklar için)
+function dropTasks(box, sb) {
+  return bindDz(box, {
+    ok: () => drag && drag.kind === 'task' && drag.arr !== sb.tasks,
+    go: () => { const fa = drag.arr, from = drag.i; drag = null; sb.tasks.push(fa.splice(from, 1)[0]); save(); render(); }});
 }
 
+// Başlık satırı: aç/kapat, ad, sayaç, sırala, düzenle, sil
 function head(obj, arr, i, st, nameLabel, delMsg) {
   const hd = el('div', {className: 'hd'},
     grip(arr, i, () => hd.closest('section.ph, .sb')),
@@ -267,71 +372,201 @@ function head(obj, arr, i, st, nameLabel, delMsg) {
     el('span', {className: 'nm', textContent: obj.name, title: 'Aç / kapat', on: {click: () => { obj.open = !obj.open; save(); render(); }}}),
     el('em', {textContent: st.d + '/' + st.n + ' · %' + st.pct}),
     ic('✎', 'Yeniden adlandır', () => rename(obj, 'name', nameLabel)),
-    ic('×', 'Sil', () => { if (confirm(delMsg)) { arr.splice(i, 1); save(); render(); } }, 'del'));
+    ic('×', 'Sil', () => withUndo(delMsg, () => arr.splice(i, 1)), 'del'));
   return dropZone(hd, arr, i);
+}
+
+const tagStyle = g => { const h = [...g].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 7); return 'background:hsl(' + h + ' 70% 50% / .2);border-color:hsl(' + h + ' 70% 50% / .55)'; };
+function chipsOf(t) {
+  const c = [];
+  if (t.pri) c.push(el('span', {className: 'chip p-' + t.pri, textContent: PRI[t.pri]}));
+  if (t.due) c.push(el('span', {className: 'chip' + (isLate(t) ? ' late' : ''), textContent: '📅 ' + fmt(t.due) + (isLate(t) ? ' · gecikti' : '')}));
+  if (t.who) c.push(el('span', {className: 'chip', textContent: '👤 ' + t.who}));
+  (t.tags || []).forEach(g => c.push(el('span', {className: 'chip', style: tagStyle(g), textContent: '#' + g})));
+  return c.length ? el('div', {className: 'chips'}, c) : '';
+}
+
+// Görev ayrıntıları: ad, not, bitiş tarihi, sorumlu, öncelik, etiket, durum
+function taskDlg(t) {
+  const f = (label, node) => el('label', {className: 'fld'}, el('span', {textContent: label}), node);
+  const sel = (opts, v) => { const s = el('select', {}, ...opts.map(([k, l]) => el('option', {value: k, textContent: l}))); s.value = v; return s; };
+  const title = el('input', {type: 'text', value: t.t}), note = el('textarea', {value: t.note || '', placeholder: 'Kısa açıklama'}),
+    due = el('input', {type: 'date', value: t.due || ''}), who = el('input', {type: 'text', value: t.who || '', placeholder: 'Sorumlu kişi'}),
+    pri = sel([['', 'Yok'], ['high', 'Yüksek'], ['mid', 'Orta'], ['low', 'Düşük']], t.pri || ''),
+    st = sel([['todo', 'Yapılacak'], ['doing', 'Sürüyor'], ['done', 'Bitti']], colOf(t)),
+    tags = el('input', {type: 'text', value: (t.tags || []).join(', '), placeholder: 'virgülle ayır: tasarım, acil'});
+  openDlg('Görev ayrıntıları', el('div', {className: 'form'}, f('Görev', title), f('Not', note), f('Bitiş tarihi', due), f('Sorumlu', who), f('Öncelik', pri), f('Etiketler', tags), f('Durum', st)), () => {
+    const v = title.value.trim(); if (!v) { title.focus(); return false; }
+    t.t = v; t.note = note.value.trim(); t.due = due.value; t.who = who.value.trim(); t.pri = pri.value;
+    t.tags = [...new Set(tags.value.split(',').map(x => x.trim().replace(/^#/, '')).filter(Boolean))];
+    setStatus(t, st.value); save(); render();
+  });
 }
 
 function taskRow(t, arr, i) {
   const row = el('div', {className: 't' + (t.done ? ' d' : '')},
-    grip(arr, i, () => row),
+    grip(arr, i, () => row, 'task'),
     el('input', {type: 'checkbox', id: t.id, checked: t.done, on: {change: e => { t.done = e.target.checked; save(); render(); }}}),
-    el('label', {htmlFor: t.id, textContent: t.t, title: 'Düzenlemek için çift tıkla', on: {dblclick: e => { e.preventDefault(); rename(t, 't', 'Görev'); }}}),
-    ic('×', 'Sil', () => { arr.splice(i, 1); save(); render(); }, 'del'));
-  return dropZone(row, arr, i);
+    el('div', {className: 'tb'},
+      el('label', {htmlFor: t.id, textContent: t.t, title: 'Düzenlemek için çift tıkla', on: {dblclick: e => { e.preventDefault(); rename(t, 't', 'Görev'); }}}),
+      t.note ? el('div', {className: 'note', textContent: t.note}) : '', chipsOf(t)),
+    ic('✎', 'Ayrıntılar: not, tarih, kişi, etiket, öncelik', () => taskDlg(t)),
+    ic('×', 'Sil', () => withUndo('Görev silindi', () => arr.splice(i, 1)), 'del'));
+  return dropZone(row, arr, i, 'task');
 }
 
-let view = 'home';
+let view = 'home', mode = 'list', showArch = false;
+const flt = {pri: '', tag: '', who: ''};
+const pass = t => (!flt.pri || t.pri === flt.pri) && (!flt.tag || (t.tags || []).includes(flt.tag)) && (!flt.who || t.who === flt.who);
 const collapse = p => p.phases.forEach(ph => { ph.open = false; ph.subs.forEach(sb => sb.open = false); });
 const open = id => {
-  db.cur = id; view = 'project';
+  db.cur = id; view = 'project'; mode = 'list'; flt.pri = flt.tag = flt.who = '';
   collapse(cur()); // proje kapalı açılsın
   save(); render();
 };
 const home = () => { view = 'home'; render(); };
 const projStat = p => stat(p.phases.flatMap(tasksOf));
+const delProject = p => withUndo('Proje silindi', () => {
+  db.projects = db.projects.filter(x => x !== p);
+  if (!db.projects.length) db.projects.push(fromTemplate(TEMPLATES[0]));
+  db.cur = db.projects[0].id; view = 'home';
+});
+const toggleArchive = p => withUndo(p.archived ? 'Arşivden çıkarıldı' : 'Proje arşivlendi', () => { p.archived = !p.archived; if (view === 'project') view = 'home'; });
 
 function renderHeader() {
   const top = $('#top'); top.replaceChildren();
+  const L = {auto: '🌓 Otomatik', light: '☀ Açık', dark: '🌙 Koyu'}, th = db.theme || 'auto';
+  const themeBtn = el('button', {textContent: L[th], title: 'Tema: otomatik → açık → koyu', on: {click: () => {
+    const o = ['auto', 'light', 'dark']; db.theme = o[(o.indexOf(th) + 1) % 3]; applyTheme(); save(); render();
+  }}});
   if (view === 'home') {
-    top.append(el('h1', {textContent: 'Proje Takip'}),
-      el('button', {className: 'pri', textContent: '+ Yeni proje', on: {click: newProject}}),
-      el('button', {textContent: 'İçe aktar', on: {click: importProject}}));
+    const na = db.projects.filter(p => p.archived).length;
+    top.append(el('h1', {textContent: showArch ? 'Arşiv' : 'Proje Takip'}),
+      showArch ? el('button', {textContent: '← Projeler', on: {click: () => { showArch = false; render(); }}})
+        : el('button', {className: 'pri', textContent: '+ Yeni proje', on: {click: newProject}}),
+      !showArch && na ? el('button', {textContent: '📦 Arşiv (' + na + ')', on: {click: () => { showArch = true; render(); }}}) : '',
+      showArch ? '' : el('button', {textContent: 'İçe aktar', on: {click: importProject}}), themeBtn);
   } else {
     top.append(el('button', {textContent: '← Ana sayfa', on: {click: home}}),
       el('h1', {textContent: cur().name, style: 'margin-left:8px'}),
-      el('button', {textContent: 'Dışa aktar', on: {click: exportProject}}));
+      el('button', {textContent: 'Dışa aktar', on: {click: exportProject}}), themeBtn);
   }
+}
+
+// Bu hafta bitmesi gerekenler + gecikenler (arşivlenmemiş projelerden)
+function upcoming() {
+  const lim = iso(new Date(Date.now() + 7 * 864e5)), out = [];
+  db.projects.filter(p => !p.archived).forEach(p => allTasks(p).forEach(({t}) => { if (!t.done && t.due && t.due <= lim) out.push({t, p}); }));
+  return out.sort((a, b) => a.t.due < b.t.due ? -1 : a.t.due > b.t.due ? 1 : 0);
 }
 
 function renderHome() {
   const app = $('#app');
-  const all = db.projects.flatMap(p => p.phases.flatMap(tasksOf)), t = stat(all);
-  const done = db.projects.filter(p => { const s = projStat(p); return s.n && s.d === s.n; }).length;
-  app.append(el('div', {className: 'stats'},
-    ...[[db.projects.length, 'proje'], [done, 'tamamlanan proje'], [t.d + ' / ' + t.n, 'görev tamamlandı'], ['%' + t.pct, 'genel ilerleme']]
-      .map(([v, l]) => el('div', {}, el('b', {textContent: v}), el('span', {textContent: l})))));
+  const act = db.projects.filter(p => !p.archived);
+  const all = act.flatMap(p => p.phases.flatMap(tasksOf)), t = stat(all);
+  const done = act.filter(p => { const s = projStat(p); return s.n && s.d === s.n; }).length;
+  if (!showArch) {
+    app.append(el('div', {className: 'stats'},
+      ...[[act.length, 'proje'], [done, 'tamamlanan proje'], [t.d + ' / ' + t.n, 'görev tamamlandı'], ['%' + t.pct, 'genel ilerleme']]
+        .map(([v, l]) => el('div', {}, el('b', {textContent: v}), el('span', {textContent: l})))));
+    const up = upcoming();
+    if (up.length) {
+      const box = el('div', {className: 'sum'}, el('b', {textContent: 'Bu hafta ve geciken işler', style: 'font-size:16px;color:var(--ink)'}));
+      up.slice(0, 12).forEach(({t, p}) => box.append(el('div', {className: 'up', on: {click: () => open(p.id)}},
+        el('span', {className: 'chip' + (isLate(t) ? ' late' : ''), textContent: '📅 ' + fmt(t.due) + (isLate(t) ? ' · gecikti' : '')}),
+        el('span', {className: 'ut', textContent: t.t}), el('small', {className: 'mut', textContent: p.name}))));
+      if (up.length > 12) box.append(el('small', {className: 'mut', textContent: '+ ' + (up.length - 12) + ' iş daha'}));
+      app.append(box);
+    }
+  }
   const grid = el('div', {className: 'grid'});
   db.projects.forEach((p, i) => {
+    if (!!p.archived !== showArch) return;
     const s = projStat(p);
     const card = el('div', {className: 'card', on: {click: () => open(p.id)}},
       el('div', {className: 'top'},
         el('span', {className: 'ttl', textContent: p.name}),
         ic('✎', 'Yeniden adlandır', e => { e.stopPropagation(); rename(p, 'name', 'Proje adı'); }),
         ic('⧉', 'Kopyala', e => { e.stopPropagation(); const c = normalize(p); c.name = p.name + ' (kopya)'; db.projects.splice(i + 1, 0, c); save(); render(); }),
-        ic('×', 'Sil', e => { e.stopPropagation(); if (confirm('"' + p.name + '" silinsin mi?')) { db.projects.splice(i, 1); if (!db.projects.length) db.projects.push(fromTemplate(TEMPLATES[0])); db.cur = db.projects[0].id; save(); render(); } }, 'del')),
+        ic('📦', p.archived ? 'Arşivden çıkar' : 'Arşivle', e => { e.stopPropagation(); toggleArchive(p); }),
+        ic('×', 'Sil', e => { e.stopPropagation(); delProject(p); }, 'del')),
       el('div', {}, el('span', {className: 'pct', textContent: '%' + s.pct}), el('small', {textContent: '  ' + s.d + '/' + s.n + ' görev · ' + p.phases.length + ' başlık'})),
       bar(s.pct));
     card.prepend(grip(db.projects, i, () => card));
     card.firstChild.style.alignSelf = 'flex-start';
     grid.append(dropZone(card, db.projects, i));
   });
-  grid.append(el('div', {className: 'card add', textContent: '+ Yeni proje', on: {click: newProject}}));
+  if (!showArch) grid.append(el('div', {className: 'card add', textContent: '+ Yeni proje', on: {click: newProject}}));
+  else if (!grid.children.length) grid.append(el('div', {className: 'empty', textContent: 'Arşivde proje yok.'}));
   app.append(grid);
+}
+
+function filterBar(p) {
+  const all = allTasks(p).map(x => x.t);
+  const tags = [...new Set(all.flatMap(t => t.tags || []))].sort(), whos = [...new Set(all.map(t => t.who).filter(Boolean))].sort();
+  if (!tags.includes(flt.tag)) flt.tag = '';
+  if (!whos.includes(flt.who)) flt.who = '';
+  if (!all.some(t => t.pri) && !tags.length && !whos.length) { flt.pri = ''; return ''; }
+  const sel = (key, ph, opts) => {
+    const s = el('select', {on: {change: e => { flt[key] = e.target.value; render(); }}}, el('option', {value: '', textContent: ph}), ...opts.map(([v, l]) => el('option', {value: v, textContent: l})));
+    s.value = flt[key]; return s;
+  };
+  return el('div', {className: 'flt'}, sel('pri', 'Tüm öncelikler', Object.entries(PRI)), sel('tag', 'Tüm etiketler', tags.map(x => [x, '#' + x])), sel('who', 'Tüm kişiler', whos.map(x => [x, x])),
+    flt.pri || flt.tag || flt.who ? el('button', {textContent: 'Filtreyi temizle', on: {click: () => { flt.pri = flt.tag = flt.who = ''; render(); }}}) : '');
+}
+
+function renderKanban(p) {
+  const cols = [['todo', 'Yapılacak'], ['doing', 'Sürüyor'], ['done', 'Bitti']];
+  const items = allTasks(p).filter(x => pass(x.t)), wrap = el('div', {className: 'kan'});
+  const go = (t, k) => { setStatus(t, k); save(); render(); };
+  cols.forEach(([k, label], ci) => {
+    const list = items.filter(x => colOf(x.t) === k), col = el('div', {className: 'kcol'}, el('h3', {textContent: label + ' · ' + list.length}));
+    list.forEach(({t, ph, sb}) => col.append(el('div', {className: 'kc' + (t.done ? ' d' : '')},
+      el('div', {className: 'kt', textContent: t.t}), el('small', {className: 'mut', textContent: ph.name + ' › ' + sb.name}),
+      t.note ? el('div', {className: 'note', textContent: t.note}) : '', chipsOf(t),
+      el('div', {className: 'ka'},
+        ic('◀', 'Geri', () => go(t, cols[ci - 1][0]), '', ci === 0),
+        ic('✎', 'Ayrıntılar', () => taskDlg(t)),
+        ic('▶', 'İleri', () => go(t, cols[ci + 1][0]), '', ci === 2)))));
+    wrap.append(col);
+  });
+  $('#app').append(wrap);
+}
+
+const cal = (d => ({y: d.getFullYear(), m: d.getMonth()}))(new Date());
+function renderCal(p) {
+  const shift = n => { cal.m += n; if (cal.m < 0) { cal.m = 11; cal.y--; } if (cal.m > 11) { cal.m = 0; cal.y++; } render(); };
+  const items = allTasks(p).map(x => x.t).filter(pass), by = {};
+  items.filter(t => t.due).forEach(t => (by[t.due] = by[t.due] || []).push(t));
+  const g = el('div', {className: 'calg'});
+  ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].forEach(w => g.append(el('div', {className: 'cwd', textContent: w})));
+  const off = (new Date(cal.y, cal.m, 1).getDay() + 6) % 7, days = new Date(cal.y, cal.m + 1, 0).getDate();
+  for (let i = 0; i < off; i++) g.append(el('div'));
+  for (let d = 1; d <= days; d++) {
+    const key = cal.y + '-' + pad(cal.m + 1) + '-' + pad(d);
+    g.append(el('div', {className: 'cd' + (key === today() ? ' today' : '')}, el('span', {className: 'dn', textContent: d}),
+      ...(by[key] || []).map(t => el('div', {className: 'ct' + (t.pri ? ' p-' + t.pri : '') + (t.done ? ' d' : '') + (isLate(t) ? ' late' : ''),
+        title: [t.t, t.who && 'Sorumlu: ' + t.who, t.pri && 'Öncelik: ' + PRI[t.pri], 'Durum: ' + COLS[colOf(t)], t.note, (t.tags || []).length && 'Etiket: ' + t.tags.join(', ')].filter(Boolean).join('\n'),
+        on: {click: () => taskDlg(t)}},
+        el('div', {textContent: t.t}),
+        t.who ? el('small', {textContent: '👤 ' + t.who}) : '',
+        el('small', {textContent: COLS[colOf(t)] + ((t.tags || []).length ? ' · ' + t.tags.map(x => '#' + x).join(' ') : '')})))));
+  }
+  const undated = items.filter(t => !t.due && !t.done);
+  $('#app').append(el('div', {className: 'calnav'},
+    ic('◀', 'Önceki ay', () => shift(-1)),
+    el('b', {textContent: new Date(cal.y, cal.m, 1).toLocaleDateString('tr-TR', {month: 'long', year: 'numeric'})}),
+    el('button', {textContent: 'Bugün', on: {click: () => { const n = new Date(); cal.y = n.getFullYear(); cal.m = n.getMonth(); render(); }}}),
+    ic('▶', 'Sonraki ay', () => shift(1))),
+    el('div', {className: 'calw'}, g),
+    undated.length ? el('div', {className: 'sum', style: 'margin-top:12px'}, el('b', {textContent: 'Tarihsiz açık görevler (' + undated.length + ')', style: 'font-size:15px;color:var(--ink)'}),
+      ...undated.map(t => el('div', {className: 'up', on: {click: () => taskDlg(t)}}, el('span', {className: 'ut', textContent: t.t}), chipsOf(t)))) : '');
 }
 
 function render() {
   const app = $('#app'); app.replaceChildren();
   renderHeader();
+  $('main').style.maxWidth = view === 'project' && mode !== 'list' ? '1100px' : '';
   if (view === 'home') return renderHome();
   const p = cur(), s = projStat(p);
   const setAll = v => { p.phases.forEach(ph => { ph.open = v; ph.subs.forEach(sb => sb.open = v); }); save(); render(); };
@@ -340,26 +575,32 @@ function render() {
     el('div', {}, el('b', {textContent: s.pct + '%'}), el('small', {textContent: '  ' + s.d + ' / ' + s.n + ' görev tamamlandı'})),
     bar(s.pct),
     el('div', {className: 'tools'},
-      el('button', {textContent: 'Tümünü aç', on: {click: () => setAll(true)}}),
-      el('button', {textContent: 'Tümünü kapat', on: {click: () => setAll(false)}}),
+      mode === 'list' ? el('button', {textContent: 'Tümünü aç', on: {click: () => setAll(true)}}) : '',
+      mode === 'list' ? el('button', {textContent: 'Tümünü kapat', on: {click: () => setAll(false)}}) : '',
       el('button', {textContent: 'Projeyi adlandır', on: {click: () => rename(p, 'name', 'Proje adı')}}),
-      el('button', {textContent: 'Projeyi sil', on: {click: () => { if (confirm('Bu proje silinsin mi?')) { db.projects = db.projects.filter(x => x !== p); if (!db.projects.length) db.projects.push(fromTemplate(TEMPLATES[0])); db.cur = db.projects[0].id; view = 'home'; save(); render(); } }}}))));
+      el('button', {textContent: 'Arşivle', on: {click: () => toggleArchive(p)}}),
+      el('button', {textContent: 'Projeyi sil', on: {click: () => delProject(p)}}))));
+
+  app.append(el('div', {className: 'tabs'}, ...[['list', '☰ Liste'], ['kan', '▥ Kanban'], ['cal', '▦ Takvim']]
+    .map(([k, l]) => el('button', {className: mode === k ? 'pri' : '', textContent: l, on: {click: () => { mode = k; render(); }}}))), filterBar(p));
+  if (mode === 'kan') return renderKanban(p);
+  if (mode === 'cal') return renderCal(p);
 
   if (!p.phases.length) app.append(el('div', {className: 'empty', textContent: 'Henüz başlık yok. Aşağıdan ekle ya da "Yeni proje" ile bir şablon seç.'}));
 
   p.phases.forEach((ph, pi) => {
-    const box = el('section', {className: 'ph'}, head(ph, p.phases, pi, stat(tasksOf(ph)), 'Başlık adı', 'Bu başlık ve içindeki her şey silinsin mi?'), bar(stat(tasksOf(ph)).pct));
+    const box = el('section', {className: 'ph'}, head(ph, p.phases, pi, stat(tasksOf(ph)), 'Başlık adı', 'Başlık silindi'), bar(stat(tasksOf(ph)).pct));
     if (ph.open) {
       ph.subs.forEach((sb, si) => {
         const inp = el('input', {type: 'text', placeholder: 'Yeni görev ekle…'});
         const add = () => { const v = inp.value.trim(); if (v) { sb.tasks.push(mk(v)); save(); render(); } };
         inp.addEventListener('keydown', e => { if (e.key === 'Enter') add(); });
-        const sbox = el('div', {className: 'sb'}, head(sb, ph.subs, si, stat(sb.tasks), 'Alt başlık adı', 'Bu alt başlık silinsin mi?'), bar(stat(sb.tasks).pct));
+        const sbox = el('div', {className: 'sb'}, head(sb, ph.subs, si, stat(sb.tasks), 'Alt başlık adı', 'Alt başlık silindi'), bar(stat(sb.tasks).pct));
         if (sb.open) {
-          sb.tasks.forEach((t, ti) => sbox.append(taskRow(t, sb.tasks, ti)));
+          sb.tasks.forEach((t, ti) => { if (pass(t)) sbox.append(taskRow(t, sb.tasks, ti)); });
           sbox.append(el('div', {className: 'add'}, inp, el('button', {textContent: 'Ekle', on: {click: add}})));
         }
-        box.append(sbox);
+        box.append(dropTasks(sbox, sb));
       });
       box.append(el('div', {className: 'tools'}, el('button', {textContent: '+ Alt başlık', on: {click: () => ask('Alt başlık adı', '', n => { ph.subs.push({id: uid(), name: n, open: true, tasks: []}); save(); render(); })}})));
     }
@@ -386,7 +627,7 @@ function ask(label, def, cb) {
   inp.focus(); inp.select();
 }
 $('#dlgX').onclick = () => dlg.close();
-const addProject = p => { collapse(p); db.projects.push(p); db.cur = p.id; view = 'project'; save(); render(); };
+const addProject = p => { collapse(p); db.projects.push(p); db.cur = p.id; view = 'project'; mode = 'list'; flt.pri = flt.tag = flt.who = ''; save(); render(); };
 
 function newProject() {
   const list = el('div', {});
@@ -408,6 +649,7 @@ function importProject() {
   });
 };
 
+applyTheme();
 render();
 </script>
 </body>
