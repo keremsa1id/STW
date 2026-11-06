@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proje Takip</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#1c2230;--mut:#6b7385;--line:#e3e6ec;--acc:#3b6df0;--ok:#22a06b;--sub:#f2f4f8}
+@media(prefers-color-scheme:dark){:root{--bg:#12151c;--card:#1a1f2a;--ink:#e8ebf2;--mut:#8f98ab;--line:#2a3140;--acc:#6b93ff;--ok:#3ec48c;--sub:#212837}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:800px;margin:0 auto;padding:20px 16px 80px}
+header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px}
+h1{font-size:20px;margin:0 auto 0 0}
+button,select,input,textarea{font:inherit;color:inherit}
+button,select{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover:not(:disabled){border-color:var(--acc)}
+button:disabled{opacity:.3;cursor:default}
+button.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+input[type=text],textarea{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 10px;width:100%}
+.bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--ok);width:0;transition:width .25s}
+.sum{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+.sum b{font-size:28px}
+.sum small,.mut{color:var(--mut)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.ph{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.hd{display:flex;gap:4px;align-items:center}
+.hd .nm{flex:1;cursor:pointer;font-weight:600;word-break:break-word;padding:2px 4px}
+.hd em{font-style:normal;color:var(--mut);font-size:13px;margin:0 6px;white-space:nowrap}
+.ic{border:0;background:none;color:var(--mut);padding:2px 6px;font-size:15px;line-height:1;border-radius:6px}
+.ic:hover:not(:disabled){color:var(--acc);background:var(--sub)}
+.ic.del:hover:not(:disabled){color:#e5484d}
+.grip{cursor:grab;user-select:none;touch-action:none;padding:2px 6px;color:var(--mut);font-size:15px;line-height:1;flex:none}
+.grip:active{cursor:grabbing}
+.over{outline:2px dashed var(--acc);outline-offset:1px;border-radius:6px}
+.ph>.hd .nm{font-size:16px}
+.ph>.bar{margin:8px 0 4px}
+.sb{background:var(--sub);border-radius:10px;padding:8px 12px;margin-top:10px}
+.sb .bar{height:5px;margin:6px 0 4px}
+.sb .hd .nm{font-size:14px}
+.t{display:flex;gap:8px;align-items:flex-start;padding:3px 0}
+.t input{margin-top:4px;width:18px;height:18px;accent-color:var(--ok);flex:none}
+.t label{flex:1;cursor:pointer;word-break:break-word}
+.t.d label{color:var(--mut);text-decoration:line-through}
+.add{display:flex;gap:8px;margin-top:6px}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(600px,92vw)}
+dialog textarea{height:260px;font-family:ui-monospace,monospace;font-size:13px}
+.row{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+.empty{color:var(--mut);text-align:center;padding:30px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:8px}
+.card:hover{border-color:var(--acc)}
+.card .top{display:flex;align-items:center;gap:2px}
+.card .ttl{flex:1;font-weight:600;font-size:16px;word-break:break-word}
+.card .pct{font-size:26px;font-weight:700}
+.card small{color:var(--mut)}
+.card.add{align-items:center;justify-content:center;color:var(--acc);border-style:dashed;min-height:120px;font-weight:600}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.stats div{flex:1;min-width:110px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.stats b{display:block;font-size:24px}
+.stats span{color:var(--mut);font-size:13px}
+.tpl{display:block;width:100%;text-align:left;margin-bottom:8px;padding:10px 14px}
+.tpl b{display:block}
+.tpl span{color:var(--mut);font-size:13px}
+</style>
+</head>
+<body>
+<main>
+<header id="top"></header>
+<div id="app"></div>
+</main>
+
+<dialog id="dlg">
+  <p id="dlgT" style="margin:0 0 8px;font-weight:600"></p>
+  <div id="dlgB"></div>
+  <div class="row"><button id="dlgX">Kapat</button><button id="dlgOk" class="pri">Tamam</button></div>
+</dialog>
+
+<script>
+const KEY = 'proje-takip-v2', OLD = 'proje-takip-v1';
+const $ = s => document.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2, 9);
+
+/* ---------- Hazır şablonlar: [aşama, [[alt başlık, [görevler]]]] ---------- */
+const TEMPLATES = [
+  {name: 'Mobil Oyun', desc: 'Fikirden mağaza yayınına, prototip ve canlı operasyon dahil', data: [
+    ['Konsept ve Tasarım', [
+      ['Oyun Vizyonu', ['Tek cümlelik oyun fikrini ve hedef kitleyi tanımla', 'Rakip ve referans oyunları analiz et', 'Monetizasyon modelini belirle']],
+      ['Oyun Tasarım Dokümanı', ['Çekirdek oyun döngüsünü yaz', 'Kontrol ve kamera şemasını çiz', 'İlerleme ve zorluk eğrisini planla']]]],
+    ['Prototip', [
+      ['Teknik Altyapı', ['Oyun motoru ve proje yapısını kur', 'Sürüm kontrolü ve yedekleme düzenini oluştur', 'Hedef cihazlarda performans bütçesini belirle']],
+      ['Çekirdek Mekanik', ['Oyuncu hareketi ve kontrolleri', 'Temel engel/düşman davranışları', 'İlk oynanabilir sahne']]]],
+    ['Üretim', [
+      ['İçerik', ['Seviye / bölüm tasarımları', 'Karakter, çevre ve arayüz görselleri', 'Müzik ve ses efektleri']],
+      ['Sistemler', ['Puan, can ve ödül sistemi', 'Menü, ayarlar ve kayıt sistemi', 'Reklam ve uygulama içi satın alma entegrasyonu']]]],
+    ['Test ve Cila', [
+      ['Kalite Güvencesi', ['Hata kayıtlarını topla ve önceliklendir', 'Farklı cihazlarda uyumluluk testi', 'Kapalı beta ile oyuncu geri bildirimi al']],
+      ['Optimizasyon', ['Kare hızı ve bellek profili', 'Uygulama boyutunu küçült', 'Açılış süresini iyileştir']]]],
+    ['Yayın ve Sonrası', [
+      ['Mağaza Hazırlığı', ['Mağaza açıklaması, ikon ve ekran görüntüleri', 'Gizlilik politikası ve yaş derecelendirmesi', 'Sürüm paketini oluştur ve gönder']],
+      ['Canlı Operasyon', ['Analitik ve çökme raporlarını izle', 'Kullanıcı yorumlarına yanıt ver', 'İlk güncelleme planını çıkar']]]]
+  ]},
+  {name: 'Mobil Uygulama', desc: 'Keşif, tasarım, geliştirme ve mağaza yayını', data: [
+    ['Keşif ve Planlama', [
+      ['Ürün Tanımı', ['Çözülecek problemi ve hedef kullanıcıyı tanımla', 'Rakip uygulamaları incele', 'Kapsam: ilk sürümde olacak özellikleri sınırla']],
+      ['Gereksinimler', ['Kullanıcı hikâyelerini yaz', 'Teknik yığını seç', 'Zaman çizelgesi ve kilometre taşlarını belirle']]]],
+    ['Tasarım', [
+      ['Kullanıcı Deneyimi', ['Kullanıcı akışlarını çiz', 'Tel kafes (wireframe) taslakları', 'Kullanılabilirlik testi yap']],
+      ['Arayüz', ['Renk, tipografi ve bileşen kütüphanesi', 'Ana ekranların yüksek doğruluklu tasarımı', 'Karanlık mod ve erişilebilirlik kontrolü']]]],
+    ['Geliştirme', [
+      ['Altyapı', ['Proje iskeleti ve klasör yapısı', 'Kimlik doğrulama ve kullanıcı verisi', 'API / veri katmanı bağlantısı']],
+      ['Özellikler', ['Ana özellik 1', 'Ana özellik 2', 'Bildirimler ve çevrimdışı çalışma']]]],
+    ['Test', [
+      ['Kalite Güvencesi', ['Birim ve entegrasyon testleri', 'Gerçek cihazlarda manuel test', 'Güvenlik ve gizlilik gözden geçirmesi']],
+      ['Kapalı Beta', ['Test kullanıcılarını belirle', 'Geri bildirim formu hazırla', 'Kritik hataları kapat']]]],
+    ['Yayın', [
+      ['Mağaza Süreci', ['Mağaza listesi ve görselleri', 'Gizlilik politikası ve veri beyanı', 'İncelemeye gönder ve yayınla']],
+      ['Yayın Sonrası', ['Çökme ve kullanım analitiği', 'Kullanıcı geri bildirimi topla', 'Sonraki sürüm planı']]]]
+  ]},
+  {name: 'Web Sitesi / Web Uygulaması', desc: 'Planlama, tasarım, geliştirme ve canlıya alma', data: [
+    ['Planlama', [
+      ['Amaç ve Kapsam', ['Hedefleri ve başarı ölçütlerini yaz', 'Hedef kitleyi ve sayfa yapısını belirle', 'Alan adı ve barındırma kararını ver']],
+      ['İçerik Stratejisi', ['İçerik envanterini çıkar', 'Metin ve görsel sorumlularını ata', 'Arama motoru (SEO) anahtar kelimelerini belirle']]]],
+    ['Tasarım', [
+      ['Sayfa Tasarımı', ['Site haritası ve tel kafesler', 'Ana sayfa ve iç sayfa tasarımı', 'Mobil uyumlu (responsive) düzen']],
+      ['Marka Tutarlılığı', ['Renk ve yazı tipi sistemi', 'Logo ve ikon seti', 'Görsel optimizasyonu']]]],
+    ['Geliştirme', [
+      ['Ön Yüz', ['Sayfa şablonlarını kodla', 'Form ve etkileşimleri ekle', 'Erişilebilirlik kontrolü']],
+      ['Arka Yüz', ['Veri modeli ve API', 'Kimlik doğrulama / yönetim paneli', 'E-posta ve üçüncü taraf entegrasyonları']]]],
+    ['Test ve Optimizasyon', [
+      ['Kalite', ['Tarayıcı ve cihaz uyumluluk testi', 'Bağlantı ve form kontrolleri', 'Güvenlik taraması']],
+      ['Performans ve SEO', ['Sayfa hızı ölçümü ve iyileştirme', 'Meta etiketleri ve site haritası', 'Analitik kurulumu']]]],
+    ['Canlıya Alma', [
+      ['Yayın', ['Alan adı, SSL ve DNS ayarları', 'Canlı ortama dağıtım', 'Yedekleme düzeni']],
+      ['Yayın Sonrası', ['Hata ve trafik izleme', 'İçerik takvimi', 'Bakım ve güncelleme planı']]]]
+  ]},
+  {name: 'Yazılım Ürünü (MVP)', desc: 'Girişim ve ürün ekipleri için ilk sürüm yol haritası', data: [
+    ['Ürün Keşfi', [
+      ['Problem Doğrulama', ['Hedef kullanıcıyla görüşmeler yap', 'Problem ve çözüm hipotezlerini yaz', 'Rakip ve alternatifleri haritala']],
+      ['MVP Kapsamı', ['Olmazsa olmaz özellikleri seç', 'Başarı metriklerini tanımla', 'Kapsam dışı maddeleri açıkça listele']]]],
+    ['Mimari ve Hazırlık', [
+      ['Teknik Tasarım', ['Mimari ve teknoloji seçimi', 'Veri modeli ve API sözleşmeleri', 'Ortam yapısı (geliştirme / test / canlı)']],
+      ['Süreç', ['Sürüm kontrolü ve dal stratejisi', 'Sürekli entegrasyon / dağıtım hattı', 'Görev panosu ve sprint düzeni']]]],
+    ['Geliştirme Sprintleri', [
+      ['Çekirdek Özellikler', ['Kullanıcı yönetimi', 'Ana iş akışı', 'Yönetim ve raporlama ekranları']],
+      ['Kalite', ['Otomatik test kapsamı', 'Kod gözden geçirme düzeni', 'Hata izleme ve günlükleme']]]],
+    ['Pilot ve Geri Bildirim', [
+      ['Pilot Kullanıcılar', ['İlk kullanıcı grubunu belirle', 'Kullanım verisini ve geri bildirimi topla', 'Önceliklendirilmiş iyileştirme listesi çıkar']],
+      ['Hazırlık', ['Güvenlik ve yük kontrolü', 'Kullanım koşulları ve gizlilik metni', 'Destek kanalını kur']]]],
+    ['Lansman', [
+      ['Duyuru', ['Tanıtım sayfası ve duyuru metni', 'İlk müşteri iletişimleri', 'Fiyatlandırma kararı']],
+      ['Sonraki Adımlar', ['Metrik panosunu izle', 'Haftalık ürün gözden geçirmesi', 'Bir sonraki çeyrek yol haritası']]]]
+  ]},
+  {name: 'Kurumsal Proje Yönetimi', desc: 'Her sektöre uyarlanabilir klasik proje yaşam döngüsü', data: [
+    ['Başlatma', [
+      ['Proje Tanımı', ['Amaç, kapsam ve beklenen çıktıları yaz', 'Paydaşları ve sponsoru belirle', 'Proje yetki belgesini (charter) onaylat']],
+      ['Fizibilite', ['Bütçe ve kaynak tahmini', 'Ön risk değerlendirmesi', 'Başarı ölçütlerini netleştir']]]],
+    ['Planlama', [
+      ['Kapsam ve Zaman', ['İş kırılım yapısını (WBS) oluştur', 'Takvim ve kilometre taşlarını belirle', 'Bağımlılıkları ve kritik yolu işaretle']],
+      ['Yönetim Planları', ['Risk ve değişiklik yönetimi planı', 'İletişim planı ve toplantı düzeni', 'Rol ve sorumluluk matrisi']]]],
+    ['Yürütme', [
+      ['Uygulama', ['İşleri ekibe ata ve başlat', 'Haftalık ilerleme toplantıları', 'Teslimatları kayıt altına al']],
+      ['Takip ve Kontrol', ['Bütçe ve takvim sapmalarını izle', 'Risk kaydını güncelle', 'Paydaşlara düzenli durum raporu gönder']]]],
+    ['Kapanış', [
+      ['Teslim', ['Çıktıları müşteriye / sponsora teslim et', 'Kabul onayını al', 'Sözleşme ve ödemeleri kapat']],
+      ['Öğrenilen Dersler', ['Kapanış toplantısı yap', 'Dersleri belgele', 'Arşivle ve ekibi serbest bırak']]]]
+  ]},
+  {name: 'Pazarlama Kampanyası', desc: 'Strateji, içerik üretimi, yayın ve ölçümleme', data: [
+    ['Strateji', [
+      ['Hedef ve Kitle', ['Kampanya hedefini ve ölçülebilir göstergeleri yaz', 'Hedef kitle ve kişilik (persona) tanımı', 'Ana mesaj ve konumlandırma']],
+      ['Plan', ['Kanal seçimi ve bütçe dağılımı', 'Yayın takvimi', 'Sorumluluk dağılımı']]]],
+    ['İçerik Üretimi', [
+      ['Metin ve Görsel', ['Slogan ve ana metinler', 'Görsel / video üretimi', 'Açılış sayfası']],
+      ['Onay', ['İç gözden geçirme', 'Marka ve hukuk onayı', 'Son dosyaların teslimi']]]],
+    ['Yayın', [
+      ['Kanallar', ['Sosyal medya paylaşımları', 'E-posta gönderimi', 'Reklam kampanyalarını başlat']],
+      ['İşbirlikleri', ['Etkileyici / ortak iletişimleri', 'Basın bülteni', 'Topluluk etkileşimi']]]],
+    ['Ölçümleme', [
+      ['Analiz', ['Metrikleri haftalık topla', 'Hedeflerle karşılaştır', 'A/B test sonuçlarını değerlendir']],
+      ['Raporlama', ['Kampanya sonuç raporu', 'Öğrenilenler ve öneriler', 'Bir sonraki kampanyaya girdi hazırla']]]]
+  ]}
+];
+
+const mk = (t, done) => ({id: uid(), t, done: !!done});
+function fromTemplate(tpl, name) {
+  return {id: uid(), name: name || tpl.name, phases: tpl.data.map(([pn, subs]) => ({
+    id: uid(), name: pn, open: true,
+    subs: subs.map(([sn, ts]) => ({id: uid(), name: sn, open: true, tasks: ts.map(t => mk(t))}))
+  }))};
+}
+
+/* ---------- Veri ---------- */
+// Eski ve yeni biçimleri (aşama > alt başlık > görev) ortak yapıya çevirir
+function normalize(o) {
+  const ph = Array.isArray(o.phases) ? o.phases : Array.isArray(o.asamalar) ? o.asamalar : [];
+  const task = t => typeof t === 'string' ? mk(t) : mk(String(t.t || t.gorev || t.name || ''), t.done || t.bitti);
+  return {id: uid(), name: String(o.name || o.ad || 'İsimsiz proje'), phases: ph.map(p => {
+    const subs = p.subs || p.altbasliklar;
+    return {id: uid(), name: String(p.name || p.ad || 'Başlık'), open: true,
+      subs: Array.isArray(subs)
+        ? subs.map(s => ({id: uid(), name: String(s.name || s.ad || 'Alt başlık'), open: true, tasks: (s.tasks || s.gorevler || []).map(task)}))
+        : [{id: uid(), name: 'Görevler', open: true, tasks: (p.tasks || p.gorevler || []).map(task)}]};
+  })};
+}
+
+let db = null;
+try { db = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+if (!db) {
+  try { const old = JSON.parse(localStorage.getItem(OLD)); if (old && old.projects) { db = {projects: old.projects.map(normalize)}; db.cur = db.projects[0].id; } } catch (e) {}
+}
+if (!db || !db.projects || !db.projects.length) { const s = fromTemplate(TEMPLATES[0]); db = {cur: s.id, projects: [s]}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} };
+const cur = () => db.projects.find(p => p.id === db.cur) || db.projects[0];
+const tasksOf = x => x.subs ? x.subs.flatMap(s => s.tasks) : x.tasks;
+const stat = ts => { const n = ts.length, d = ts.filter(x => x.done).length; return {n, d, pct: n ? Math.round(d * 100 / n) : 0}; };
+const move = (arr, i, d) => { const j = i + d; if (j < 0 || j >= arr.length) return; [arr[i], arr[j]] = [arr[j], arr[i]]; save(); render(); };
+const rename = (obj, key, label) => ask(label, obj[key], n => { obj[key] = n; save(); render(); });
+
+/* ---------- Arayüz ---------- */
+function el(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const k in attrs || {}) {
+    if (k === 'on') for (const ev in attrs.on) e.addEventListener(ev, attrs.on[ev]);
+    else if (k in e) e[k] = attrs[k]; else e.setAttribute(k, attrs[k]);
+  }
+  kids.flat().forEach(c => e.append(c));
+  return e;
+}
+const ic = (txt, title, fn, cls, dis) => el('button', {className: 'ic ' + (cls || ''), textContent: txt, title, disabled: !!dis, on: {click: fn}});
+const bar = pct => el('div', {className: 'bar'}, el('i', {style: 'width:' + pct + '%'}));
+
+// Başlık satırı: aç/kapat, ad, sayaç, sırala, düzenle, sil
+// Sürükle-bırak: tutamaçtan (⠿) basılı tutup taşı, başka satırın üstüne bırak
+let drag = null;
+function grip(arr, i, getBox) {
+  return el('span', {className: 'grip', textContent: '⠿', title: 'Basılı tutup sürükle', draggable: true, on: {
+    click: e => e.stopPropagation(),
+    dragstart: e => { e.stopPropagation(); drag = {arr, i}; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'x'); const b = getBox(); if (b) e.dataTransfer.setDragImage(b, 10, 10); },
+    dragend: () => { drag = null; document.querySelectorAll('.over').forEach(n => n.classList.remove('over')); }}});
+}
+function dropZone(row, arr, i) {
+  const ok = () => drag && drag.arr === arr;
+  row.addEventListener('dragover', e => { if (ok()) { e.preventDefault(); e.stopPropagation(); row.classList.add('over'); } });
+  row.addEventListener('dragleave', () => row.classList.remove('over'));
+  row.addEventListener('drop', e => {
+    if (!ok()) return; e.preventDefault(); e.stopPropagation();
+    const from = drag.i; drag = null;
+    if (from !== i) { const [x] = arr.splice(from, 1); arr.splice(i, 0, x); save(); }
+    render();
+  });
+  return row;
+}
+
+function head(obj, arr, i, st, nameLabel, delMsg) {
+  const hd = el('div', {className: 'hd'},
+    grip(arr, i, () => hd.closest('section.ph, .sb')),
+    ic(obj.open ? '▾' : '▸', obj.open ? 'Kapat' : 'Aç', () => { obj.open = !obj.open; save(); render(); }),
+    el('span', {className: 'nm', textContent: obj.name, title: 'Aç / kapat', on: {click: () => { obj.open = !obj.open; save(); render(); }}}),
+    el('em', {textContent: st.d + '/' + st.n + ' · %' + st.pct}),
+    ic('✎', 'Yeniden adlandır', () => rename(obj, 'name', nameLabel)),
+    ic('×', 'Sil', () => { if (confirm(delMsg)) { arr.splice(i, 1); save(); render(); } }, 'del'));
+  return dropZone(hd, arr, i);
+}
+
+function taskRow(t, arr, i) {
+  const row = el('div', {className: 't' + (t.done ? ' d' : '')},
+    grip(arr, i, () => row),
+    el('input', {type: 'checkbox', id: t.id, checked: t.done, on: {change: e => { t.done = e.target.checked; save(); render(); }}}),
+    el('label', {htmlFor: t.id, textContent: t.t, title: 'Düzenlemek için çift tıkla', on: {dblclick: e => { e.preventDefault(); rename(t, 't', 'Görev'); }}}),
+    ic('×', 'Sil', () => { arr.splice(i, 1); save(); render(); }, 'del'));
+  return dropZone(row, arr, i);
+}
+
+let view = 'home';
+const open = id => { db.cur = id; view = 'project'; save(); render(); };
+const home = () => { view = 'home'; render(); };
+const projStat = p => stat(p.phases.flatMap(tasksOf));
+
+function renderHeader() {
+  const top = $('#top'); top.replaceChildren();
+  if (view === 'home') {
+    top.append(el('h1', {textContent: 'Proje Takip'}),
+      el('button', {className: 'pri', textContent: '+ Yeni proje', on: {click: newProject}}),
+      el('button', {textContent: 'İçe aktar', on: {click: importProject}}));
+  } else {
+    top.append(el('button', {textContent: '← Ana sayfa', on: {click: home}}),
+      el('h1', {textContent: cur().name, style: 'margin-left:8px'}),
+      el('button', {textContent: 'Dışa aktar', on: {click: exportProject}}));
+  }
+}
+
+function renderHome() {
+  const app = $('#app');
+  const all = db.projects.flatMap(p => p.phases.flatMap(tasksOf)), t = stat(all);
+  const done = db.projects.filter(p => { const s = projStat(p); return s.n && s.d === s.n; }).length;
+  app.append(el('div', {className: 'stats'},
+    ...[[db.projects.length, 'proje'], [done, 'tamamlanan proje'], [t.d + ' / ' + t.n, 'görev tamamlandı'], ['%' + t.pct, 'genel ilerleme']]
+      .map(([v, l]) => el('div', {}, el('b', {textContent: v}), el('span', {textContent: l})))));
+  const grid = el('div', {className: 'grid'});
+  db.projects.forEach((p, i) => {
+    const s = projStat(p);
+    const card = el('div', {className: 'card', on: {click: () => open(p.id)}},
+      el('div', {className: 'top'},
+        el('span', {className: 'ttl', textContent: p.name}),
+        ic('✎', 'Yeniden adlandır', e => { e.stopPropagation(); rename(p, 'name', 'Proje adı'); }),
+        ic('⧉', 'Kopyala', e => { e.stopPropagation(); const c = normalize(p); c.name = p.name + ' (kopya)'; db.projects.splice(i + 1, 0, c); save(); render(); }),
+        ic('×', 'Sil', e => { e.stopPropagation(); if (confirm('"' + p.name + '" silinsin mi?')) { db.projects.splice(i, 1); if (!db.projects.length) db.projects.push(fromTemplate(TEMPLATES[0])); db.cur = db.projects[0].id; save(); render(); } }, 'del')),
+      el('div', {}, el('span', {className: 'pct', textContent: '%' + s.pct}), el('small', {textContent: '  ' + s.d + '/' + s.n + ' görev · ' + p.phases.length + ' başlık'})),
+      bar(s.pct));
+    card.prepend(grip(db.projects, i, () => card));
+    card.firstChild.style.alignSelf = 'flex-start';
+    grid.append(dropZone(card, db.projects, i));
+  });
+  grid.append(el('div', {className: 'card add', textContent: '+ Yeni proje', on: {click: newProject}}));
+  app.append(grid);
+}
+
+function render() {
+  const app = $('#app'); app.replaceChildren();
+  renderHeader();
+  if (view === 'home') return renderHome();
+  const p = cur(), s = projStat(p);
+  const setAll = v => { p.phases.forEach(ph => { ph.open = v; ph.subs.forEach(sb => sb.open = v); }); save(); render(); };
+
+  app.append(el('div', {className: 'sum'},
+    el('div', {}, el('b', {textContent: s.pct + '%'}), el('small', {textContent: '  ' + s.d + ' / ' + s.n + ' görev tamamlandı'})),
+    bar(s.pct),
+    el('div', {className: 'tools'},
+      el('button', {textContent: 'Tümünü aç', on: {click: () => setAll(true)}}),
+      el('button', {textContent: 'Tümünü kapat', on: {click: () => setAll(false)}}),
+      el('button', {textContent: 'Projeyi adlandır', on: {click: () => rename(p, 'name', 'Proje adı')}}),
+      el('button', {textContent: 'Projeyi sil', on: {click: () => { if (confirm('Bu proje silinsin mi?')) { db.projects = db.projects.filter(x => x !== p); if (!db.projects.length) db.projects.push(fromTemplate(TEMPLATES[0])); db.cur = db.projects[0].id; view = 'home'; save(); render(); } }}}))));
+
+  if (!p.phases.length) app.append(el('div', {className: 'empty', textContent: 'Henüz başlık yok. Aşağıdan ekle ya da "Yeni proje" ile bir şablon seç.'}));
+
+  p.phases.forEach((ph, pi) => {
+    const box = el('section', {className: 'ph'}, head(ph, p.phases, pi, stat(tasksOf(ph)), 'Başlık adı', 'Bu başlık ve içindeki her şey silinsin mi?'), bar(stat(tasksOf(ph)).pct));
+    if (ph.open) {
+      ph.subs.forEach((sb, si) => {
+        const inp = el('input', {type: 'text', placeholder: 'Yeni görev ekle…'});
+        const add = () => { const v = inp.value.trim(); if (v) { sb.tasks.push(mk(v)); save(); render(); } };
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') add(); });
+        const sbox = el('div', {className: 'sb'}, head(sb, ph.subs, si, stat(sb.tasks), 'Alt başlık adı', 'Bu alt başlık silinsin mi?'), bar(stat(sb.tasks).pct));
+        if (sb.open) {
+          sb.tasks.forEach((t, ti) => sbox.append(taskRow(t, sb.tasks, ti)));
+          sbox.append(el('div', {className: 'add'}, inp, el('button', {textContent: 'Ekle', on: {click: add}})));
+        }
+        box.append(sbox);
+      });
+      box.append(el('div', {className: 'tools'}, el('button', {textContent: '+ Alt başlık', on: {click: () => ask('Alt başlık adı', '', n => { ph.subs.push({id: uid(), name: n, open: true, tasks: []}); save(); render(); })}})));
+    }
+    app.append(box);
+  });
+
+  app.append(el('button', {className: 'pri', textContent: '+ Başlık ekle', on: {click: () => ask('Başlık adı', '', n => { p.phases.push({id: uid(), name: n, open: true, subs: [{id: uid(), name: 'Görevler', open: true, tasks: []}]}); save(); render(); })}}));
+}
+
+/* ---------- Pencere ---------- */
+const dlg = $('#dlg');
+function openDlg(title, body, onOk) {
+  $('#dlgT').textContent = title; $('#dlgB').replaceChildren(body);
+  $('#dlgOk').style.display = onOk ? '' : 'none';
+  $('#dlgOk').onclick = () => { if (onOk() !== false) dlg.close(); };
+  if (!dlg.open) dlg.showModal();
+}
+// prompt() bazı ortamlarda (önizleme/iframe) engellendiği için sayfa içi pencere kullan
+function ask(label, def, cb) {
+  const inp = el('input', {type: 'text', value: def || '', placeholder: label});
+  inp.style.width = '100%';
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#dlgOk').click(); } });
+  openDlg(label, inp, () => { const v = inp.value.trim(); if (!v) { inp.focus(); return false; } cb(v); });
+  inp.focus(); inp.select();
+}
+$('#dlgX').onclick = () => dlg.close();
+const addProject = p => { db.projects.push(p); db.cur = p.id; view = 'project'; save(); render(); };
+
+function newProject() {
+  const list = el('div', {});
+  TEMPLATES.forEach(tp => list.append(el('button', {className: 'tpl', on: {click: () => {
+    ask('Proje adı', tp.name, n => addProject(fromTemplate(tp, n)));
+  }}}, el('b', {textContent: tp.name}), el('span', {textContent: tp.desc}))));
+  list.append(el('button', {className: 'tpl', on: {click: () => {
+    ask('Proje adı', '', n => addProject({id: uid(), name: n, phases: []}));
+  }}}, el('b', {textContent: 'Boş proje'}), el('span', {textContent: 'Sıfırdan kendi başlıklarını oluştur'})));
+  openDlg('Şablon seç', list, null);
+}
+
+function exportProject() { const ta = el('textarea', {spellcheck: false, value: JSON.stringify(cur(), null, 2)}); openDlg('Bu projenin yedeği (kopyalayıp sakla)', ta, () => true); }
+function importProject() {
+  const ta = el('textarea', {spellcheck: false, placeholder: 'Claude\'un verdiği ya da daha önce dışa aktardığın JSON metnini buraya yapıştır'});
+  openDlg('Plan içe aktar (JSON)', ta, () => {
+    try { addProject(normalize(JSON.parse(ta.value))); }
+    catch (e) { alert('JSON okunamadı. Metni olduğu gibi yapıştır.'); return false; }
+  });
+};
+
+render();
+</script>
+</body>
+</html>
