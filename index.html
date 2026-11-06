@@ -281,7 +281,11 @@ function taskRow(t, arr, i) {
 }
 
 let view = 'home';
-const open = id => { db.cur = id; view = 'project'; save(); render(); };
+const open = id => {
+  db.cur = id; view = 'project';
+  const p = cur(); p.phases.forEach(ph => { ph.open = false; ph.subs.forEach(sb => sb.open = false); }); // proje kapalı açılsın
+  save(); render();
+};
 const home = () => { view = 'home'; render(); };
 const projStat = p => stat(p.phases.flatMap(tasksOf));
 
