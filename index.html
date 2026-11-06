@@ -281,9 +281,10 @@ function taskRow(t, arr, i) {
 }
 
 let view = 'home';
+const collapse = p => p.phases.forEach(ph => { ph.open = false; ph.subs.forEach(sb => sb.open = false); });
 const open = id => {
   db.cur = id; view = 'project';
-  const p = cur(); p.phases.forEach(ph => { ph.open = false; ph.subs.forEach(sb => sb.open = false); }); // proje kapalı açılsın
+  collapse(cur()); // proje kapalı açılsın
   save(); render();
 };
 const home = () => { view = 'home'; render(); };
@@ -385,7 +386,7 @@ function ask(label, def, cb) {
   inp.focus(); inp.select();
 }
 $('#dlgX').onclick = () => dlg.close();
-const addProject = p => { db.projects.push(p); db.cur = p.id; view = 'project'; save(); render(); };
+const addProject = p => { collapse(p); db.projects.push(p); db.cur = p.id; view = 'project'; save(); render(); };
 
 function newProject() {
   const list = el('div', {});
