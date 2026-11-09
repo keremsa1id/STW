@@ -92,12 +92,15 @@ dialog textarea{height:260px;font-family:ui-monospace,monospace;font-size:13px}
 .empty{color:var(--mut);text-align:center;padding:30px}
 .ph:nth-of-type(5n+2){--pc:var(--c2)}.ph:nth-of-type(5n+3){--pc:var(--c3)}.ph:nth-of-type(5n+4){--pc:var(--c4)}.ph:nth-of-type(5n+5){--pc:var(--c5)}
 .ph>.hd .nm{color:var(--pc)}
-.split{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+.split{display:grid;grid-template-columns:400px minmax(0,1fr);gap:16px;align-items:start}
+.side .ph>.hd{flex-wrap:wrap;row-gap:2px}
+.side .ph>.hd .nm{order:-1;flex:1 0 100%}
+.side .ph>.hd em{margin:0 auto 0 4px}
 .side{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;padding:2px}
 .side .ph.on{box-shadow:0 0 0 1px var(--pc)}
 .dp{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--pc);border-radius:12px;padding:12px 14px;margin-bottom:12px}
 .dp>h3{margin:0 0 4px;font-size:16px;color:var(--pc)}
-@media(max-width:800px){.split{grid-template-columns:1fr}.side{position:static;max-height:none;order:-1}}
+@media(max-width:800px){.split{grid-template-columns:1fr}.side{position:static;max-height:none}}
 .card{--pc:var(--c1);border-top:4px solid var(--pc)!important}
 .card:nth-child(5n+2){--pc:var(--c2)}.card:nth-child(5n+3){--pc:var(--c3)}.card:nth-child(5n+4){--pc:var(--c4)}.card:nth-child(5n+5){--pc:var(--c5)}
 .card .pct{color:var(--pc)}
@@ -599,7 +602,7 @@ function renderCal(p) {
 function render() {
   const app = $('#app'); app.replaceChildren();
   renderHeader();
-  $('main').style.maxWidth = view === 'project' ? '1200px' : '';
+  $('main').style.maxWidth = view === 'project' ? '1800px' : '';
   if (view === 'home') return renderHome();
   const p = cur(), s = projStat(p);
   const setAll = v => { p.phases.forEach(ph => { ph.open = v; ph.subs.forEach(sb => sb.open = v); }); save(); render(); };
@@ -643,10 +646,10 @@ function render() {
       detail.append(box);
     }
   });
-  if (!detail.children.length && p.phases.length) detail.append(el('div', {className: 'empty', textContent: 'Sağdaki listeden bir başlık seç; alt başlık ve görevleri burada açılır.'}));
+  if (!detail.children.length && p.phases.length) detail.append(el('div', {className: 'empty', textContent: 'Soldaki listeden bir başlık seç; alt başlık ve görevleri burada açılır.'}));
 
   side.append(el('button', {className: 'pri', textContent: '+ Başlık ekle', on: {click: () => ask('Başlık adı', '', n => { p.phases.push({id: uid(), name: n, open: true, subs: [{id: uid(), name: 'Görevler', open: true, tasks: []}]}); save(); render(); })}}));
-  app.append(el('div', {className: 'split'}, detail, side));
+  app.append(el('div', {className: 'split'}, side, detail));
 }
 
 /* ---------- Pencere ---------- */
