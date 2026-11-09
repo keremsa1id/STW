@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Proje Takip</title>
+<title>Project Tracker</title>
 <style>
 :root{--bg:#fff;--card:#fff;--ink:#1f2430;--mut:#667085;--line:#e4e7ec;--acc:#3f76ff;--ok:#16a34a;--sub:#f7f8fa;--hov:#eef0f4;--c1:#3f76ff;--c2:#8b5cf6;--c3:#0ea5a4;--c4:#f59e0b;--c5:#ec4899;--bad:#e5484d}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#15171c;--card:#1b1e25;--ink:#e6e8ec;--mut:#8c94a5;--line:#2a2f3a;--acc:#6f97ff;--ok:#3ec48c;--sub:#191c22;--hov:#242832;--c1:#6f97ff;--c2:#a78bfa;--c3:#2dd4bf;--c4:#fbbf24;--c5:#f472b6;color-scheme:dark}}
@@ -22,7 +22,7 @@ input[type=text]:focus,textarea:focus,select:focus{outline:2px solid color-mix(i
 .mut,.sum small{color:var(--mut)}
 .sp{flex:1}
 
-/* --- Kabuk: sol menü + üst çubuk + içerik --- */
+/* --- Shell: sidebar + top bar + content --- */
 #shell{display:flex;min-height:100vh}
 #sbar{width:248px;flex:none;background:var(--sub);border-right:1px solid var(--line);padding:12px 10px;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:100vh;overflow:auto}
 #sbar .brand{display:flex;align-items:center;gap:8px;padding:4px 6px 12px;font-size:15px}
@@ -69,7 +69,7 @@ main{padding:16px 20px 80px}
 .grip:hover{opacity:1}.grip:active{cursor:grabbing}
 .over{outline:2px dashed var(--acc);outline-offset:1px;border-radius:6px}
 
-/* --- Liste: sol başlıklar, sağ ayrıntı --- */
+/* --- List: epics on the left, details on the right --- */
 .split{display:grid;grid-template-columns:320px minmax(0,1fr);gap:20px;align-items:start}
 .side{position:sticky;top:68px;max-height:calc(100vh - 84px);overflow:auto;padding:2px}
 .ph{--pc:var(--c1);background:var(--card);border:1px solid var(--line);border-left:3px solid var(--pc);border-radius:8px;padding:8px 10px;margin-bottom:8px}
@@ -215,7 +215,7 @@ dialog textarea{height:260px;font-family:ui-monospace,monospace;font-size:13px}
 <dialog id="dlg">
   <p id="dlgT" style="margin:0 0 8px;font-weight:600"></p>
   <div id="dlgB"></div>
-  <div class="row"><button id="dlgX">Kapat</button><button id="dlgOk" class="pri">Tamam</button></div>
+  <div class="row"><button id="dlgX">Cancel</button><button id="dlgOk" class="pri">Save</button></div>
 </dialog>
 <div id="toast" hidden></div>
 
@@ -224,134 +224,134 @@ const KEY = 'proje-takip-v2', OLD = 'proje-takip-v1';
 const $ = s => document.querySelector(s);
 const uid = () => Math.random().toString(36).slice(2, 9);
 
-/* ---------- Hazır şablonlar: [aşama, [[alt başlık, [görevler]]]] ---------- */
+/* ---------- Templates: [epic, [[story, [tasks]]]] ---------- */
 const TEMPLATES = [
-  {name: 'Mobil Oyun', desc: 'Fikirden mağaza yayınına, prototip ve canlı operasyon dahil', data: [
-    ['Konsept ve Tasarım', [
-      ['Oyun Vizyonu', ['Tek cümlelik oyun fikrini ve hedef kitleyi tanımla', 'Rakip ve referans oyunları analiz et', 'Monetizasyon modelini belirle']],
-      ['Oyun Tasarım Dokümanı', ['Çekirdek oyun döngüsünü yaz', 'Kontrol ve kamera şemasını çiz', 'İlerleme ve zorluk eğrisini planla']]]],
-    ['Prototip', [
-      ['Teknik Altyapı', ['Oyun motoru ve proje yapısını kur', 'Sürüm kontrolü ve yedekleme düzenini oluştur', 'Hedef cihazlarda performans bütçesini belirle']],
-      ['Çekirdek Mekanik', ['Oyuncu hareketi ve kontrolleri', 'Temel engel/düşman davranışları', 'İlk oynanabilir sahne']]]],
-    ['Üretim', [
-      ['İçerik', ['Seviye / bölüm tasarımları', 'Karakter, çevre ve arayüz görselleri', 'Müzik ve ses efektleri']],
-      ['Sistemler', ['Puan, can ve ödül sistemi', 'Menü, ayarlar ve kayıt sistemi', 'Reklam ve uygulama içi satın alma entegrasyonu']]]],
-    ['Test ve Cila', [
-      ['Kalite Güvencesi', ['Hata kayıtlarını topla ve önceliklendir', 'Farklı cihazlarda uyumluluk testi', 'Kapalı beta ile oyuncu geri bildirimi al']],
-      ['Optimizasyon', ['Kare hızı ve bellek profili', 'Uygulama boyutunu küçült', 'Açılış süresini iyileştir']]]],
-    ['Yayın ve Sonrası', [
-      ['Mağaza Hazırlığı', ['Mağaza açıklaması, ikon ve ekran görüntüleri', 'Gizlilik politikası ve yaş derecelendirmesi', 'Sürüm paketini oluştur ve gönder']],
-      ['Canlı Operasyon', ['Analitik ve çökme raporlarını izle', 'Kullanıcı yorumlarına yanıt ver', 'İlk güncelleme planını çıkar']]]]
+  {name: 'Mobile Game', desc: 'From concept to store launch, including prototype and live operations', data: [
+    ['Concept & Design', [
+      ['Game Vision', ['Define the one-line game concept and target audience', 'Analyze competitor and reference titles', 'Define the monetization model']],
+      ['Game Design Document', ['Write the core gameplay loop', 'Define controls and camera scheme', 'Plan progression and difficulty curve']]]],
+    ['Prototype', [
+      ['Technical Foundation', ['Set up game engine and project structure', 'Establish version control and backup process', 'Define performance budget for target devices']],
+      ['Core Mechanics', ['Implement player movement and controls', 'Implement basic obstacle and enemy behavior', 'Deliver first playable scene']]]],
+    ['Production', [
+      ['Content', ['Design levels and stages', 'Create character, environment and UI art', 'Produce music and sound effects']],
+      ['Systems', ['Implement score, lives and rewards system', 'Implement menu, settings and save system', 'Integrate ads and in-app purchases']]]],
+    ['Testing & Polish', [
+      ['Quality Assurance', ['Collect and prioritize bug reports', 'Run device compatibility testing', 'Gather player feedback through closed beta']],
+      ['Optimization', ['Profile frame rate and memory usage', 'Reduce application size', 'Improve startup time']]]],
+    ['Launch & Live Ops', [
+      ['Store Readiness', ['Prepare store listing, icon and screenshots', 'Finalize privacy policy and age rating', 'Build and submit release package']],
+      ['Live Operations', ['Monitor analytics and crash reports', 'Respond to user reviews', 'Plan the first content update']]]]
   ]},
-  {name: 'Mobil Uygulama', desc: 'Keşif, tasarım, geliştirme ve mağaza yayını', data: [
-    ['Keşif ve Planlama', [
-      ['Ürün Tanımı', ['Çözülecek problemi ve hedef kullanıcıyı tanımla', 'Rakip uygulamaları incele', 'Kapsam: ilk sürümde olacak özellikleri sınırla']],
-      ['Gereksinimler', ['Kullanıcı hikâyelerini yaz', 'Teknik yığını seç', 'Zaman çizelgesi ve kilometre taşlarını belirle']]]],
-    ['Tasarım', [
-      ['Kullanıcı Deneyimi', ['Kullanıcı akışlarını çiz', 'Tel kafes (wireframe) taslakları', 'Kullanılabilirlik testi yap']],
-      ['Arayüz', ['Renk, tipografi ve bileşen kütüphanesi', 'Ana ekranların yüksek doğruluklu tasarımı', 'Karanlık mod ve erişilebilirlik kontrolü']]]],
-    ['Geliştirme', [
-      ['Altyapı', ['Proje iskeleti ve klasör yapısı', 'Kimlik doğrulama ve kullanıcı verisi', 'API / veri katmanı bağlantısı']],
-      ['Özellikler', ['Ana özellik 1', 'Ana özellik 2', 'Bildirimler ve çevrimdışı çalışma']]]],
-    ['Test', [
-      ['Kalite Güvencesi', ['Birim ve entegrasyon testleri', 'Gerçek cihazlarda manuel test', 'Güvenlik ve gizlilik gözden geçirmesi']],
-      ['Kapalı Beta', ['Test kullanıcılarını belirle', 'Geri bildirim formu hazırla', 'Kritik hataları kapat']]]],
-    ['Yayın', [
-      ['Mağaza Süreci', ['Mağaza listesi ve görselleri', 'Gizlilik politikası ve veri beyanı', 'İncelemeye gönder ve yayınla']],
-      ['Yayın Sonrası', ['Çökme ve kullanım analitiği', 'Kullanıcı geri bildirimi topla', 'Sonraki sürüm planı']]]]
+  {name: 'Mobile App', desc: 'Discovery, design, development and store release', data: [
+    ['Discovery & Planning', [
+      ['Product Definition', ['Define the problem to solve and the target user', 'Review competing applications', 'Define scope: limit features for the first release']],
+      ['Requirements', ['Write user stories', 'Select the technology stack', 'Define timeline and milestones']]]],
+    ['Design', [
+      ['User Experience', ['Map user flows', 'Create wireframes', 'Conduct usability testing']],
+      ['User Interface', ['Define color, typography and component library', 'Create high-fidelity designs for key screens', 'Review dark mode and accessibility']]]],
+    ['Development', [
+      ['Foundation', ['Set up project skeleton and folder structure', 'Implement authentication and user data', 'Connect API and data layer']],
+      ['Features', ['Core feature 1', 'Core feature 2', 'Push notifications and offline support']]]],
+    ['Testing', [
+      ['Quality Assurance', ['Write unit and integration tests', 'Run manual tests on real devices', 'Complete security and privacy review']],
+      ['Closed Beta', ['Identify beta testers', 'Prepare feedback form', 'Resolve critical bugs']]]],
+    ['Release', [
+      ['Store Process', ['Prepare store listing and assets', 'Complete privacy policy and data disclosure', 'Submit for review and publish']],
+      ['Post-Release', ['Monitor crash and usage analytics', 'Collect user feedback', 'Plan the next release']]]]
   ]},
-  {name: 'Web Sitesi / Web Uygulaması', desc: 'Planlama, tasarım, geliştirme ve canlıya alma', data: [
-    ['Planlama', [
-      ['Amaç ve Kapsam', ['Hedefleri ve başarı ölçütlerini yaz', 'Hedef kitleyi ve sayfa yapısını belirle', 'Alan adı ve barındırma kararını ver']],
-      ['İçerik Stratejisi', ['İçerik envanterini çıkar', 'Metin ve görsel sorumlularını ata', 'Arama motoru (SEO) anahtar kelimelerini belirle']]]],
-    ['Tasarım', [
-      ['Sayfa Tasarımı', ['Site haritası ve tel kafesler', 'Ana sayfa ve iç sayfa tasarımı', 'Mobil uyumlu (responsive) düzen']],
-      ['Marka Tutarlılığı', ['Renk ve yazı tipi sistemi', 'Logo ve ikon seti', 'Görsel optimizasyonu']]]],
-    ['Geliştirme', [
-      ['Ön Yüz', ['Sayfa şablonlarını kodla', 'Form ve etkileşimleri ekle', 'Erişilebilirlik kontrolü']],
-      ['Arka Yüz', ['Veri modeli ve API', 'Kimlik doğrulama / yönetim paneli', 'E-posta ve üçüncü taraf entegrasyonları']]]],
-    ['Test ve Optimizasyon', [
-      ['Kalite', ['Tarayıcı ve cihaz uyumluluk testi', 'Bağlantı ve form kontrolleri', 'Güvenlik taraması']],
-      ['Performans ve SEO', ['Sayfa hızı ölçümü ve iyileştirme', 'Meta etiketleri ve site haritası', 'Analitik kurulumu']]]],
-    ['Canlıya Alma', [
-      ['Yayın', ['Alan adı, SSL ve DNS ayarları', 'Canlı ortama dağıtım', 'Yedekleme düzeni']],
-      ['Yayın Sonrası', ['Hata ve trafik izleme', 'İçerik takvimi', 'Bakım ve güncelleme planı']]]]
+  {name: 'Website / Web Application', desc: 'Planning, design, development and go-live', data: [
+    ['Planning', [
+      ['Goals & Scope', ['Define goals and success criteria', 'Identify target audience and site structure', 'Decide on domain name and hosting']],
+      ['Content Strategy', ['Create a content inventory', 'Assign copy and visual owners', 'Define SEO keywords']]]],
+    ['Design', [
+      ['Page Design', ['Create sitemap and wireframes', 'Design home page and inner pages', 'Define responsive layouts']],
+      ['Brand Consistency', ['Define color and typography system', 'Create logo and icon set', 'Optimize images']]]],
+    ['Development', [
+      ['Front End', ['Build page templates', 'Add forms and interactions', 'Run accessibility checks']],
+      ['Back End', ['Design data model and API', 'Build authentication and admin panel', 'Integrate email and third-party services']]]],
+    ['Testing & Optimization', [
+      ['Quality', ['Run browser and device compatibility tests', 'Verify links and forms', 'Run security scan']],
+      ['Performance & SEO', ['Measure and improve page speed', 'Configure meta tags and sitemap', 'Set up analytics']]]],
+    ['Go-Live', [
+      ['Launch', ['Configure domain, SSL and DNS', 'Deploy to production', 'Set up backups']],
+      ['Post-Launch', ['Monitor errors and traffic', 'Create content calendar', 'Plan maintenance and updates']]]]
   ]},
-  {name: 'Yazılım Ürünü (MVP)', desc: 'Girişim ve ürün ekipleri için ilk sürüm yol haritası', data: [
-    ['Ürün Keşfi', [
-      ['Problem Doğrulama', ['Hedef kullanıcıyla görüşmeler yap', 'Problem ve çözüm hipotezlerini yaz', 'Rakip ve alternatifleri haritala']],
-      ['MVP Kapsamı', ['Olmazsa olmaz özellikleri seç', 'Başarı metriklerini tanımla', 'Kapsam dışı maddeleri açıkça listele']]]],
-    ['Mimari ve Hazırlık', [
-      ['Teknik Tasarım', ['Mimari ve teknoloji seçimi', 'Veri modeli ve API sözleşmeleri', 'Ortam yapısı (geliştirme / test / canlı)']],
-      ['Süreç', ['Sürüm kontrolü ve dal stratejisi', 'Sürekli entegrasyon / dağıtım hattı', 'Görev panosu ve sprint düzeni']]]],
-    ['Geliştirme Sprintleri', [
-      ['Çekirdek Özellikler', ['Kullanıcı yönetimi', 'Ana iş akışı', 'Yönetim ve raporlama ekranları']],
-      ['Kalite', ['Otomatik test kapsamı', 'Kod gözden geçirme düzeni', 'Hata izleme ve günlükleme']]]],
-    ['Pilot ve Geri Bildirim', [
-      ['Pilot Kullanıcılar', ['İlk kullanıcı grubunu belirle', 'Kullanım verisini ve geri bildirimi topla', 'Önceliklendirilmiş iyileştirme listesi çıkar']],
-      ['Hazırlık', ['Güvenlik ve yük kontrolü', 'Kullanım koşulları ve gizlilik metni', 'Destek kanalını kur']]]],
-    ['Lansman', [
-      ['Duyuru', ['Tanıtım sayfası ve duyuru metni', 'İlk müşteri iletişimleri', 'Fiyatlandırma kararı']],
-      ['Sonraki Adımlar', ['Metrik panosunu izle', 'Haftalık ürün gözden geçirmesi', 'Bir sonraki çeyrek yol haritası']]]]
+  {name: 'Software Product (MVP)', desc: 'First-release roadmap for startups and product teams', data: [
+    ['Product Discovery', [
+      ['Problem Validation', ['Conduct interviews with target users', 'Document problem and solution hypotheses', 'Map competitors and alternatives']],
+      ['MVP Scope', ['Select must-have features', 'Define success metrics', 'List out-of-scope items explicitly']]]],
+    ['Architecture & Setup', [
+      ['Technical Design', ['Select architecture and technology', 'Define data model and API contracts', 'Set up environments (dev / staging / production)']],
+      ['Process', ['Define version control and branching strategy', 'Set up CI/CD pipeline', 'Set up board and sprint cadence']]]],
+    ['Development Sprints', [
+      ['Core Features', ['User management', 'Primary workflow', 'Admin and reporting screens']],
+      ['Quality', ['Automated test coverage', 'Code review process', 'Error tracking and logging']]]],
+    ['Pilot & Feedback', [
+      ['Pilot Users', ['Identify the first user group', 'Collect usage data and feedback', 'Produce a prioritized improvement backlog']],
+      ['Readiness', ['Complete security and load review', 'Publish terms of use and privacy notice', 'Set up the support channel']]]],
+    ['Launch', [
+      ['Announcement', ['Create landing page and announcement copy', 'Reach out to first customers', 'Decide on pricing']],
+      ['Next Steps', ['Monitor the metrics dashboard', 'Hold weekly product reviews', 'Draft the next quarter roadmap']]]]
   ]},
-  {name: 'Kurumsal Proje Yönetimi', desc: 'Her sektöre uyarlanabilir klasik proje yaşam döngüsü', data: [
-    ['Başlatma', [
-      ['Proje Tanımı', ['Amaç, kapsam ve beklenen çıktıları yaz', 'Paydaşları ve sponsoru belirle', 'Proje yetki belgesini (charter) onaylat']],
-      ['Fizibilite', ['Bütçe ve kaynak tahmini', 'Ön risk değerlendirmesi', 'Başarı ölçütlerini netleştir']]]],
-    ['Planlama', [
-      ['Kapsam ve Zaman', ['İş kırılım yapısını (WBS) oluştur', 'Takvim ve kilometre taşlarını belirle', 'Bağımlılıkları ve kritik yolu işaretle']],
-      ['Yönetim Planları', ['Risk ve değişiklik yönetimi planı', 'İletişim planı ve toplantı düzeni', 'Rol ve sorumluluk matrisi']]]],
-    ['Yürütme', [
-      ['Uygulama', ['İşleri ekibe ata ve başlat', 'Haftalık ilerleme toplantıları', 'Teslimatları kayıt altına al']],
-      ['Takip ve Kontrol', ['Bütçe ve takvim sapmalarını izle', 'Risk kaydını güncelle', 'Paydaşlara düzenli durum raporu gönder']]]],
-    ['Kapanış', [
-      ['Teslim', ['Çıktıları müşteriye / sponsora teslim et', 'Kabul onayını al', 'Sözleşme ve ödemeleri kapat']],
-      ['Öğrenilen Dersler', ['Kapanış toplantısı yap', 'Dersleri belgele', 'Arşivle ve ekibi serbest bırak']]]]
+  {name: 'Corporate Project Management', desc: 'Classic project lifecycle adaptable to any industry', data: [
+    ['Initiation', [
+      ['Project Definition', ['Document objectives, scope and expected deliverables', 'Identify stakeholders and sponsor', 'Obtain approval of the project charter']],
+      ['Feasibility', ['Estimate budget and resources', 'Perform preliminary risk assessment', 'Clarify success criteria']]]],
+    ['Planning', [
+      ['Scope & Schedule', ['Create the work breakdown structure (WBS)', 'Define schedule and milestones', 'Identify dependencies and the critical path']],
+      ['Management Plans', ['Prepare risk and change management plans', 'Define communication plan and meeting cadence', 'Establish roles and responsibilities (RACI)']]]],
+    ['Execution', [
+      ['Delivery', ['Assign work to the team and kick off', 'Hold weekly progress meetings', 'Record deliverables']],
+      ['Monitoring & Control', ['Track budget and schedule variances', 'Update the risk register', 'Send regular status reports to stakeholders']]]],
+    ['Closure', [
+      ['Handover', ['Deliver outputs to the client / sponsor', 'Obtain acceptance sign-off', 'Close contracts and payments']],
+      ['Lessons Learned', ['Hold the closing meeting', 'Document lessons learned', 'Archive project files and release the team']]]]
   ]},
-  {name: 'Pazarlama Kampanyası', desc: 'Strateji, içerik üretimi, yayın ve ölçümleme', data: [
-    ['Strateji', [
-      ['Hedef ve Kitle', ['Kampanya hedefini ve ölçülebilir göstergeleri yaz', 'Hedef kitle ve kişilik (persona) tanımı', 'Ana mesaj ve konumlandırma']],
-      ['Plan', ['Kanal seçimi ve bütçe dağılımı', 'Yayın takvimi', 'Sorumluluk dağılımı']]]],
-    ['İçerik Üretimi', [
-      ['Metin ve Görsel', ['Slogan ve ana metinler', 'Görsel / video üretimi', 'Açılış sayfası']],
-      ['Onay', ['İç gözden geçirme', 'Marka ve hukuk onayı', 'Son dosyaların teslimi']]]],
-    ['Yayın', [
-      ['Kanallar', ['Sosyal medya paylaşımları', 'E-posta gönderimi', 'Reklam kampanyalarını başlat']],
-      ['İşbirlikleri', ['Etkileyici / ortak iletişimleri', 'Basın bülteni', 'Topluluk etkileşimi']]]],
-    ['Ölçümleme', [
-      ['Analiz', ['Metrikleri haftalık topla', 'Hedeflerle karşılaştır', 'A/B test sonuçlarını değerlendir']],
-      ['Raporlama', ['Kampanya sonuç raporu', 'Öğrenilenler ve öneriler', 'Bir sonraki kampanyaya girdi hazırla']]]]
+  {name: 'Marketing Campaign', desc: 'Strategy, content production, launch and measurement', data: [
+    ['Strategy', [
+      ['Goals & Audience', ['Define campaign goals and measurable KPIs', 'Define target audience and personas', 'Define key message and positioning']],
+      ['Plan', ['Select channels and allocate budget', 'Create the publishing calendar', 'Assign responsibilities']]]],
+    ['Content Production', [
+      ['Copy & Creative', ['Write slogan and main copy', 'Produce visual and video assets', 'Build the landing page']],
+      ['Approval', ['Complete internal review', 'Obtain brand and legal approval', 'Deliver final files']]]],
+    ['Launch', [
+      ['Channels', ['Publish social media posts', 'Send email campaign', 'Launch paid advertising']],
+      ['Partnerships', ['Reach out to influencers and partners', 'Issue press release', 'Engage the community']]]],
+    ['Measurement', [
+      ['Analysis', ['Collect metrics weekly', 'Compare results against goals', 'Evaluate A/B test results']],
+      ['Reporting', ['Prepare campaign results report', 'Document learnings and recommendations', 'Prepare inputs for the next campaign']]]]
   ]},
-  {name: 'Finans: Ajan Destekli Piyasa Analizi ve İşlem', desc: 'Ajan/skill kurulumu, ABD hisse, kripto ve kademeli (merdiven) analiz, canlı işlem takibi', data: [
-    ['1. Hedef ve Çerçeve', [
-      ['Kapsam', ['Hedefi yaz: getiri beklentisi, vade, işlem sıklığı', 'Varlık evrenini belirle (ABD hisseleri, kripto, diğer)', 'Başlangıç sermayesi ve kaybedilebilir tutar sınırını yaz']],
-      ['Kurallar ve Uyum', ['Risk kurallarını yaz (işlem başı risk %, günlük/aylık maksimum kayıp)', 'Vergi ve yasal yükümlülükleri araştır', 'Ajanların yetki sınırını belirle: sadece analiz mi, emir de verebilir mi?']]]],
-    ['2. Ajan ve Skill Altyapısı', [
-      ['Claude Kurulumu', ['Claude Code / Agent SDK ortamını kur', 'Proje klasör yapısı ve CLAUDE.md talimatlarını yaz', 'API anahtarlarını güvenli sakla (.env, depoya ekleme)']],
-      ['Skill Keşfi ve Ekleme', ['Finans için mevcut skill ve MCP sunucularını araştır', 'Aday skill listesi çıkar: kaynak, güvenlik ve lisans kontrolü', 'Seçilen skilleri ekle ve örnek görevle test et', 'Eksik yetenekler için kendi skillini yaz (ör. rapor şablonu, risk hesabı)']],
-      ['Ajan Tasarımı', ['Ajan rollerini tanımla: veri toplayıcı, analist, risk denetçisi, raporlayıcı', 'Ajanlar arası iş akışı ve çıktı biçimini belirle', 'Hata ve halüsinasyon kontrolü: her sayı kaynağıyla doğrulansın']]]],
-    ['3. Veri Kaynakları', [
-      ['Piyasa Verisi', ['ABD hisse verisi kaynağı seç (fiyat, bilanço, haber)', 'Kripto verisi kaynağı seç (borsa API, zincir üstü veri)', 'Veri kalitesi ve gecikme kontrolü', 'Geçmiş veriyi indir ve sakla']],
-      ['Haber ve Makro', ['Ekonomik takvim (faiz kararı, enflasyon, istihdam)', 'Şirket kazanç takvimi', 'Haber ve duyarlılık kaynakları']]]],
-    ['4. Piyasa Analizi', [
-      ['ABD Hisseleri', ['İzleme listesi oluştur', 'Temel analiz: gelir, kâr, borç, değerleme', 'Teknik analiz: trend, destek/direnç, hacim', 'Sektör ve endeks karşılaştırması']],
-      ['Kripto', ['İzleme listesi oluştur', 'Teknik analiz ve piyasa yapısı', 'Likidite, hacim ve borsa riski kontrolü', 'BTC ve genel piyasa korelasyonu']],
-      ['Merdiven (Kademeli) İşlemler', ['Kademeli alım/satım seviyelerini belirle (giriş aralığı, adım, her kademenin tutarı)', 'Toplam pozisyon ve ortalama maliyet hesabı', 'Zarar durdur ve çıkış kademelerini yaz', 'Geçmiş veride merdiven stratejisini simüle et']],
-      ['Raporlama', ['Günlük piyasa özeti şablonu', 'Haftalık görünüm ve senaryolar (yükseliş / yatay / düşüş)', 'Her fikir için tez, risk ve iptal koşulunu yaz']]]],
-    ['5. Strateji ve Test', [
-      ['Geriye Dönük Test', ['Kuralları koda dök', 'Komisyon, kayma ve vergiyi hesaba kat', 'Farklı piyasa dönemlerinde test et (aşırı uyumdan kaçın)']],
-      ['Kâğıt Üzerinde İşlem', ['Sanal hesapla en az 4-8 hafta ileriye dönük test yap', 'Her sinyali ve sonucu kayda al', 'Canlıya geçiş ölçütlerini yaz (isabet, maksimum düşüş, tutarlılık)']]]],
-    ['6. Canlı İşlem ve Takip', [
-      ['Canlıya Geçiş', ['Aracı kurum / borsa hesabı ve API izinlerini ayarla (yalnız gerekli yetki, para çekme kapalı)', 'Küçük sermayeyle başla', 'Emir öncesi insan onayı adımı ekle']],
-      ['İşlem Defteri', ['Her işlemi kaydet: tarih, varlık, giriş/çıkış, miktar, gerekçe', 'Açık pozisyonlar ve merdiven kademeleri tablosu', 'Gerçekleşen ve gerçekleşmemiş kâr/zarar takibi']],
-      ['Risk ve Uyarılar', ['Fiyat ve zarar durdur uyarıları', 'Portföy dağılımı ve konsantrasyon kontrolü', 'Maksimum kayıp aşılırsa işlemi durdurma kuralı']]]],
-    ['7. Operasyon ve İyileştirme', [
-      ['Düzenli Süreç', ['Günlük: piyasa özeti ve açık pozisyon kontrolü', 'Haftalık: performans ve kural uyum raporu', 'Aylık: strateji gözden geçirme ve vergi kaydı']],
-      ['Sürekli Geliştirme', ['Hatalı kararların analizi (neden yanıldık?)', 'Yeni skill ve veri kaynağı araştırması', 'Ajan talimatlarını ve risk kurallarını güncelle']]]]
+  {name: 'Finance: Agent-Assisted Market Analysis & Trading', desc: 'Agent and skill setup, US equities, crypto and laddered-entry analysis, live trade tracking', data: [
+    ['1. Objectives & Framework', [
+      ['Scope', ['Define objectives: expected return, time horizon, trading frequency', 'Define the asset universe (US equities, crypto, other)', 'Define starting capital and maximum acceptable loss']],
+      ['Rules & Compliance', ['Define risk rules (risk per trade %, daily / monthly maximum loss)', 'Research tax and regulatory obligations', 'Define agent authority: analysis only, or order placement as well']]]],
+    ['2. Agent & Skill Infrastructure', [
+      ['Claude Setup', ['Set up the Claude Code / Agent SDK environment', 'Define project structure and write CLAUDE.md instructions', 'Store API keys securely (.env, never committed)']],
+      ['Skill Discovery & Onboarding', ['Research existing finance skills and MCP servers', 'Shortlist candidate skills: source, security and license review', 'Install selected skills and test with a sample task', 'Build custom skills for gaps (e.g. report template, risk calculator)']],
+      ['Agent Design', ['Define agent roles: data collector, analyst, risk reviewer, reporter', 'Define inter-agent workflow and output format', 'Hallucination control: every figure must cite a source']]]],
+    ['3. Data Sources', [
+      ['Market Data', ['Select US equity data source (prices, financials, news)', 'Select crypto data source (exchange API, on-chain data)', 'Validate data quality and latency', 'Download and store historical data']],
+      ['News & Macro', ['Economic calendar (rate decisions, inflation, employment)', 'Corporate earnings calendar', 'News and sentiment sources']]]],
+    ['4. Market Analysis', [
+      ['US Equities', ['Build the watchlist', 'Fundamental analysis: revenue, earnings, debt, valuation', 'Technical analysis: trend, support / resistance, volume', 'Sector and index comparison']],
+      ['Crypto', ['Build the watchlist', 'Technical analysis and market structure', 'Liquidity, volume and exchange risk review', 'BTC and broad-market correlation']],
+      ['Laddered Entries', ['Define ladder levels (entry range, step size, size per rung)', 'Calculate total position and average cost', 'Define stop-loss and exit rungs', 'Simulate the ladder strategy on historical data']],
+      ['Reporting', ['Daily market summary template', 'Weekly outlook and scenarios (bullish / neutral / bearish)', 'Document thesis, risk and invalidation condition for every idea']]]],
+    ['5. Strategy & Testing', [
+      ['Backtesting', ['Codify the rules', 'Include commissions, slippage and tax', 'Test across different market regimes (avoid overfitting)']],
+      ['Paper Trading', ['Run forward test on a paper account for at least 4-8 weeks', 'Log every signal and outcome', 'Define go-live criteria (hit rate, maximum drawdown, consistency)']]]],
+    ['6. Live Trading & Monitoring', [
+      ['Go-Live', ['Set up brokerage / exchange account and API permissions (least privilege, withdrawals disabled)', 'Start with small capital', 'Add a human approval step before every order']],
+      ['Trade Journal', ['Record every trade: date, asset, entry / exit, size, rationale', 'Open positions and ladder rung table', 'Track realized and unrealized P&L']],
+      ['Risk & Alerts', ['Price and stop-loss alerts', 'Portfolio allocation and concentration check', 'Halt trading when the maximum loss limit is breached']]]],
+    ['7. Operations & Improvement', [
+      ['Routine', ['Daily: market summary and open position check', 'Weekly: performance and rule-compliance report', 'Monthly: strategy review and tax records']],
+      ['Continuous Improvement', ['Post-mortem on losing decisions', 'Research new skills and data sources', 'Update agent instructions and risk rules']]]]
   ]}
 ];
 
-// Görev: açıklama (note), bitiş (due, YYYY-AA-GG), sorumlu (who), öncelik (pri: high|mid|low), etiketler (tags), durum (st: todo|doing; done ayrı)
+// Task: description (note), due date (due, YYYY-MM-DD), assignee (who), priority (pri: high|mid|low), labels (tags), status (st: backlog|todo|doing; done is separate)
 const mk = (t, done, x = {}) => ({id: uid(), t, done: !!done, note: String(x.note || ''), due: String(x.due || ''), who: String(x.who || ''),
   pri: ['high', 'mid', 'low'].includes(x.pri) ? x.pri : '', tags: Array.isArray(x.tags) ? x.tags.map(String) : [], st: ['doing', 'backlog'].includes(x.st) ? x.st : 'todo'});
 function fromTemplate(tpl, name) {
@@ -362,16 +362,16 @@ function fromTemplate(tpl, name) {
 }
 
 /* ---------- Veri ---------- */
-// Eski ve yeni biçimleri (aşama > alt başlık > görev) ortak yapıya çevirir
+// Normalizes old and new formats (epic > story > task) into a common structure
 function normalize(o) {
   const ph = Array.isArray(o.phases) ? o.phases : Array.isArray(o.asamalar) ? o.asamalar : [];
   const task = t => typeof t === 'string' ? mk(t) : mk(String(t.t || t.gorev || t.name || ''), t.done || t.bitti, t);
-  return {id: uid(), name: String(o.name || o.ad || 'İsimsiz proje'), phases: ph.map(p => {
+  return {id: uid(), name: String(o.name || o.ad || 'Untitled project'), phases: ph.map(p => {
     const subs = p.subs || p.altbasliklar;
-    return {id: uid(), name: String(p.name || p.ad || 'Başlık'), open: true,
+    return {id: uid(), name: String(p.name || p.ad || 'Epic'), open: true,
       subs: Array.isArray(subs)
-        ? subs.map(s => ({id: uid(), name: String(s.name || s.ad || 'Alt başlık'), open: true, tasks: (s.tasks || s.gorevler || []).map(task)}))
-        : [{id: uid(), name: 'Görevler', open: true, tasks: (p.tasks || p.gorevler || []).map(task)}]};
+        ? subs.map(s => ({id: uid(), name: String(s.name || s.ad || 'Story'), open: true, tasks: (s.tasks || s.gorevler || []).map(task)}))
+        : [{id: uid(), name: 'Tasks', open: true, tasks: (p.tasks || p.gorevler || []).map(task)}]};
   })};
 }
 
@@ -392,16 +392,16 @@ const applyTheme = () => { if (db.theme === 'light' || db.theme === 'dark') docu
 const pad = n => String(n).padStart(2, '0');
 const iso = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
 const today = () => iso(new Date());
-const fmt = s => new Date(s + 'T00:00').toLocaleDateString('tr-TR', {day: 'numeric', month: 'short'});
+const fmt = s => new Date(s + 'T00:00').toLocaleDateString('en-US', {day: 'numeric', month: 'short'});
 const isLate = t => !t.done && t.due && t.due < today();
-const PRI = {high: 'Yüksek', mid: 'Orta', low: 'Düşük'};
+const PRI = {high: 'High', mid: 'Medium', low: 'Low'};
 const allTasks = p => p.phases.flatMap(ph => ph.subs.flatMap(sb => sb.tasks.map(t => ({t, ph, sb}))));
 const COLS = {backlog: 'Backlog', todo: 'Todo', doing: 'In progress', done: 'Done'};
 const ST_ORDER = Object.keys(COLS);
 const colOf = t => t.done ? 'done' : t.st === 'doing' || t.st === 'backlog' ? t.st : 'todo';
 const setStatus = (t, s) => { t.done = s === 'done'; if (s !== 'done') t.st = s; };
 
-/* ---------- Arayüz ---------- */
+/* ---------- UI ---------- */
 function el(tag, attrs, ...kids) {
   const e = document.createElement(tag);
   for (const k in attrs || {}) {
@@ -414,12 +414,12 @@ function el(tag, attrs, ...kids) {
 const ic = (txt, title, fn, cls, dis) => el('button', {className: 'ic ' + (cls || ''), textContent: txt, title, disabled: !!dis, on: {click: fn}});
 const bar = pct => el('div', {className: 'bar'}, el('i', {style: 'width:' + pct + '%'}));
 
-/* --- Geri al: silme/arşivleme öncesi anlık görüntü alınır, 8 sn "Geri al" düğmesi çıkar (Ctrl+Z de çalışır) --- */
+/* --- Undo: a snapshot is taken before delete/archive; an "Undo" button shows for 8 s (Ctrl+Z works too) --- */
 let undoCb = null, toastT = 0;
 function hideToast() { $('#toast').hidden = true; undoCb = null; clearTimeout(toastT); }
 function toast(msg, cb) {
   const t = $('#toast'); undoCb = cb; clearTimeout(toastT);
-  t.replaceChildren(el('span', {textContent: msg}), el('button', {textContent: 'Geri al', on: {click: () => { cb(); hideToast(); }}}));
+  t.replaceChildren(el('span', {textContent: msg}), el('button', {textContent: 'Undo', on: {click: () => { cb(); hideToast(); }}}));
   t.hidden = false; toastT = setTimeout(hideToast, 8000);
 }
 function withUndo(msg, fn) {
@@ -431,9 +431,9 @@ document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && undoCb && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); undoCb(); hideToast(); }
 });
 
-// Sürükle-bırak: tutamaçtan (⠿) basılı tutup taşı, başka satırın üstüne bırak.
-// Fare: HTML5 drag&drop. Dokunmatik/kalem: pointer olayları (elementFromPoint ile hedef bulunur).
-// Görevler başka alt başlığa da taşınabilir; başlık ve alt başlıklar yalnızca kendi grubunda.
+// Drag and drop: hold the handle (⠿) and drop onto another row.
+// Mouse: HTML5 drag & drop. Touch/pen: pointer events (target found via elementFromPoint).
+// Tasks can be moved to another story; epics and stories can only be reordered within their own group.
 const COARSE = matchMedia('(pointer:coarse)').matches;
 let drag = null;
 const clearOver = () => document.querySelectorAll('.over').forEach(n => n.classList.remove('over'));
@@ -455,7 +455,7 @@ function touchDrag(e, d) {
   g.addEventListener('pointermove', move); g.addEventListener('pointerup', end); g.addEventListener('pointercancel', end);
 }
 function grip(arr, i, getBox, kind) {
-  return el('span', {className: 'grip', textContent: '⠿', title: 'Basılı tutup sürükle', draggable: !COARSE, on: {
+  return el('span', {className: 'grip', textContent: '⠿', title: 'Drag to reorder', draggable: !COARSE, on: {
     click: e => e.stopPropagation(),
     pointerdown: e => touchDrag(e, {arr, i, kind}),
     dragstart: e => { e.stopPropagation(); drag = {arr, i, kind}; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'x'); const b = getBox(); if (b) e.dataTransfer.setDragImage(b, 10, 10); },
@@ -477,14 +477,14 @@ function dropZone(row, arr, i, kind) {
       render();
     }});
 }
-// Alt başlık kutusuna bırakılan görev, o alt başlığın sonuna eklenir (boş/kapalı alt başlıklar için)
+// A task dropped on a story box is appended to that story (for empty/collapsed stories)
 function dropTasks(box, sb) {
   return bindDz(box, {
     ok: () => drag && drag.kind === 'task' && drag.arr !== sb.tasks,
     go: () => { const fa = drag.arr, from = drag.i; drag = null; sb.tasks.push(fa.splice(from, 1)[0]); save(); render(); }});
 }
 
-// Başlık satırı: aç/kapat, ad, sayaç, sırala, düzenle, sil
+// Header row: expand/collapse, name, counter, reorder, rename, delete
 const rangeOf = ts => {
   const d = ts.map(t => t.due).filter(Boolean).sort();
   return d.length ? '📅 ' + fmt(d[0]) + (d[0] !== d[d.length - 1] ? ' – ' + fmt(d[d.length - 1]) : '') : '';
@@ -493,12 +493,12 @@ function head(obj, arr, i, st, nameLabel, delMsg) {
   const rg = obj.tasks ? rangeOf(obj.tasks) : '';
   const hd = el('div', {className: 'hd'},
     grip(arr, i, () => hd.closest('section.ph, .sb')),
-    ic(obj.open ? '▾' : '▸', obj.open ? 'Kapat' : 'Aç', () => { obj.open = !obj.open; save(); render(); }),
-    el('span', {className: 'nm', textContent: obj.name, title: 'Aç / kapat', on: {click: () => { obj.open = !obj.open; save(); render(); }}}),
-    rg ? el('span', {className: 'rng', textContent: rg, title: 'Görevlerin bitiş tarihi aralığı'}) : '',
-    el('em', {textContent: st.d + '/' + st.n + ' · %' + st.pct}),
-    ic('✎', 'Yeniden adlandır', () => rename(obj, 'name', nameLabel)),
-    ic('×', 'Sil', () => withUndo(delMsg, () => arr.splice(i, 1)), 'del'));
+    ic(obj.open ? '▾' : '▸', obj.open ? 'Collapse' : 'Expand', () => { obj.open = !obj.open; save(); render(); }),
+    el('span', {className: 'nm', textContent: obj.name, title: 'Expand / collapse', on: {click: () => { obj.open = !obj.open; save(); render(); }}}),
+    rg ? el('span', {className: 'rng', textContent: rg, title: 'Due date range'}) : '',
+    el('em', {textContent: st.d + '/' + st.n + ' · ' + st.pct + '%'}),
+    ic('✎', 'Rename', () => rename(obj, 'name', nameLabel)),
+    ic('×', 'Delete', () => withUndo(delMsg, () => arr.splice(i, 1)), 'del'));
   return dropZone(hd, arr, i);
 }
 
@@ -506,22 +506,22 @@ const tagStyle = g => { const h = [...g].reduce((a, c) => (a * 31 + c.charCodeAt
 function chipsOf(t) {
   const c = [];
   if (t.pri) c.push(el('span', {className: 'chip p-' + t.pri, textContent: PRI[t.pri]}));
-  if (t.due) c.push(el('span', {className: 'chip' + (isLate(t) ? ' late' : ''), textContent: '📅 ' + fmt(t.due) + (isLate(t) ? ' · gecikti' : '')}));
+  if (t.due) c.push(el('span', {className: 'chip' + (isLate(t) ? ' late' : ''), textContent: '📅 ' + fmt(t.due) + (isLate(t) ? ' · Overdue' : '')}));
   if (t.who) c.push(el('span', {className: 'chip', textContent: '👤 ' + t.who}));
   (t.tags || []).forEach(g => c.push(el('span', {className: 'chip', style: tagStyle(g), textContent: '#' + g})));
   return c.length ? el('div', {className: 'chips'}, c) : '';
 }
 
-// Görev ayrıntıları: ad, not, bitiş tarihi, sorumlu, öncelik, etiket, durum
+// Task details: summary, description, due date, assignee, priority, labels, status
 function taskDlg(t) {
   const f = (label, node) => el('label', {className: 'fld'}, el('span', {textContent: label}), node);
   const sel = (opts, v) => { const s = el('select', {}, ...opts.map(([k, l]) => el('option', {value: k, textContent: l}))); s.value = v; return s; };
-  const title = el('input', {type: 'text', value: t.t}), note = el('textarea', {value: t.note || '', placeholder: 'Kısa açıklama'}),
-    due = el('input', {type: 'date', value: t.due || ''}), who = el('input', {type: 'text', value: t.who || '', placeholder: 'Sorumlu kişi'}),
-    pri = sel([['', 'Yok'], ['high', 'Yüksek'], ['mid', 'Orta'], ['low', 'Düşük']], t.pri || ''),
+  const title = el('input', {type: 'text', value: t.t}), note = el('textarea', {value: t.note || '', placeholder: 'Add a description'}),
+    due = el('input', {type: 'date', value: t.due || ''}), who = el('input', {type: 'text', value: t.who || '', placeholder: 'Assignee name'}),
+    pri = sel([['', 'None'], ['high', 'High'], ['mid', 'Medium'], ['low', 'Low']], t.pri || ''),
     st = sel(Object.entries(COLS), colOf(t)),
-    tags = el('input', {type: 'text', value: (t.tags || []).join(', '), placeholder: 'virgülle ayır: tasarım, acil'});
-  openDlg('Görev ayrıntıları', el('div', {className: 'form'}, f('Görev', title), f('Not', note), f('Bitiş tarihi', due), f('Sorumlu', who), f('Öncelik', pri), f('Etiketler', tags), f('Durum', st)), () => {
+    tags = el('input', {type: 'text', value: (t.tags || []).join(', '), placeholder: 'comma separated: design, urgent'});
+  openDlg('Edit task', el('div', {className: 'form'}, f('Summary', title), f('Description', note), f('Due date', due), f('Assignee', who), f('Priority', pri), f('Labels', tags), f('Status', st)), () => {
     const v = title.value.trim(); if (!v) { title.focus(); return false; }
     t.t = v; t.note = note.value.trim(); t.due = due.value; t.who = who.value.trim(); t.pri = pri.value;
     t.tags = [...new Set(tags.value.split(',').map(x => x.trim().replace(/^#/, '')).filter(Boolean))];
@@ -534,10 +534,10 @@ function taskRow(t, arr, i) {
     grip(arr, i, () => row, 'task'),
     el('input', {type: 'checkbox', id: t.id, checked: t.done, on: {change: e => { t.done = e.target.checked; save(); render(); }}}),
     el('div', {className: 'tb'},
-      el('label', {htmlFor: t.id, textContent: t.t, title: 'Düzenlemek için çift tıkla', on: {dblclick: e => { e.preventDefault(); rename(t, 't', 'Görev'); }}}),
+      el('label', {htmlFor: t.id, textContent: t.t, title: 'Double-click to edit', on: {dblclick: e => { e.preventDefault(); rename(t, 't', 'Summary'); }}}),
       t.note ? el('div', {className: 'note', textContent: t.note}) : '', chipsOf(t)),
-    ic('✎', 'Ayrıntılar: not, tarih, kişi, etiket, öncelik', () => taskDlg(t)),
-    ic('×', 'Sil', () => withUndo('Görev silindi', () => arr.splice(i, 1)), 'del'));
+    ic('✎', 'Edit details', () => taskDlg(t)),
+    ic('×', 'Delete', () => withUndo('Task deleted', () => arr.splice(i, 1)), 'del'));
   return dropZone(row, arr, i, 'task');
 }
 
@@ -547,66 +547,66 @@ const pass = t => (!flt.pri || t.pri === flt.pri) && (!flt.tag || (t.tags || [])
 const collapse = p => p.phases.forEach(ph => { ph.open = false; ph.subs.forEach(sb => sb.open = false); });
 const open = id => {
   db.cur = id; view = 'project'; mode = 'list'; flt.pri = flt.tag = flt.who = flt.st = '';
-  collapse(cur()); // proje kapalı açılsın
+  collapse(cur()); // open the project collapsed
   save(); render();
 };
 const home = () => { view = 'home'; render(); };
 const projStat = p => stat(p.phases.flatMap(tasksOf));
-const delProject = p => withUndo('Proje silindi', () => {
+const delProject = p => withUndo('Project deleted', () => {
   db.projects = db.projects.filter(x => x !== p);
   if (!db.projects.length) db.projects.push(fromTemplate(TEMPLATES[0]));
   db.cur = db.projects[0].id; view = 'home';
 });
-const toggleArchive = p => withUndo(p.archived ? 'Arşivden çıkarıldı' : 'Proje arşivlendi', () => { p.archived = !p.archived; if (view === 'project') view = 'home'; });
+const toggleArchive = p => withUndo(p.archived ? 'Project restored' : 'Project archived', () => { p.archived = !p.archived; if (view === 'project') view = 'home'; });
 
-const avatar = p => el('span', {className: 'av', style: '--pc:var(--c' + (db.projects.indexOf(p) % 5 + 1) + ')', textContent: ([...p.name.trim()][0] || '?').toLocaleUpperCase('tr')});
+const avatar = p => el('span', {className: 'av', style: '--pc:var(--c' + (db.projects.indexOf(p) % 5 + 1) + ')', textContent: ([...p.name.trim()][0] || '?').toLocaleUpperCase('en')});
 
 function renderSidebar() {
   const sb = $('#sbar'); sb.replaceChildren();
-  const L = {auto: '🌓 Tema: otomatik', light: '☀ Tema: açık', dark: '🌙 Tema: koyu'}, th = db.theme || 'auto';
+  const L = {auto: '🌓 Theme: auto', light: '☀ Theme: light', dark: '🌙 Theme: dark'}, th = db.theme || 'auto';
   const nv = (txt, on, fn) => el('button', {className: 'nv' + (on ? ' on' : ''), textContent: txt, on: {click: fn}});
   const na = db.projects.filter(p => p.archived).length;
-  sb.append(el('div', {className: 'brand'}, el('span', {className: 'logo', textContent: 'P'}), el('b', {textContent: 'Proje Takip'})),
-    el('button', {className: 'pri newb', textContent: '+ Yeni proje', on: {click: newProject}}),
-    nv('🏠 Ana sayfa', view === 'home' && !showArch, () => { showArch = false; view = 'home'; render(); }),
-    na ? nv('📦 Arşiv (' + na + ')', view === 'home' && showArch, () => { showArch = true; view = 'home'; render(); }) : '',
-    el('div', {className: 'sec', textContent: 'Projeler'}));
+  sb.append(el('div', {className: 'brand'}, el('span', {className: 'logo', textContent: 'P'}), el('b', {textContent: 'Project Tracker'})),
+    el('button', {className: 'pri newb', textContent: '+ Create project', on: {click: newProject}}),
+    nv('🏠 Dashboard', view === 'home' && !showArch, () => { showArch = false; view = 'home'; render(); }),
+    na ? nv('📦 Archive (' + na + ')', view === 'home' && showArch, () => { showArch = true; view = 'home'; render(); }) : '',
+    el('div', {className: 'sec', textContent: 'Projects'}));
   db.projects.forEach(p => {
     if (p.archived) return;
     sb.append(el('button', {className: 'nv' + (view === 'project' && cur() === p ? ' on' : ''), title: p.name, on: {click: () => { showArch = false; open(p.id); }}},
-      avatar(p), el('span', {className: 'pn', textContent: p.name}), el('small', {textContent: '%' + projStat(p).pct})));
+      avatar(p), el('span', {className: 'pn', textContent: p.name}), el('small', {textContent: projStat(p).pct + '%'})));
   });
   sb.append(el('div', {className: 'grow'}),
-    'Notification' in window && Notification.permission === 'granted' ? '' : nv('🔔 Bildirimleri aç', false, askNotify),
-    nv('⬆ İçe aktar', false, importProject),
+    'Notification' in window && Notification.permission === 'granted' ? '' : nv('🔔 Enable notifications', false, askNotify),
+    nv('⬆ Import', false, importProject),
     nv(L[th], false, () => { const o = ['auto', 'light', 'dark']; db.theme = o[(o.indexOf(th) + 1) % 3]; applyTheme(); save(); render(); }));
 }
 
 function renderHeader() {
   const top = $('#top'); top.replaceChildren();
   if (view === 'home') {
-    top.append(el('h1', {textContent: showArch ? 'Arşiv' : 'Ana sayfa'}), el('span', {className: 'sp'}),
-      showArch ? el('button', {textContent: '← Projeler', on: {click: () => { showArch = false; render(); }}}) : el('button', {className: 'pri', textContent: '+ Yeni proje', on: {click: newProject}}));
+    top.append(el('h1', {textContent: showArch ? 'Archive' : 'Dashboard'}), el('span', {className: 'sp'}),
+      showArch ? el('button', {textContent: '← Projects', on: {click: () => { showArch = false; render(); }}}) : el('button', {className: 'pri', textContent: '+ Create project', on: {click: newProject}}));
   } else {
     const p = cur(), s = projStat(p);
-    top.append(el('button', {className: 'crumb', textContent: 'Projeler', on: {click: home}}), el('span', {className: 'sep', textContent: '/'}),
-      avatar(p), el('h1', {textContent: p.name}), ic('✎', 'Projeyi adlandır', () => rename(p, 'name', 'Proje adı')), el('span', {className: 'sp'}),
-      el('div', {className: 'mini'}, el('span', {textContent: '%' + s.pct + ' · ' + s.d + '/' + s.n + ' görev'}), bar(s.pct)),
+    top.append(el('button', {className: 'crumb', textContent: 'Projects', on: {click: home}}), el('span', {className: 'sep', textContent: '/'}),
+      avatar(p), el('h1', {textContent: p.name}), ic('✎', 'Rename project', () => rename(p, 'name', 'Project name')), el('span', {className: 'sp'}),
+      el('div', {className: 'mini'}, el('span', {textContent: s.pct + '% · ' + s.d + '/' + s.n + ' tasks'}), bar(s.pct)),
       viewSwitch(), filterBar(p),
-      el('button', {textContent: 'Dışa aktar', on: {click: exportProject}}));
+      el('button', {textContent: 'Export', on: {click: exportProject}}));
   }
 }
 
-/* ---------- Acil görev bildirimi ---------- */
-// Acil: önceliği "Yüksek" ya da #acil / #kritik etiketli, bitmemiş ve bitiş tarihi bugün ya da geçmiş olan görevler
+/* ---------- Urgent task notifications ---------- */
+// Urgent: not done, due today or earlier, and priority "High" or labelled #urgent / #critical (#acil / #kritik also work)
 const NKEY = 'proje-takip-bildirim';
-const isUrgent = t => !t.done && t.due && t.due <= today() && (t.pri === 'high' || (t.tags || []).some(g => /^(acil|kritik)$/i.test(g)));
+const isUrgent = t => !t.done && t.due && t.due <= today() && (t.pri === 'high' || (t.tags || []).some(g => /^(acil|kritik|urgent|critical)$/i.test(g)));
 function urgent() {
   const out = [];
   db.projects.filter(p => !p.archived).forEach(p => allTasks(p).forEach(({t}) => { if (isUrgent(t)) out.push({t, p}); }));
   return out.sort((a, b) => a.t.due < b.t.due ? -1 : a.t.due > b.t.due ? 1 : 0);
 }
-// Yapılmayan her acil görev için saat başı sistem bildirimi (izin verilmişse; sayfa açıkken)
+// Hourly system notification for every unfinished urgent task (if permitted; only while the page is open)
 function notifyUrgent() {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
   let s = null; try { s = JSON.parse(localStorage.getItem(NKEY)); } catch (e) {}
@@ -614,29 +614,29 @@ function notifyUrgent() {
   if (!s || s.h !== hk || !Array.isArray(s.ids)) s = {h: hk, ids: []};
   urgent().filter(({t}) => !s.ids.includes(t.id)).forEach(({t, p}) => {
     s.ids.push(t.id);
-    try { new Notification((t.due < today() ? 'Gecikti: ' : 'Bugün: ') + t.t, {body: p.name + (t.who ? ' · ' + t.who : '') + ' · yapılınca işaretle, bildirim durur', tag: t.id, renotify: true}); } catch (e) {}
+    try { new Notification((t.due < today() ? 'Overdue: ' : 'Due today: ') + t.t, {body: p.name + (t.who ? ' · ' + t.who : '') + ' · mark as done to stop reminders', tag: t.id, renotify: true}); } catch (e) {}
   });
   try { localStorage.setItem(NKEY, JSON.stringify(s)); } catch (e) {}
 }
 function askNotify() {
-  if (!('Notification' in window)) { openDlg('Bildirim', el('p', {textContent: 'Bu tarayıcı sistem bildirimini desteklemiyor. Acil görevler sayfanın üstündeki kırmızı kutuda yine görünür.'}), null); return; }
+  if (!('Notification' in window)) { openDlg('Notifications', el('p', {textContent: 'This browser does not support system notifications. Urgent tasks still appear in the red box at the top of the page.'}), null); return; }
   Notification.requestPermission().then(r => {
     if (r === 'granted') notifyUrgent();
-    else openDlg('Bildirim', el('p', {textContent: 'İzin verilmedi. Tarayıcının adres çubuğundaki site ayarlarından bildirimlere izin verebilirsin. Acil görevler sayfanın üstündeki kırmızı kutuda yine görünür.'}), null);
+    else openDlg('Notifications', el('p', {textContent: 'Permission was not granted. You can allow notifications in the site settings next to the address bar. Urgent tasks still appear in the red box at the top of the page.'}), null);
     render();
   });
 }
 function urgentBox() {
   const ug = urgent(); if (!ug.length) return '';
-  const box = el('div', {className: 'sum urg'}, el('b', {textContent: '🔔 Acil görevler (' + ug.length + ')', style: 'font-size:16px;color:var(--bad)'}));
+  const box = el('div', {className: 'sum urg'}, el('b', {textContent: '🔔 Urgent tasks (' + ug.length + ')', style: 'font-size:16px;color:var(--bad)'}));
   ug.slice(0, 6).forEach(({t, p}) => box.append(el('div', {className: 'up', on: {click: () => open(p.id)}},
-    el('span', {className: 'chip late', textContent: '📅 ' + fmt(t.due) + (t.due < today() ? ' · gecikti' : ' · bugün')}),
+    el('span', {className: 'chip late', textContent: '📅 ' + fmt(t.due) + (t.due < today() ? ' · Overdue' : ' · Due today')}),
     el('span', {className: 'ut', textContent: t.t}), el('small', {className: 'mut', textContent: p.name}))));
-  if (ug.length > 6) box.append(el('small', {className: 'mut', textContent: '+ ' + (ug.length - 6) + ' acil görev daha'}));
+  if (ug.length > 6) box.append(el('small', {className: 'mut', textContent: '+ ' + (ug.length - 6) + ' more urgent tasks'}));
   return box;
 }
 
-// Bu hafta bitmesi gerekenler + gecikenler (arşivlenmemiş projelerden)
+// Due this week + overdue (from non-archived projects)
 function upcoming() {
   const lim = iso(new Date(Date.now() + 7 * 864e5)), out = [];
   db.projects.filter(p => !p.archived).forEach(p => allTasks(p).forEach(({t}) => { if (!t.done && t.due && t.due <= lim) out.push({t, p}); }));
@@ -650,15 +650,15 @@ function renderHome() {
   const done = act.filter(p => { const s = projStat(p); return s.n && s.d === s.n; }).length;
   if (!showArch) {
     app.append(el('div', {className: 'stats'},
-      ...[[act.length, 'proje'], [done, 'tamamlanan proje'], [t.d + ' / ' + t.n, 'görev tamamlandı'], ['%' + t.pct, 'genel ilerleme']]
+      ...[[act.length, 'projects'], [done, 'completed projects'], [t.d + ' / ' + t.n, 'tasks completed'], [t.pct + '%', 'overall progress']]
         .map(([v, l]) => el('div', {}, el('b', {textContent: v}), el('span', {textContent: l})))));
     const up = upcoming();
     if (up.length) {
-      const box = el('div', {className: 'sum'}, el('b', {textContent: 'Bu hafta ve geciken işler', style: 'font-size:16px;color:var(--ink)'}));
+      const box = el('div', {className: 'sum'}, el('b', {textContent: 'Due this week & overdue', style: 'font-size:16px;color:var(--ink)'}));
       up.slice(0, 12).forEach(({t, p}) => box.append(el('div', {className: 'up', on: {click: () => open(p.id)}},
-        el('span', {className: 'chip' + (isLate(t) ? ' late' : ''), textContent: '📅 ' + fmt(t.due) + (isLate(t) ? ' · gecikti' : '')}),
+        el('span', {className: 'chip' + (isLate(t) ? ' late' : ''), textContent: '📅 ' + fmt(t.due) + (isLate(t) ? ' · Overdue' : '')}),
         el('span', {className: 'ut', textContent: t.t}), el('small', {className: 'mut', textContent: p.name}))));
-      if (up.length > 12) box.append(el('small', {className: 'mut', textContent: '+ ' + (up.length - 12) + ' iş daha'}));
+      if (up.length > 12) box.append(el('small', {className: 'mut', textContent: '+ ' + (up.length - 12) + ' more tasks'}));
       app.append(box);
     }
   }
@@ -669,18 +669,18 @@ function renderHome() {
     const card = el('div', {className: 'card', on: {click: () => open(p.id)}},
       el('div', {className: 'top'},
         el('span', {className: 'ttl', textContent: p.name}),
-        ic('✎', 'Yeniden adlandır', e => { e.stopPropagation(); rename(p, 'name', 'Proje adı'); }),
-        ic('⧉', 'Kopyala', e => { e.stopPropagation(); const c = normalize(p); c.name = p.name + ' (kopya)'; db.projects.splice(i + 1, 0, c); save(); render(); }),
-        ic('📦', p.archived ? 'Arşivden çıkar' : 'Arşivle', e => { e.stopPropagation(); toggleArchive(p); }),
-        ic('×', 'Sil', e => { e.stopPropagation(); delProject(p); }, 'del')),
-      el('div', {}, el('span', {className: 'pct', textContent: '%' + s.pct}), el('small', {textContent: '  ' + s.d + '/' + s.n + ' görev · ' + p.phases.length + ' başlık'})),
+        ic('✎', 'Rename', e => { e.stopPropagation(); rename(p, 'name', 'Project name'); }),
+        ic('⧉', 'Duplicate', e => { e.stopPropagation(); const c = normalize(p); c.name = p.name + ' (copy)'; db.projects.splice(i + 1, 0, c); save(); render(); }),
+        ic('📦', p.archived ? 'Unarchive' : 'Archive', e => { e.stopPropagation(); toggleArchive(p); }),
+        ic('×', 'Delete', e => { e.stopPropagation(); delProject(p); }, 'del')),
+      el('div', {}, el('span', {className: 'pct', textContent: s.pct + '%'}), el('small', {textContent: '  ' + s.d + '/' + s.n + ' tasks · ' + p.phases.length + ' epics'})),
       bar(s.pct));
     card.prepend(grip(db.projects, i, () => card));
     card.firstChild.style.alignSelf = 'flex-start';
     grid.append(dropZone(card, db.projects, i));
   });
-  if (!showArch) grid.append(el('div', {className: 'card add', textContent: '+ Yeni proje', on: {click: newProject}}));
-  else if (!grid.children.length) grid.append(el('div', {className: 'empty', textContent: 'Arşivde proje yok.'}));
+  if (!showArch) grid.append(el('div', {className: 'card add', textContent: '+ Create project', on: {click: newProject}}));
+  else if (!grid.children.length) grid.append(el('div', {className: 'empty', textContent: 'No archived projects.'}));
   app.append(grid);
 }
 
@@ -701,12 +701,12 @@ const viewSwitch = () => el('div', {className: 'tabs'}, ...[['list', 'Liste'], [
 document.addEventListener('click', e => { if (fOpen && !e.target.closest('.fwrap')) { fOpen = false; render(); } });
 
 const stIcon = k => el('span', {className: 'si si-' + k});
-const pbar = pri => pri ? el('span', {className: 'pb p-' + pri, title: 'Öncelik: ' + PRI[pri]}, el('i'), el('i'), el('i')) : '';
+const pbar = pri => pri ? el('span', {className: 'pb p-' + pri, title: 'Priority: ' + PRI[pri]}, el('i'), el('i'), el('i')) : '';
 const ava = name => {
   const h = [...name].reduce((x, c) => (x * 31 + c.charCodeAt(0)) % 360, 11);
-  return el('span', {className: 'ava', title: name, style: 'background:hsl(' + h + ' 55% 45%)', textContent: name.trim().split(/\s+/).slice(0, 2).map(w => [...w][0]).join('').toLocaleUpperCase('tr')});
+  return el('span', {className: 'ava', title: name, style: 'background:hsl(' + h + ' 55% 45%)', textContent: name.trim().split(/\s+/).slice(0, 2).map(w => [...w][0]).join('').toLocaleUpperCase('en')});
 };
-const prefix = p => ([...p.name].filter(c => /\p{L}/u.test(c)).slice(0, 3).join('') || 'PRJ').toLocaleUpperCase('tr');
+const prefix = p => ([...p.name].filter(c => /\p{L}/u.test(c)).slice(0, 3).join('') || 'PRJ').toLocaleUpperCase('en');
 const idxMap = p => new Map(allTasks(p).map((x, i) => [x.t, i + 1]));
 
 function filterBar(p) {
@@ -716,24 +716,24 @@ function filterBar(p) {
   if (!whos.includes(flt.who)) flt.who = '';
   const n = ['st', 'pri', 'tag', 'who'].filter(k => flt[k]).length;
   const sel = (key, label, opts) => {
-    const x = el('select', {on: {change: e => { flt[key] = e.target.value; render(); }}}, el('option', {value: '', textContent: 'Tümü'}), ...opts.map(([v, l]) => el('option', {value: v, textContent: l})));
+    const x = el('select', {on: {change: e => { flt[key] = e.target.value; render(); }}}, el('option', {value: '', textContent: 'All'}), ...opts.map(([v, l]) => el('option', {value: v, textContent: l})));
     x.value = flt[key]; return el('label', {className: 'fld'}, el('span', {textContent: label}), x);
   };
-  const pop = fOpen ? el('div', {className: 'pop'}, sel('st', 'Durum', Object.entries(COLS)), sel('pri', 'Öncelik', Object.entries(PRI)),
-    tags.length ? sel('tag', 'Etiket', tags.map(x => [x, '#' + x])) : '', whos.length ? sel('who', 'Kişi', whos.map(x => [x, x])) : '',
-    n ? el('button', {textContent: 'Filtreyi temizle', on: {click: () => { flt.pri = flt.tag = flt.who = flt.st = ''; render(); }}}) : '') : '';
-  return el('div', {className: 'fwrap'}, el('button', {className: 'fbtn' + (n ? ' on' : ''), textContent: 'Filtreler' + (n ? ' (' + n + ')' : '') + ' ▾',
+  const pop = fOpen ? el('div', {className: 'pop'}, sel('st', 'Status', Object.entries(COLS)), sel('pri', 'Priority', Object.entries(PRI)),
+    tags.length ? sel('tag', 'Labels', tags.map(x => [x, '#' + x])) : '', whos.length ? sel('who', 'Assignee', whos.map(x => [x, x])) : '',
+    n ? el('button', {textContent: 'Clear filters', on: {click: () => { flt.pri = flt.tag = flt.who = flt.st = ''; render(); }}}) : '') : '';
+  return el('div', {className: 'fwrap'}, el('button', {className: 'fbtn' + (n ? ' on' : ''), textContent: 'Filters' + (n ? ' (' + n + ')' : '') + ' ▾',
     on: {click: e => { e.stopPropagation(); fOpen = !fOpen; render(); }}}), pop);
 }
 
-// Seçilen durumda yeni görev: başlık ve alt başlık seçtirir
+// Create a task in the selected status: asks for epic and story
 function newTask(p, st) {
   const opts = p.phases.flatMap(ph => ph.subs.map(sb => [sb, ph.name + ' › ' + sb.name]));
-  if (!opts.length) { openDlg('Yeni görev', el('p', {textContent: 'Önce Liste görünümünden bir başlık ve alt başlık ekle.'}), null); return; }
-  const title = el('input', {type: 'text', placeholder: 'Görev adı'}), where = el('select', {}, ...opts.map(([, l], i) => el('option', {value: i, textContent: l})));
+  if (!opts.length) { openDlg('Create task', el('p', {textContent: 'First add an epic and a story from the List view.'}), null); return; }
+  const title = el('input', {type: 'text', placeholder: 'What needs to be done?'}), where = el('select', {}, ...opts.map(([, l], i) => el('option', {value: i, textContent: l})));
   title.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#dlgOk').click(); } });
   const f = (l, n) => el('label', {className: 'fld'}, el('span', {textContent: l}), n);
-  openDlg('Yeni görev · ' + COLS[st], el('div', {className: 'form'}, f('Görev', title), f('Konum (başlık › alt başlık)', where)), () => {
+  openDlg('Create task · ' + COLS[st], el('div', {className: 'form'}, f('Summary', title), f('Location (epic › story)', where)), () => {
     const v = title.value.trim(); if (!v) { title.focus(); return false; }
     const t = mk(v); setStatus(t, st); opts[+where.value][0].tasks.push(t); save(); render();
   });
@@ -746,33 +746,33 @@ function renderKanban(p) {
   ST_ORDER.forEach((k, ci) => {
     const list = items.filter(x => colOf(x.t) === k), shut = kcl.has(k), col = el('div', {className: 'kcol k-' + k});
     col.append(el('div', {className: 'kh'}, stIcon(k), el('b', {textContent: COLS[k]}), el('span', {className: 'kn', textContent: list.length}), el('span', {className: 'sp'}),
-      ic(shut ? '⤢' : '⤡', shut ? 'Aç' : 'Daralt', () => { shut ? kcl.delete(k) : kcl.add(k); render(); }), ic('+', 'Yeni görev', () => newTask(p, k))));
+      ic(shut ? '⤢' : '⤡', shut ? 'Expand' : 'Collapse', () => { shut ? kcl.delete(k) : kcl.add(k); render(); }), ic('+', 'Create', () => newTask(p, k))));
     if (!shut) {
       list.forEach(({t, ph, sb}) => col.append(el('div', {className: 'kc' + (t.done ? ' d' : ''), style: '--pc:var(--c' + (p.phases.indexOf(ph) % 5 + 1) + ')', title: ph.name + ' › ' + sb.name + (t.note ? '\n\n' + t.note : '')},
-        el('div', {className: 'kk'}, el('span', {className: 'kico'}), el('span', {textContent: pre + ' ' + idx.get(t)}), el('span', {className: 'sp'}),
+        el('div', {className: 'kk'}, el('span', {className: 'kico'}), el('span', {textContent: pre + '-' + idx.get(t)}), el('span', {className: 'sp'}),
           el('span', {className: 'ka'},
-            ic('◀', 'Geri', () => go(t, ST_ORDER[ci - 1]), '', ci === 0),
-            ic('✎', 'Ayrıntılar', () => taskDlg(t)),
-            ic('▶', 'İleri', () => go(t, ST_ORDER[ci + 1]), '', ci === ST_ORDER.length - 1))),
+            ic('◀', 'Move back', () => go(t, ST_ORDER[ci - 1]), '', ci === 0),
+            ic('✎', 'Edit', () => taskDlg(t)),
+            ic('▶', 'Move forward', () => go(t, ST_ORDER[ci + 1]), '', ci === ST_ORDER.length - 1))),
         el('div', {className: 'kt', textContent: t.t}),
         el('div', {className: 'kp'}, pbar(t.pri), el('span', {className: 'chip st'}, stIcon(k), COLS[k]),
           t.due ? el('span', {className: 'chip' + (isLate(t) ? ' late' : ''), textContent: '📅 ' + fmt(t.due)}) : '', t.who ? ava(t.who) : ''),
         (t.tags || []).length ? el('div', {className: 'chips'}, t.tags.map(g => el('span', {className: 'chip', style: tagStyle(g), textContent: '#' + g}))) : '')));
-      col.append(el('button', {className: 'knew', textContent: '+ Yeni görev', on: {click: () => newTask(p, k)}}));
+      col.append(el('button', {className: 'knew', textContent: '+ Create', on: {click: () => newTask(p, k)}}));
     }
     wrap.append(col);
   });
   $('#app').append(wrap);
 }
 
-// Tablo (e-tablo) görünümü
+// Table (spreadsheet) view
 function renderTable(p) {
   const items = allTasks(p).filter(x => pass(x.t)), idx = idxMap(p), pre = prefix(p);
-  if (!items.length) { $('#app').append(el('div', {className: 'empty', textContent: 'Görev yok.'})); return; }
+  if (!items.length) { $('#app').append(el('div', {className: 'empty', textContent: 'No tasks.'})); return; }
   $('#app').append(el('div', {className: 'tblw'}, el('table', {className: 'tbl'},
-    el('thead', {}, el('tr', {}, ...['ID', 'Görev', 'Durum', 'Öncelik', 'Bitiş', 'Sorumlu', 'Etiketler', 'Konum'].map(h => el('th', {textContent: h})))),
+    el('thead', {}, el('tr', {}, ...['Key', 'Summary', 'Status', 'Priority', 'Due date', 'Assignee', 'Labels', 'Location'].map(h => el('th', {textContent: h})))),
     el('tbody', {}, ...items.map(({t, ph, sb}) => el('tr', {className: t.done ? 'd' : '', on: {click: () => taskDlg(t)}},
-      el('td', {className: 'mut', textContent: pre + ' ' + idx.get(t)}),
+      el('td', {className: 'mut', textContent: pre + '-' + idx.get(t)}),
       el('td', {className: 'tt', textContent: t.t}),
       el('td', {}, el('span', {className: 'chip st'}, stIcon(colOf(t)), COLS[colOf(t)])),
       el('td', {}, t.pri ? el('span', {className: 'chip p-' + t.pri, textContent: PRI[t.pri]}) : ''),
@@ -788,14 +788,14 @@ function renderCal(p) {
   const items = allTasks(p).map(x => x.t).filter(pass), by = {};
   items.filter(t => t.due).forEach(t => (by[t.due] = by[t.due] || []).push(t));
   const g = el('div', {className: 'calg'});
-  ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].forEach(w => g.append(el('div', {className: 'cwd', textContent: w})));
+  ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(w => g.append(el('div', {className: 'cwd', textContent: w})));
   const off = (new Date(cal.y, cal.m, 1).getDay() + 6) % 7, days = new Date(cal.y, cal.m + 1, 0).getDate();
   for (let i = 0; i < off; i++) g.append(el('div'));
   for (let d = 1; d <= days; d++) {
     const key = cal.y + '-' + pad(cal.m + 1) + '-' + pad(d);
     g.append(el('div', {className: 'cd' + (key === today() ? ' today' : '')}, el('span', {className: 'dn', textContent: d}),
       ...(by[key] || []).map(t => el('div', {className: 'ct' + (t.pri ? ' p-' + t.pri : '') + (t.done ? ' d' : '') + (isLate(t) ? ' late' : ''),
-        title: [t.t, t.who && 'Sorumlu: ' + t.who, t.pri && 'Öncelik: ' + PRI[t.pri], 'Durum: ' + COLS[colOf(t)], t.note, (t.tags || []).length && 'Etiket: ' + t.tags.join(', ')].filter(Boolean).join('\n'),
+        title: [t.t, t.who && 'Assignee: ' + t.who, t.pri && 'Priority: ' + PRI[t.pri], 'Status: ' + COLS[colOf(t)], t.note, (t.tags || []).length && 'Labels: ' + t.tags.join(', ')].filter(Boolean).join('\n'),
         on: {click: () => taskDlg(t)}},
         el('div', {textContent: t.t}),
         t.who ? el('small', {textContent: '👤 ' + t.who}) : '',
@@ -803,12 +803,12 @@ function renderCal(p) {
   }
   const undated = items.filter(t => !t.due && !t.done);
   $('#app').append(el('div', {className: 'calnav'},
-    ic('◀', 'Önceki ay', () => shift(-1)),
-    el('b', {textContent: new Date(cal.y, cal.m, 1).toLocaleDateString('tr-TR', {month: 'long', year: 'numeric'})}),
-    el('button', {textContent: 'Bugün', on: {click: () => { const n = new Date(); cal.y = n.getFullYear(); cal.m = n.getMonth(); render(); }}}),
-    ic('▶', 'Sonraki ay', () => shift(1))),
+    ic('◀', 'Previous month', () => shift(-1)),
+    el('b', {textContent: new Date(cal.y, cal.m, 1).toLocaleDateString('en-US', {month: 'long', year: 'numeric'})}),
+    el('button', {textContent: 'Today', on: {click: () => { const n = new Date(); cal.y = n.getFullYear(); cal.m = n.getMonth(); render(); }}}),
+    ic('▶', 'Next month', () => shift(1))),
     el('div', {className: 'calw'}, g),
-    undated.length ? el('div', {className: 'sum', style: 'margin-top:12px'}, el('b', {textContent: 'Tarihsiz açık görevler (' + undated.length + ')', style: 'font-size:15px;color:var(--ink)'}),
+    undated.length ? el('div', {className: 'sum', style: 'margin-top:12px'}, el('b', {textContent: 'Unscheduled open tasks (' + undated.length + ')', style: 'font-size:15px;color:var(--ink)'}),
       ...undated.map(t => el('div', {className: 'up', on: {click: () => taskDlg(t)}}, el('span', {className: 'ut', textContent: t.t}), chipsOf(t)))) : '');
 }
 
@@ -821,41 +821,41 @@ function render() {
   const setAll = v => { p.phases.forEach(ph => { ph.open = v; ph.subs.forEach(sb => sb.open = v); }); save(); render(); };
 
   app.append(el('div', {className: 'bartool'}, el('span', {className: 'sp'}),
-    mode === 'list' ? el('button', {textContent: 'Tümünü aç', on: {click: () => setAll(true)}}) : '',
-    mode === 'list' ? el('button', {textContent: 'Tümünü kapat', on: {click: () => setAll(false)}}) : '',
-    el('button', {textContent: 'Arşivle', on: {click: () => toggleArchive(p)}}),
-    el('button', {textContent: 'Sil', on: {click: () => delProject(p)}})));
+    mode === 'list' ? el('button', {textContent: 'Expand all', on: {click: () => setAll(true)}}) : '',
+    mode === 'list' ? el('button', {textContent: 'Collapse all', on: {click: () => setAll(false)}}) : '',
+    el('button', {textContent: 'Archive', on: {click: () => toggleArchive(p)}}),
+    el('button', {textContent: 'Delete', on: {click: () => delProject(p)}})));
   if (mode === 'kan') return renderKanban(p);
   if (mode === 'cal') return renderCal(p);
   if (mode === 'tbl') return renderTable(p);
 
-  if (!p.phases.length) app.append(el('div', {className: 'empty', textContent: 'Henüz başlık yok. Aşağıdan ekle ya da "Yeni proje" ile bir şablon seç.'}));
+  if (!p.phases.length) app.append(el('div', {className: 'empty', textContent: 'No epics yet. Add one below or create a project from a template.'}));
 
-  // İki sütun: solda açık başlıkların alt başlık ve görevleri, sağda başlık listesi
+  // Two columns: epic list on the left, stories and tasks of open epics on the right
   const side = el('div', {className: 'side'}), detail = el('div', {className: 'detail'});
   p.phases.forEach((ph, pi) => {
     const pc = '--pc:var(--c' + (pi % 5 + 1) + ')';
-    side.append(el('section', {className: 'ph' + (ph.open ? ' on' : ''), style: pc}, head(ph, p.phases, pi, stat(tasksOf(ph)), 'Başlık adı', 'Başlık silindi'), bar(stat(tasksOf(ph)).pct)));
+    side.append(el('section', {className: 'ph' + (ph.open ? ' on' : ''), style: pc}, head(ph, p.phases, pi, stat(tasksOf(ph)), 'Epic name', 'Epic deleted'), bar(stat(tasksOf(ph)).pct)));
     if (ph.open) {
       const box = el('section', {className: 'dp', style: pc}, el('h3', {textContent: ph.name}));
       ph.subs.forEach((sb, si) => {
-        const inp = el('input', {type: 'text', placeholder: 'Yeni görev ekle…'});
+        const inp = el('input', {type: 'text', placeholder: 'What needs to be done?'});
         const add = () => { const v = inp.value.trim(); if (v) { sb.tasks.push(mk(v)); save(); render(); } };
         inp.addEventListener('keydown', e => { if (e.key === 'Enter') add(); });
-        const sbox = el('div', {className: 'sb'}, head(sb, ph.subs, si, stat(sb.tasks), 'Alt başlık adı', 'Alt başlık silindi'), bar(stat(sb.tasks).pct));
+        const sbox = el('div', {className: 'sb'}, head(sb, ph.subs, si, stat(sb.tasks), 'Story name', 'Story deleted'), bar(stat(sb.tasks).pct));
         if (sb.open) {
           sb.tasks.forEach((t, ti) => { if (pass(t)) sbox.append(taskRow(t, sb.tasks, ti)); });
-          sbox.append(el('div', {className: 'add'}, inp, el('button', {textContent: 'Ekle', on: {click: add}})));
+          sbox.append(el('div', {className: 'add'}, inp, el('button', {textContent: 'Create', on: {click: add}})));
         }
         box.append(dropTasks(sbox, sb));
       });
-      box.append(el('div', {className: 'tools'}, el('button', {textContent: '+ Alt başlık', on: {click: () => ask('Alt başlık adı', '', n => { ph.subs.push({id: uid(), name: n, open: true, tasks: []}); save(); render(); })}})));
+      box.append(el('div', {className: 'tools'}, el('button', {textContent: '+ Add story', on: {click: () => ask('Story name', '', n => { ph.subs.push({id: uid(), name: n, open: true, tasks: []}); save(); render(); })}})));
       detail.append(box);
     }
   });
-  if (!detail.children.length && p.phases.length) detail.append(el('div', {className: 'empty', textContent: 'Soldaki listeden bir başlık seç; alt başlık ve görevleri burada açılır.'}));
+  if (!detail.children.length && p.phases.length) detail.append(el('div', {className: 'empty', textContent: 'Select an epic on the left to see its stories and tasks.'}));
 
-  side.append(el('button', {className: 'pri', textContent: '+ Başlık ekle', on: {click: () => ask('Başlık adı', '', n => { p.phases.push({id: uid(), name: n, open: true, subs: [{id: uid(), name: 'Görevler', open: true, tasks: []}]}); save(); render(); })}}));
+  side.append(el('button', {className: 'pri', textContent: '+ Add epic', on: {click: () => ask('Epic name', '', n => { p.phases.push({id: uid(), name: n, open: true, subs: [{id: uid(), name: 'Tasks', open: true, tasks: []}]}); save(); render(); })}}));
   app.append(el('div', {className: 'split'}, side, detail));
 }
 
@@ -867,7 +867,7 @@ function openDlg(title, body, onOk) {
   $('#dlgOk').onclick = () => { if (onOk() !== false) dlg.close(); };
   if (!dlg.open) dlg.showModal();
 }
-// prompt() bazı ortamlarda (önizleme/iframe) engellendiği için sayfa içi pencere kullan
+// prompt() is blocked in some environments (previews/iframes), so an in-page dialog is used
 function ask(label, def, cb) {
   const inp = el('input', {type: 'text', value: def || '', placeholder: label});
   inp.style.width = '100%';
@@ -881,20 +881,20 @@ const addProject = p => { collapse(p); db.projects.push(p); db.cur = p.id; view 
 function newProject() {
   const list = el('div', {});
   TEMPLATES.forEach(tp => list.append(el('button', {className: 'tpl', on: {click: () => {
-    ask('Proje adı', tp.name, n => addProject(fromTemplate(tp, n)));
+    ask('Project name', tp.name, n => addProject(fromTemplate(tp, n)));
   }}}, el('b', {textContent: tp.name}), el('span', {textContent: tp.desc}))));
   list.append(el('button', {className: 'tpl', on: {click: () => {
-    ask('Proje adı', '', n => addProject({id: uid(), name: n, phases: []}));
-  }}}, el('b', {textContent: 'Boş proje'}), el('span', {textContent: 'Sıfırdan kendi başlıklarını oluştur'})));
-  openDlg('Şablon seç', list, null);
+    ask('Project name', '', n => addProject({id: uid(), name: n, phases: []}));
+  }}}, el('b', {textContent: 'Blank project'}), el('span', {textContent: 'Start from scratch and build your own epics'})));
+  openDlg('Choose a template', list, null);
 }
 
-function exportProject() { const ta = el('textarea', {spellcheck: false, value: JSON.stringify(cur(), null, 2)}); openDlg('Bu projenin yedeği (kopyalayıp sakla)', ta, () => true); }
+function exportProject() { const ta = el('textarea', {spellcheck: false, value: JSON.stringify(cur(), null, 2)}); openDlg('Project backup (copy and keep)', ta, () => true); }
 function importProject() {
-  const ta = el('textarea', {spellcheck: false, placeholder: 'Claude\'un verdiği ya da daha önce dışa aktardığın JSON metnini buraya yapıştır'});
-  openDlg('Plan içe aktar (JSON)', ta, () => {
+  const ta = el('textarea', {spellcheck: false, placeholder: 'Paste the JSON provided by Claude or exported earlier'});
+  openDlg('Import project (JSON)', ta, () => {
     try { addProject(normalize(JSON.parse(ta.value))); }
-    catch (e) { alert('JSON okunamadı. Metni olduğu gibi yapıştır.'); return false; }
+    catch (e) { alert('Could not read the JSON. Paste the text exactly as exported.'); return false; }
   });
 };
 
