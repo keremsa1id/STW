@@ -95,7 +95,7 @@ main{padding:16px 20px 80px}
 .t input{appearance:none;-webkit-appearance:none;margin:2px 0 0;width:16px;height:16px;border:1.6px solid color-mix(in srgb,var(--mut) 80%,transparent);border-radius:50%;flex:none;cursor:pointer;background:transparent center/10px no-repeat}
 .t input:hover{border-color:var(--ok)}
 .t input:checked{background-color:var(--ok);border-color:var(--ok);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.5l2.3 2.3 4.7-5' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
-.t.s-doing input{border-color:var(--c4);background-image:linear-gradient(90deg,var(--c4) 50%,transparent 50%)}
+.t.s-doing input,.t.s-review input,.t.s-blocked input,.t.s-qa input{border-color:var(--c1);background-image:linear-gradient(90deg,var(--c1) 50%,transparent 50%)}
 .t label{display:block;cursor:pointer;word-break:break-word;font-weight:500}
 .t.d label{color:var(--mut);text-decoration:line-through}
 .tb{flex:1;min-width:0}
@@ -123,20 +123,32 @@ dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
 .kc .kt{font-weight:500}
 .kc.d .kt{color:var(--mut);text-decoration:line-through}
 
-.kan{display:grid;grid-template-columns:repeat(4,minmax(270px,1fr));gap:16px;align-items:start;overflow-x:auto;padding-bottom:8px}
+.kan{display:grid;grid-template-columns:repeat(var(--n,4),minmax(270px,1fr));gap:16px;align-items:start;overflow-x:auto;padding-bottom:8px}
 .kcol{min-height:60px}
 .kh{display:flex;align-items:center;gap:8px;padding:2px 2px 10px}
 .kh b{font-size:14px;font-weight:600}.kn{color:var(--mut);font-size:13px}
 .kk{display:flex;align-items:center;gap:6px;margin-bottom:6px;color:var(--mut);font-size:12px;font-weight:500}
 .kico{width:18px;height:18px;border-radius:5px;flex:none;background:color-mix(in srgb,var(--pc) 22%,var(--card));border:1px solid color-mix(in srgb,var(--pc) 50%,transparent)}
 .kk .ka{display:flex;opacity:0;transition:opacity .12s}.kc:hover .ka{opacity:1}
+.kepic{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;min-width:0}
+.kepic i{width:8px;height:8px;border-radius:2px;background:var(--pc);flex:none}
+.kepic span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 8px;border-radius:5px;background:color-mix(in srgb,var(--pc) 16%,var(--card));border:1px solid color-mix(in srgb,var(--pc) 42%,var(--line));color:var(--ink)}
 .kp{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
 .knew{border:0;background:none;color:var(--mut);width:100%;text-align:left;padding:8px 6px;border-radius:6px}
 .knew:hover{background:var(--hov);color:var(--ink)}
-.si{width:14px;height:14px;border-radius:50%;border:1.8px solid var(--mut);display:inline-block;flex:none;vertical-align:-2px}
+.si{width:14px;height:14px;border-radius:50%;border:1.8px solid var(--mut);display:inline-block;flex:none;vertical-align:-2px;box-sizing:border-box}
+/* gray = To Do category */
 .si-backlog{border-style:dotted}
-.si-doing{border-color:var(--c4);background:linear-gradient(90deg,var(--c4) 50%,transparent 50%)}
+.si-defined{background:radial-gradient(circle,var(--mut) 30%,transparent 34%)}
+.si-selected{background:conic-gradient(var(--mut) 0 25%,transparent 0)}
+/* blue = In Progress category */
+.si-doing{border-color:var(--c1);background:conic-gradient(var(--c1) 0 50%,transparent 0)}
+.si-review{border-color:var(--c1);background:conic-gradient(var(--c1) 0 75%,transparent 0)}
+.si-blocked{border-color:var(--c1);background:linear-gradient(var(--card),var(--card)) center/6px 2px no-repeat,var(--c1)}
+.si-qa{border-color:var(--c1);background:radial-gradient(circle,var(--c1) 30%,transparent 34%)}
+/* green = Done category */
 .si-done{border-color:var(--ok);background:var(--ok)}
+.si-cancelled{border-color:var(--ok);background:linear-gradient(135deg,transparent 42%,var(--ok) 42% 58%,transparent 58%)}
 .chip.st{display:inline-flex;align-items:center;gap:5px;padding:1px 8px}
 .pb{display:inline-flex;align-items:flex-end;gap:2px;height:22px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--card)}
 .pb i{width:3px;border-radius:1px;background:var(--line)}
@@ -152,6 +164,7 @@ dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
 .tabs button{display:grid;place-items:center;padding:5px 8px}
 .tabs svg{display:block}
 .t.s-backlog input{border-style:dotted}
+.t.s-cancelled input:checked{background-color:var(--card);border-color:var(--ok);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 3l6 6M9 3l-6 6' fill='none' stroke='%2316a34a' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E")}
 .tblw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
 .tbl{width:100%;border-collapse:collapse;font-size:13px}
 .tbl th{text-align:left;font-weight:600;color:var(--mut);padding:8px 10px;background:var(--sub);border-bottom:1px solid var(--line);white-space:nowrap}
@@ -199,7 +212,7 @@ dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
   #top .tabs,#top .fwrap,#top .mbtn,#top>button:last-child{order:8}
   .side{position:static;max-height:none;overflow:visible}
   .bartool{gap:6px}
-  .kan{grid-template-columns:repeat(4,minmax(260px,84vw));scroll-snap-type:x mandatory;margin:0 -12px;padding:0 12px 8px;scroll-padding-left:12px}
+  .kan{grid-template-columns:repeat(var(--n,4),minmax(260px,84vw));scroll-snap-type:x mandatory;margin:0 -12px;padding:0 12px 8px;scroll-padding-left:12px}
   .kcol{scroll-snap-align:start}
   .pop{right:auto;left:0;width:min(260px,86vw)}
   .fwrap{position:static}
@@ -244,6 +257,135 @@ dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
 .mrow{display:flex;align-items:center;gap:10px;padding:6px 0}.mrow .mi{flex:1;display:grid}
 .form hr{width:100%;border:0;border-top:1px solid var(--line);margin:2px 0}
 @media(max-width:900px){.rl{grid-template-columns:minmax(0,1fr)}}
+
+
+/* --- Project tabs, task page, timeline, backlog, sprints, reports --- */
+kbd{font:11px/1 ui-monospace,monospace;padding:2px 5px;border:1px solid var(--line);border-radius:4px;color:var(--mut);background:var(--card)}
+.ptabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:-4px 0 14px;overflow-x:auto}
+.pt{border:0;border-bottom:2px solid transparent;border-radius:0;background:none;padding:8px 12px;color:var(--mut);white-space:nowrap}
+.pt:hover:not(:disabled){background:var(--hov)}
+.pt.on{color:var(--acc);border-bottom-color:var(--acc);font-weight:600}
+.cnt{margin-left:6px;font-size:11px;padding:0 6px;border-radius:99px;background:var(--hov);color:var(--mut)}
+.kt{cursor:pointer}.kt:hover{color:var(--acc)}
+
+.tk{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+.tk-top{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.tk-title{font-size:22px;font-weight:600;border-color:transparent!important;background:transparent!important;padding:4px 6px!important;margin-bottom:6px}
+.tk-title:hover{border-color:var(--line)!important}
+.tk-sec{margin:18px 0}
+.tk-sec>h3{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}
+.tk-desc{min-height:90px;resize:vertical;font-family:inherit}
+.tk-sub{display:flex;align-items:center;gap:8px;padding:5px 2px;border-bottom:1px solid var(--line)}
+.tk-sub input{width:16px;height:16px;accent-color:var(--ok)}
+.tk-sub .tk-st{flex:1}.tk-sub.d .tk-st{color:var(--mut);text-decoration:line-through}
+.tk-link{display:flex;align-items:center;gap:8px;padding:5px 2px;border-bottom:1px solid var(--line)}
+.tk-link a{flex:1;color:var(--acc);text-decoration:none;word-break:break-all}.tk-link a:hover{text-decoration:underline}
+.tk-link .rl{white-space:nowrap;font-size:12px}
+.tk-sec .add select{max-width:50%}
+.tk-cin{display:grid;gap:6px;justify-items:end;margin-bottom:10px}
+.tk-cm{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.tk-cb{flex:1;min-width:0}.tk-ct{white-space:pre-wrap;word-break:break-word}
+.tk-lg{display:flex;gap:10px;padding:4px 0;font-size:13px}.tk-lg small{min-width:110px}
+.tk-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.tk-card h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}
+.tk-meta{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:13px}
+.tk-meta span:last-child{text-align:right}
+.tk-q{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 8px}
+.tk-side{position:sticky;top:68px}
+@media(max-width:900px){.tk{grid-template-columns:minmax(0,1fr)}.tk-side{position:static}}
+
+.tlbar{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.tl{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.tl-l{width:280px;flex:none;border-right:1px solid var(--line);background:var(--card);z-index:1}
+.tl-lh{height:48px;display:flex;align-items:flex-end;padding:0 12px 6px;color:var(--mut);font-size:12px;border-bottom:1px solid var(--line);background:var(--sub)}
+.tl-lr,.tl-row{height:34px}
+.tl-lr{display:flex;align-items:center;gap:6px;padding:0 12px;border-bottom:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
+.tl-lr.epic{background:var(--sub)}
+.tl-lr.task{padding-left:26px}
+.tl-lr .dot{width:9px;height:9px;border-radius:3px;background:var(--pc);flex:none}
+.tl-lr span:last-child,.tl-lr b{overflow:hidden;text-overflow:ellipsis}
+.tl-r{flex:1;min-width:0;overflow-x:auto}
+.tl-in{position:relative;min-width:100%}
+.tl-head{height:48px;position:relative;border-bottom:1px solid var(--line);background:var(--sub)}
+.tl-mh{display:flex;height:24px}
+.tl-m{flex:none;font-size:12px;font-weight:600;padding:3px 8px;border-left:1px solid var(--line);overflow:hidden;white-space:nowrap}
+.tl-dh{position:relative;height:24px}
+.tl-d{position:absolute;top:0;font-size:11px;color:var(--mut);text-align:center;padding-top:3px;border-left:1px solid var(--line);height:24px;overflow:hidden}
+.tl-body{position:relative}
+.tl-row{position:relative;border-bottom:1px solid var(--line)}
+.tl-we{position:absolute;top:0;bottom:0;background:color-mix(in srgb,var(--mut) 8%,transparent);pointer-events:none}
+.tl-today{position:absolute;top:0;bottom:0;width:2px;background:var(--bad);z-index:2;pointer-events:none}
+.tlb{position:absolute;top:6px;height:22px;border-radius:5px;background:color-mix(in srgb,var(--pc) 22%,var(--card));border:1px solid var(--pc);overflow:hidden;font-size:12px;line-height:20px;padding:0 6px;white-space:nowrap;cursor:pointer;z-index:1}
+.tlb.task:hover{background:color-mix(in srgb,var(--pc) 38%,var(--card))}
+.tlb.epic{cursor:default;background:color-mix(in srgb,var(--pc) 16%,var(--card))}
+.tlb.epic i{position:absolute;left:0;top:0;bottom:0;background:color-mix(in srgb,var(--pc) 55%,transparent)}
+.tlb span{position:relative;font-weight:500}
+.tlb.d{opacity:.55;text-decoration:line-through}
+@media(max-width:900px){.tl-l{width:150px}.tl-lr{padding:0 8px}.tl-lr.task{padding-left:12px}}
+
+.bl{border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.bl-r{display:flex;align-items:center;gap:10px;padding:6px 10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.bl-r:last-child{border-bottom:0}.bl-r:hover{background:var(--hov)}
+.bl-mv{display:flex;flex-direction:column;line-height:1}
+.bl-mv .ic{padding:0 6px;min-height:16px;font-size:10px}
+.bl-k{min-width:64px;font-size:12px}
+.bl-t{flex:1;min-width:160px;cursor:pointer;font-weight:500}.bl-t:hover{color:var(--acc)}
+.bl-e{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.sp-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.sp-h h2{margin:0}
+.st-active{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.st-planned{background:color-mix(in srgb,var(--c1) 14%,transparent);color:var(--c1)}
+.st-closed{background:var(--hov);color:var(--mut)}
+.rl-main h4{margin:18px 0 8px}
+
+.ins-h{font-size:16px;margin:8px 0 10px}
+.ins-k{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0}
+.ins-t{flex:1;min-width:120px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.ins-t b{display:block;font-size:22px}.ins-t span{color:var(--mut);font-size:12.5px}
+.ins-t.bad b{color:var(--bad)}
+.ins-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-bottom:16px}
+.ins-c{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.ins-c.wide{margin-top:14px}
+.ins-c h3{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}
+.stk{display:flex;height:14px;gap:2px;margin-bottom:10px}
+.stk i{border-radius:4px;min-width:6px}
+.sg-backlog{background:color-mix(in srgb,var(--mut) 40%,var(--card))}.sg-defined{background:color-mix(in srgb,var(--mut) 55%,var(--card))}.sg-selected{background:color-mix(in srgb,var(--mut) 70%,var(--card))}.sg-todo{background:var(--mut)}
+.sg-doing{background:var(--c1)}.sg-review{background:color-mix(in srgb,var(--c1) 80%,var(--card))}.sg-blocked{background:color-mix(in srgb,var(--c1) 62%,var(--card))}.sg-qa{background:color-mix(in srgb,var(--c1) 46%,var(--card))}
+.sg-done{background:var(--ok)}.sg-cancelled{background:color-mix(in srgb,var(--ok) 50%,var(--card))}
+.lg{display:flex;gap:6px 16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink)}
+.lg span{display:inline-flex;align-items:center;gap:6px}
+.hb-r{display:grid;grid-template-columns:110px minmax(0,1fr) 34px;gap:8px;align-items:center;padding:3px 0;font-size:13px}
+.hb-l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hb-t{height:10px;background:var(--hov);border-radius:5px;overflow:hidden}
+.hb-t i{display:block;height:100%;border-radius:5px}
+.hb-v{text-align:right;font-variant-numeric:tabular-nums}
+.c-high{background:var(--bad)}.c-mid{background:var(--c4)}.c-low{background:var(--c1)}.c-none{background:color-mix(in srgb,var(--mut) 55%,var(--card))}.c-acc{background:var(--acc)}
+.wk{display:flex;gap:8px;align-items:flex-end;height:150px}
+.wk-c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px}
+.wk-c b{font-size:12px;min-height:16px}
+.wk-c i{width:70%;max-width:34px;background:var(--acc);border-radius:4px 4px 0 0;min-height:0}
+.wk-c small{font-size:11px}
+.chartbox{max-width:680px}
+.chart{width:100%;height:auto;display:block}
+.chart .gl{stroke:var(--line);stroke-width:1}
+.chart .ax{fill:var(--mut);font-size:11px}
+.chart .ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.chart .ln.s-main{stroke:var(--acc)}.chart .ln.s-ideal{stroke:var(--mut);stroke-dasharray:5 5}
+.chart .pt{stroke:var(--card);stroke-width:2}.chart .pt.s-main{fill:var(--acc)}.chart .pt.s-ideal{fill:var(--mut)}
+.chart .hit{fill:transparent}
+.lg .sw{display:inline-block;width:18px;height:0;border-top:2px solid var(--acc)}
+.lg .sw.s-ideal{border-top:2px dashed var(--mut)}
+
+.bulk{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 12px;margin-bottom:10px;background:color-mix(in srgb,var(--acc) 10%,var(--card));border:1px solid color-mix(in srgb,var(--acc) 40%,var(--line));border-radius:10px}
+.bulk input[type=text]{width:150px}
+.tbl .cb{width:34px;text-align:center}.tbl .cb input{width:16px;height:16px;accent-color:var(--acc)}
+.tbl tr.sel{background:color-mix(in srgb,var(--acc) 10%,transparent)}
+
+.sr-list{margin-top:10px;max-height:50vh;overflow:auto;display:grid;gap:2px}
+.sr-it{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:6px;cursor:pointer}
+.sr-it.on,.sr-it:hover{background:color-mix(in srgb,var(--acc) 13%,transparent)}
+.sr-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sv{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:10px}.sv-r{display:flex;gap:4px}.sv-r button:first-child{flex:1;text-align:left}
 
 /* --- Pencere, bildirim --- */
 dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(600px,92vw);box-shadow:0 12px 40px #0004}
@@ -424,8 +566,18 @@ const TEMPLATES = [
 ];
 
 // Task: description (note), due date (due, YYYY-MM-DD), assignee (who), priority (pri: high|mid|low), labels (tags), status (st: backlog|todo|doing; done is separate)
-const mk = (t, done, x = {}) => ({id: uid(), t, done: !!done, note: String(x.note || ''), due: String(x.due || ''), who: String(x.who || ''),
-  pri: ['high', 'mid', 'low'].includes(x.pri) ? x.pri : '', tags: Array.isArray(x.tags) ? x.tags.map(String) : [], st: ['doing', 'backlog'].includes(x.st) ? x.st : 'todo'});
+const safeUrl0 = u => { try { return /^https?:$/.test(new URL(u).protocol); } catch (e) { return false; } };
+const arr0 = (v, f) => Array.isArray(v) ? v.map(f) : [];
+const mk = (t, done, x = {}) => ({id: typeof x.id === 'string' && x.id ? x.id : uid(), t, done: !!done || x.st === 'cancelled', note: String(x.note || ''), due: String(x.due || ''), who: String(x.who || ''),
+  pri: ['high', 'mid', 'low'].includes(x.pri) ? x.pri : '', tags: Array.isArray(x.tags) ? x.tags.map(String) : [], st: ['defined', 'selected', 'doing', 'review', 'blocked', 'qa', 'backlog', 'cancelled'].includes(x.st) ? x.st : 'todo',
+  start: String(x.start || ''), est: +x.est > 0 ? +x.est : 0, spent: +x.spent > 0 ? +x.spent : 0, num: +x.num || 0, sprint: String(x.sprint || ''), doneAt: String(x.doneAt || ''), rank: +x.rank || 0,
+  subs: arr0(x.subs, s => ({id: String(s.id || uid()), t: String(s.t || ''), done: !!s.done})),
+  comments: arr0(x.comments, c => ({id: String(c.id || uid()), at: String(c.at || ''), text: String(c.text || ''), by: String(c.by || '')})),
+  log: arr0(x.log, l => ({at: String(l.at || ''), text: String(l.text || '')})).slice(0, 200),
+  links: arr0(x.links, l => ({rel: ['blocks', 'blocked_by', 'relates'].includes(l.rel) ? l.rel : 'relates', to: String(l.to || '')})),
+  urls: arr0(x.urls, u => ({url: String(u.url || ''), label: String(u.label || '')})).filter(u => safeUrl0(u.url))});
+const normSprints = v => arr0(v, s => ({id: String(s.id || uid()), name: String(s.name || 'Sprint'), start: String(s.start || ''), end: String(s.end || ''), goal: String(s.goal || ''),
+  state: ['planned', 'active', 'closed'].includes(s.state) ? s.state : 'planned'}));
 function fromTemplate(tpl, name) {
   return {id: uid(), name: name || tpl.name, phases: tpl.data.map(([pn, subs]) => ({
     id: uid(), name: pn, open: true,
@@ -438,7 +590,7 @@ function fromTemplate(tpl, name) {
 function normalize(o) {
   const ph = Array.isArray(o.phases) ? o.phases : Array.isArray(o.asamalar) ? o.asamalar : [];
   const task = t => typeof t === 'string' ? mk(t) : mk(String(t.t || t.gorev || t.name || ''), t.done || t.bitti, t);
-  return {id: uid(), name: String(o.name || o.ad || 'Untitled project'), phases: ph.map(p => {
+  return {id: uid(), name: String(o.name || o.ad || 'Untitled project'), sprints: normSprints(o.sprints), seq: +o.seq || 0, phases: ph.map(p => {
     const subs = p.subs || p.altbasliklar;
     return {id: uid(), name: String(p.name || p.ad || 'Epic'), open: true,
       subs: Array.isArray(subs)
@@ -468,10 +620,30 @@ const fmt = s => new Date(s + 'T00:00').toLocaleDateString('en-US', {day: 'numer
 const isLate = t => !t.done && t.due && t.due < today();
 const PRI = {high: 'High', mid: 'Medium', low: 'Low'};
 const allTasks = p => p.phases.flatMap(ph => ph.subs.flatMap(sb => sb.tasks.map(t => ({t, ph, sb}))));
-const COLS = {backlog: 'Backlog', todo: 'Todo', doing: 'In progress', done: 'Done'};
+// Jira-style statuses. Category decides the colour: gray = To Do, blue = In Progress, green = Done
+const COLS = {backlog: 'Backlog', defined: 'Defined', selected: 'Selected for Development', todo: 'To Do', doing: 'In Progress', review: 'In Review', blocked: 'Blocked', qa: 'Ready for QA', done: 'Done', cancelled: 'Cancelled'};
+const CAT = {backlog: 'todo', defined: 'todo', selected: 'todo', todo: 'todo', doing: 'prog', review: 'prog', blocked: 'prog', qa: 'prog', done: 'done', cancelled: 'done'};
+const CATNAME = {todo: 'To Do', prog: 'In Progress', done: 'Done'};
+const DEFCOLS = ['backlog', 'todo', 'doing', 'review', 'blocked', 'done'];
 const ST_ORDER = Object.keys(COLS);
-const colOf = t => t.done ? 'done' : t.st === 'doing' || t.st === 'backlog' ? t.st : 'todo';
-const setStatus = (t, s) => { t.done = s === 'done'; if (s !== 'done') t.st = s; };
+const colOf = t => t.done ? (t.st === 'cancelled' ? 'cancelled' : 'done') : COLS[t.st] && CAT[t.st] !== 'done' ? t.st : 'todo';
+const logT = (t, text) => { (t.log = t.log || []).unshift({at: new Date().toISOString(), text}); if (t.log.length > 200) t.log.length = 200; };
+const setStatus = (t, s) => {
+  const old = colOf(t), closing = CAT[s] === 'done';
+  if (closing && CAT[old] !== 'done') t.pst = old;
+  t.done = closing; t.st = s;
+  if (old !== s) { logT(t, 'Status: ' + COLS[old] + ' → ' + COLS[s]); t.doneAt = s === 'done' ? new Date().toISOString() : ''; }
+};
+// Older saved data lacks the newer fields; fill defaults and give every task a stable number (key = PREFIX-number)
+const ensureTask = t => { t.subs = t.subs || []; t.comments = t.comments || []; t.log = t.log || []; t.links = t.links || []; t.urls = t.urls || [];
+  t.start = t.start || ''; t.est = +t.est || 0; t.spent = +t.spent || 0; t.sprint = t.sprint || ''; t.doneAt = t.doneAt || ''; t.rank = +t.rank || 0; return t; };
+const ensureProj = p => {
+  p.sprints = p.sprints || [];
+  const ts = allTasks(p).map(x => ensureTask(x.t));
+  p.seq = Math.max(p.seq || 0, ...ts.map(t => t.num || 0));
+  ts.forEach(t => { if (!t.num) t.num = ++p.seq; });
+};
+db.projects.forEach(ensureProj);
 
 /* ---------- UI ---------- */
 function el(tag, attrs, ...kids) {
@@ -580,34 +752,19 @@ function chipsOf(t) {
   if (t.pri) c.push(el('span', {className: 'chip p-' + t.pri, textContent: PRI[t.pri]}));
   if (t.due) c.push(el('span', {className: 'chip' + (isLate(t) ? ' late' : ''), textContent: '📅 ' + fmt(t.due) + (isLate(t) ? ' · Overdue' : '')}));
   if (t.who) c.push(el('span', {className: 'chip', textContent: '👤 ' + t.who}));
+  if ((t.subs || []).length) c.push(el('span', {className: 'chip', title: 'Sub-tasks', textContent: '☑ ' + t.subs.filter(s => s.done).length + '/' + t.subs.length}));
+  if (t.est || t.spent) c.push(el('span', {className: 'chip', title: 'Time spent / estimate', textContent: '⏱ ' + hrs(t.spent) + (t.est ? ' / ' + hrs(t.est) : '')}));
   (t.tags || []).forEach(g => c.push(el('span', {className: 'chip', style: tagStyle(g), textContent: '#' + g})));
   return c.length ? el('div', {className: 'chips'}, c) : '';
 }
 
 // Task details: summary, description, due date, assignee, priority, labels, status
-function taskDlg(t) {
-  const f = (label, node) => el('label', {className: 'fld'}, el('span', {textContent: label}), node);
-  const sel = (opts, v) => { const s = el('select', {}, ...opts.map(([k, l]) => el('option', {value: k, textContent: l}))); s.value = v; return s; };
-  const title = el('input', {type: 'text', value: t.t}), note = el('textarea', {value: t.note || '', placeholder: 'Add a description'}),
-    due = el('input', {type: 'date', value: t.due || ''}), who = el('input', {type: 'text', value: t.who || '', placeholder: 'Assignee name'}),
-    pri = sel([['', 'None'], ['high', 'High'], ['mid', 'Medium'], ['low', 'Low']], t.pri || ''),
-    st = sel(Object.entries(COLS), colOf(t)),
-    tags = el('input', {type: 'text', value: (t.tags || []).join(', '), placeholder: 'comma separated: design, urgent'});
-  who.setAttribute('list', 'assignees');
-  const names = [...new Set(db.projects.flatMap(pp => allTasks(pp).map(x => x.t.who)).filter(Boolean))];
-  const dl = el('datalist', {id: 'assignees'}, ...names.map(n => el('option', {value: n})));
-  openDlg('Edit task', el('div', {className: 'form'}, f('Summary', title), f('Description', note), f('Due date', due), f('Assignee', who), f('Priority', pri), f('Labels', tags), f('Status', st), dl), () => {
-    const v = title.value.trim(); if (!v) { title.focus(); return false; }
-    t.t = v; t.note = note.value.trim(); t.due = due.value; t.who = who.value.trim(); t.pri = pri.value;
-    t.tags = [...new Set(tags.value.split(',').map(x => x.trim().replace(/^#/, '')).filter(Boolean))];
-    setStatus(t, st.value); save(); render();
-  });
-}
+function taskDlg(t) { openTask(t); }
 
 function taskRow(t, arr, i) {
   const row = el('div', {className: 't' + (t.pri ? ' p-' + t.pri : '') + (' s-' + colOf(t)) + (t.done ? ' d' : '')},
     grip(arr, i, () => row, 'task'),
-    el('input', {type: 'checkbox', id: t.id, checked: t.done, on: {change: e => { t.done = e.target.checked; save(); render(); }}}),
+    el('input', {type: 'checkbox', id: t.id, checked: t.done, on: {change: e => { setStatus(t, e.target.checked ? 'done' : (t.pst && CAT[t.pst] !== 'done' ? t.pst : 'todo')); save(); render(); }}}),
     el('div', {className: 'tb'},
       el('label', {htmlFor: t.id, textContent: t.t, title: 'Double-click to edit', on: {dblclick: e => { e.preventDefault(); rename(t, 't', 'Summary'); }}}),
       t.note ? el('div', {className: 'note', textContent: t.note}) : '', chipsOf(t)),
@@ -616,12 +773,12 @@ function taskRow(t, arr, i) {
   return dropZone(row, arr, i, 'task');
 }
 
-let view = 'home', mode = 'list', showArch = false;
+let view = 'home', mode = 'list', ptab = 'items', showArch = false;
 const flt = {pri: '', tag: '', who: '', st: ''};
 const pass = t => (!flt.pri || t.pri === flt.pri) && (!flt.tag || (t.tags || []).includes(flt.tag)) && (!flt.who || t.who === flt.who) && (!flt.st || colOf(t) === flt.st);
 const collapse = p => p.phases.forEach(ph => { ph.open = false; ph.subs.forEach(sb => sb.open = false); });
 const open = id => {
-  db.cur = id; view = 'project'; mode = 'list'; flt.pri = flt.tag = flt.who = flt.st = '';
+  db.cur = id; view = 'project'; mode = 'list'; ptab = 'items'; flt.pri = flt.tag = flt.who = flt.st = '';
   collapse(cur()); // open the project collapsed
   save(); render();
 };
@@ -732,7 +889,9 @@ function renderSidebar() {
   const na = db.projects.filter(p => p.archived).length;
   sb.append(el('div', {className: 'brand'}, el('span', {className: 'logo', textContent: 'P'}), el('b', {textContent: 'Project Tracker'})),
     el('button', {className: 'pri newb', textContent: '+ Create project', on: {click: newProject}}),
+    el('button', {className: 'nv', on: {click: searchDlg}}, el('span', {className: 'pn', textContent: '🔍 Search'}), el('kbd', {textContent: 'Ctrl K'})),
     nv('🏠 Dashboard', view === 'home' && !showArch, () => { showArch = false; view = 'home'; render(); }),
+    nv('⭐ For you', view === 'me', () => { view = 'me'; render(); }),
     na ? nv('📦 Archive (' + na + ')', view === 'home' && showArch, () => { showArch = true; view = 'home'; render(); }) : '',
     nv('👥 Members & Roles', view === 'roles', () => { view = 'roles'; render(); }),
     el('div', {className: 'sec', textContent: 'Projects'}));
@@ -754,6 +913,13 @@ function renderHeader() {
   if (view === 'home') {
     top.append(el('h1', {textContent: showArch ? 'Archive' : 'Dashboard'}), el('span', {className: 'sp'}),
       showArch ? el('button', {textContent: '← Projects', on: {click: () => { showArch = false; render(); }}}) : el('button', {className: 'pri', textContent: '+ Create project', on: {click: newProject}}));
+  } else if (view === 'me') {
+    top.append(el('h1', {textContent: 'For you'}));
+  } else if (view === 'task' && taskCtx) {
+    const tp = taskCtx.p, tt = taskCtx.t;
+    top.append(el('button', {className: 'crumb', textContent: 'Projects', on: {click: () => { taskCtx = null; view = 'home'; render(); }}}), el('span', {className: 'sep', textContent: '/'}),
+      el('button', {className: 'crumb', textContent: tp.name, on: {click: () => { taskCtx = null; view = 'project'; ptab = 'items'; render(); }}}), el('span', {className: 'sep', textContent: '/'}),
+      el('h1', {textContent: keyOf(tp, tt)}), el('span', {className: 'sp'}), el('button', {textContent: 'Delete', on: {click: deleteOpenTask}}));
   } else if (view === 'roles') {
     top.append(el('h1', {textContent: 'Members & Roles'}), el('span', {className: 'sp'}),
       el('button', {className: 'pri', textContent: '+ Invite user', on: {click: () => soon('Invite users')}}));
@@ -762,7 +928,7 @@ function renderHeader() {
     top.append(el('button', {className: 'crumb', textContent: 'Projects', on: {click: home}}), el('span', {className: 'sep', textContent: '/'}),
       avatar(p), el('h1', {textContent: p.name}), ic('✎', 'Rename project', () => rename(p, 'name', 'Project name')), el('span', {className: 'sp'}),
       el('div', {className: 'mini'}, el('span', {textContent: s.pct + '% · ' + s.d + '/' + s.n + ' tasks'}), bar(s.pct)),
-      viewSwitch(), filterBar(p),
+      ...(ptab === 'items' ? [viewSwitch(), filterBar(p)] : []),
       el('button', {className: 'mbtn', textContent: '👥 Members', on: {click: () => membersDlg(p)}}),
       el('button', {textContent: 'Export', on: {click: exportProject}}));
   }
@@ -859,23 +1025,25 @@ function renderHome() {
   if (!showArch) grid.append(el('div', {className: 'card add', textContent: '+ Create project', on: {click: newProject}}));
   else if (!grid.children.length) grid.append(el('div', {className: 'empty', textContent: 'No archived projects.'}));
   app.append(grid);
+  if (!showArch) app.append(insights(act.flatMap(pp => allTasks(pp).map(x => ({t: x.t, p: pp}))), 'Insights · all projects'));
 }
 
-let fOpen = false;
+let fOpen = false, cOpen = false;
 const kcl = new Set();
 const ICONS = {
   list: '<path d="M5.5 4h8M5.5 8h8M5.5 12h8M2.5 4h.01M2.5 8h.01M2.5 12h.01"/>',
   kan: '<rect x="2.5" y="2.5" width="4" height="11" rx="1"/><rect x="9.5" y="2.5" width="4" height="7" rx="1"/>',
   cal: '<rect x="2.5" y="3.5" width="11" height="10" rx="1.5"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/>',
-  tbl: '<rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/><path d="M2.5 6.5h11M2.5 10h11M7 6.5v7"/>'};
+  tbl: '<rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/><path d="M2.5 6.5h11M2.5 10h11M7 6.5v7"/>',
+  tl: '<path d="M2.5 4h6M5 8h8M3.5 12h7"/>'};
 function svgIcon(k) {
   const v = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   [['viewBox', '0 0 16 16'], ['width', '16'], ['height', '16'], ['fill', 'none'], ['stroke', 'currentColor'], ['stroke-width', '1.5'], ['stroke-linecap', 'round']].forEach(([n, x]) => v.setAttribute(n, x));
   v.innerHTML = ICONS[k]; return v;
 }
-const viewSwitch = () => el('div', {className: 'tabs'}, ...[['list', 'Liste'], ['kan', 'Kanban'], ['cal', 'Takvim'], ['tbl', 'Tablo']]
+const viewSwitch = () => el('div', {className: 'tabs'}, ...[['list', 'List'], ['kan', 'Board'], ['cal', 'Calendar'], ['tbl', 'Table'], ['tl', 'Timeline']]
   .map(([k, l]) => el('button', {className: mode === k ? 'pri' : '', title: l, on: {click: () => { mode = k; render(); }}}, svgIcon(k))));
-document.addEventListener('click', e => { if (fOpen && !e.target.closest('.fwrap')) { fOpen = false; render(); } });
+document.addEventListener('click', e => { if ((fOpen || cOpen) && !e.target.closest('.fwrap')) { fOpen = cOpen = false; render(); } });
 
 const stIcon = k => el('span', {className: 'si si-' + k});
 const pbar = pri => pri ? el('span', {className: 'pb p-' + pri, title: 'Priority: ' + PRI[pri]}, el('i'), el('i'), el('i')) : '';
@@ -898,6 +1066,11 @@ function filterBar(p) {
   };
   const pop = fOpen ? el('div', {className: 'pop'}, sel('st', 'Status', Object.entries(COLS)), sel('pri', 'Priority', Object.entries(PRI)),
     tags.length ? sel('tag', 'Labels', tags.map(x => [x, '#' + x])) : '', whos.length ? sel('who', 'Assignee', whos.map(x => [x, x])) : '',
+    el('div', {className: 'sv'}, ...(db.savedFilters || []).map(sf => el('div', {className: 'sv-r'},
+      el('button', {textContent: '★ ' + sf.name, on: {click: () => { Object.assign(flt, {pri: '', tag: '', who: '', st: ''}, sf.f); render(); }}}),
+      ic('×', 'Delete saved filter', () => { db.savedFilters = db.savedFilters.filter(x => x !== sf); save(); render(); }, 'del'))),
+      me() ? el('button', {textContent: 'Assigned to me', on: {click: () => { flt.who = me(); render(); }}}) : '',
+      n ? el('button', {textContent: 'Save current filter…', on: {click: () => ask('Filter name', '', nm => { (db.savedFilters = db.savedFilters || []).push({id: uid(), name: nm, f: {pri: flt.pri, tag: flt.tag, who: flt.who, st: flt.st}}); save(); render(); })}}) : ''),
     n ? el('button', {textContent: 'Clear filters', on: {click: () => { flt.pri = flt.tag = flt.who = flt.st = ''; render(); }}}) : '') : '';
   return el('div', {className: 'fwrap'}, el('button', {className: 'fbtn' + (n ? ' on' : ''), textContent: 'Filters' + (n ? ' (' + n + ')' : '') + ' ▾',
     on: {click: e => { e.stopPropagation(); fOpen = !fOpen; render(); }}}), pop);
@@ -912,26 +1085,40 @@ function newTask(p, st) {
   const f = (l, n) => el('label', {className: 'fld'}, el('span', {textContent: l}), n);
   openDlg('Create task · ' + COLS[st], el('div', {className: 'form'}, f('Summary', title), f('Location (epic › story)', where)), () => {
     const v = title.value.trim(); if (!v) { title.focus(); return false; }
-    const t = mk(v); setStatus(t, st); opts[+where.value][0].tasks.push(t); save(); render();
+    const t = mk(v); logT(t, 'Created'); setStatus(t, st); opts[+where.value][0].tasks.push(t); save(); render();
   });
   title.focus();
 }
 
+const colsShown = () => db.cols && db.cols.length ? db.cols : DEFCOLS;
+function columnsMenu(p) {
+  const used = new Set(allTasks(p).map(x => colOf(x.t))), shown = new Set(colsShown());
+  const pop = cOpen ? el('div', {className: 'pop'}, el('b', {textContent: 'Board columns'}),
+    ...Object.keys(COLS).map(k => el('label', {className: 'pr', title: used.has(k) ? 'Has work items, so it stays visible' : ''},
+      el('input', {type: 'checkbox', checked: shown.has(k) || used.has(k), disabled: used.has(k), on: {change: e => {
+        const n = new Set(colsShown()); e.target.checked ? n.add(k) : n.delete(k); db.cols = Object.keys(COLS).filter(x => n.has(x)); save(); render(); }}}),
+      stIcon(k), el('span', {textContent: COLS[k]})))) : '';
+  return el('div', {className: 'fwrap'}, el('button', {className: 'fbtn', textContent: 'Columns ▾', on: {click: e => { e.stopPropagation(); cOpen = !cOpen; render(); }}}), pop);
+}
 function renderKanban(p) {
-  const items = allTasks(p).filter(x => pass(x.t)), wrap = el('div', {className: 'kan'}), idx = idxMap(p), pre = prefix(p);
+  const all = allTasks(p), items = all.filter(x => pass(x.t)), pre = prefix(p);
+  const used = new Set(all.map(x => colOf(x.t))), shown = new Set(colsShown());
+  const vis = Object.keys(COLS).filter(k => shown.has(k) || used.has(k));
+  const wrap = el('div', {className: 'kan', style: '--n:' + vis.length});
   const go = (t, k) => { setStatus(t, k); save(); render(); };
-  ST_ORDER.forEach((k, ci) => {
+  vis.forEach((k, ci) => {
     const list = items.filter(x => colOf(x.t) === k), shut = kcl.has(k), col = el('div', {className: 'kcol k-' + k});
     col.append(el('div', {className: 'kh'}, stIcon(k), el('b', {textContent: COLS[k]}), el('span', {className: 'kn', textContent: list.length}), el('span', {className: 'sp'}),
       ic(shut ? '⤢' : '⤡', shut ? 'Expand' : 'Collapse', () => { shut ? kcl.delete(k) : kcl.add(k); render(); }), ic('+', 'Create', () => newTask(p, k))));
     if (!shut) {
       list.forEach(({t, ph, sb}) => col.append(el('div', {className: 'kc' + (t.done ? ' d' : ''), style: '--pc:var(--c' + (p.phases.indexOf(ph) % 5 + 1) + ')', title: ph.name + ' › ' + sb.name + (t.note ? '\n\n' + t.note : '')},
-        el('div', {className: 'kk'}, el('span', {className: 'kico'}), el('span', {textContent: pre + '-' + idx.get(t)}), el('span', {className: 'sp'}),
+        el('div', {className: 'kk'}, el('span', {className: 'kico'}), el('span', {textContent: pre + '-' + t.num}), el('span', {className: 'sp'}),
           el('span', {className: 'ka'},
-            ic('◀', 'Move back', () => go(t, ST_ORDER[ci - 1]), '', ci === 0),
+            ic('◀', 'Move back', () => go(t, vis[ci - 1]), '', ci === 0),
             ic('✎', 'Edit', () => taskDlg(t)),
-            ic('▶', 'Move forward', () => go(t, ST_ORDER[ci + 1]), '', ci === ST_ORDER.length - 1))),
-        el('div', {className: 'kt', textContent: t.t}),
+            ic('▶', 'Move forward', () => go(t, vis[ci + 1]), '', ci === vis.length - 1))),
+        el('div', {className: 'kt', textContent: t.t, title: 'Open work item', on: {click: () => openTask(t)}}),
+        el('div', {className: 'kepic', title: 'Epic: ' + ph.name + '\nStory: ' + sb.name}, el('i'), el('span', {textContent: ph.name})),
         el('div', {className: 'kp'}, pbar(t.pri), el('span', {className: 'chip st'}, stIcon(k), COLS[k]),
           t.due ? el('span', {className: 'chip' + (isLate(t) ? ' late' : ''), textContent: '📅 ' + fmt(t.due)}) : '', t.who ? ava(t.who) : ''),
         (t.tags || []).length ? el('div', {className: 'chips'}, t.tags.map(g => el('span', {className: 'chip', style: tagStyle(g), textContent: '#' + g}))) : '')));
@@ -942,22 +1129,433 @@ function renderKanban(p) {
   $('#app').append(wrap);
 }
 
-// Table (spreadsheet) view
+// Table (spreadsheet) view with bulk edit
+const bsel = new Set();
 function renderTable(p) {
-  const items = allTasks(p).filter(x => pass(x.t)), idx = idxMap(p), pre = prefix(p);
+  const items = allTasks(p).filter(x => pass(x.t)), pre = prefix(p);
+  for (const t of [...bsel]) if (!items.some(x => x.t === t)) bsel.delete(t);
   if (!items.length) { $('#app').append(el('div', {className: 'empty', textContent: 'No tasks.'})); return; }
-  $('#app').append(el('div', {className: 'tblw'}, el('table', {className: 'tbl'},
-    el('thead', {}, el('tr', {}, ...['Key', 'Summary', 'Status', 'Priority', 'Due date', 'Assignee', 'Labels', 'Location'].map(h => el('th', {textContent: h})))),
-    el('tbody', {}, ...items.map(({t, ph, sb}) => el('tr', {className: t.done ? 'd' : '', on: {click: () => taskDlg(t)}},
-      el('td', {className: 'mut', textContent: pre + '-' + idx.get(t)}),
+  const bulk = fn => { [...bsel].forEach(fn); save(); render(); };
+  const pick = (ph, opts, fn) => el('select', {on: {change: e => { if (e.target.value !== '') fn(e.target.value); }}}, el('option', {value: '', textContent: ph}), ...opts.map(([k, l]) => el('option', {value: k, textContent: l})));
+  const who = el('input', {type: 'text', placeholder: 'Assignee…'}); who.setAttribute('list', 'assignees');
+  const setPri = v => bulk(t => { const n = v === 'none' ? '' : v; if ((t.pri || '') !== n) { logT(t, 'Priority: ' + (PRI[t.pri] || 'None') + ' → ' + (PRI[n] || 'None')); t.pri = n; } });
+  const setSprint = v => bulk(t => { const n = v === 'none' ? '' : v; if (t.sprint !== n) { logT(t, 'Sprint: ' + (sprintName(p, t.sprint) || 'None') + ' → ' + (sprintName(p, n) || 'None')); t.sprint = n; if (n && t.st === 'backlog' && !t.done) t.st = 'todo'; } });
+  const bar2 = bsel.size ? el('div', {className: 'bulk'}, el('b', {textContent: bsel.size + ' selected'}),
+    pick('Status…', Object.entries(COLS), v => bulk(t => setStatus(t, v))),
+    pick('Priority…', [['none', 'None'], ...Object.entries(PRI)], setPri),
+    ...(p.sprints.some(x => x.state !== 'closed') ? [pick('Sprint…', [['none', 'No sprint'], ...openSprints(p).map(x => [x.id, x.name])], setSprint)] : []),
+    who, el('button', {textContent: 'Assign', on: {click: () => { const v = who.value.trim(); bulk(t => { if ((t.who || '') !== v) { logT(t, 'Assignee: ' + (t.who || 'None') + ' → ' + (v || 'None')); t.who = v; } }); }}}),
+    el('span', {className: 'sp'}),
+    el('button', {textContent: 'Delete', on: {click: () => { const set = new Set(bsel); bsel.clear(); withUndo(set.size + ' work items deleted', () => removeTasks(p, set)); }}}),
+    el('button', {textContent: 'Clear', on: {click: () => { bsel.clear(); render(); }}})) : '';
+  const hcb = el('input', {type: 'checkbox', checked: items.every(x => bsel.has(x.t)), title: 'Select all', on: {change: e => { items.forEach(x => e.target.checked ? bsel.add(x.t) : bsel.delete(x.t)); render(); }}});
+  $('#app').append(bar2, el('div', {className: 'tblw'}, el('table', {className: 'tbl'},
+    el('thead', {}, el('tr', {}, el('th', {className: 'cb'}, hcb), ...['Key', 'Summary', 'Status', 'Priority', 'Due date', 'Assignee', 'Labels', 'Location'].map(h => el('th', {textContent: h})))),
+    el('tbody', {}, ...items.map(({t, ph, sb}) => el('tr', {className: (t.done ? 'd' : '') + (bsel.has(t) ? ' sel' : ''), on: {click: () => openTask(t)}},
+      el('td', {className: 'cb', on: {click: e => e.stopPropagation()}}, el('input', {type: 'checkbox', checked: bsel.has(t), on: {change: e => { e.target.checked ? bsel.add(t) : bsel.delete(t); render(); }}})),
+      el('td', {className: 'mut', textContent: pre + '-' + t.num}),
       el('td', {className: 'tt', textContent: t.t}),
       el('td', {}, el('span', {className: 'chip st'}, stIcon(colOf(t)), COLS[colOf(t)])),
       el('td', {}, t.pri ? el('span', {className: 'chip p-' + t.pri, textContent: PRI[t.pri]}) : ''),
       el('td', {className: isLate(t) ? 'late' : '', textContent: t.due ? fmt(t.due) : ''}),
       el('td', {}, t.who ? [ava(t.who), ' ' + t.who] : ''),
       el('td', {}, (t.tags || []).map(g => el('span', {className: 'chip', style: tagStyle(g), textContent: '#' + g}))),
-      el('td', {className: 'mut', textContent: ph.name + ' › ' + sb.name})))))));
+      el('td', {className: 'mut', textContent: ph.name + ' › ' + sb.name})))))), assigneeList());
 }
+
+/* ================= Work-item features =================
+   Task page, timeline, roadmap, backlog, sprints, reports, For you, search, bulk edit.
+   All of it is local (localStorage); nothing here needs the cloud. */
+const nowIso = () => new Date().toISOString();
+const dn = s => Math.round(Date.parse(s + 'T00:00:00Z') / 864e5);          // 'YYYY-MM-DD' -> day number
+const fromDn = n => new Date(n * 864e5);
+const fmtDn = (n, o) => fromDn(n).toLocaleDateString('en-US', Object.assign({timeZone: 'UTC'}, o || {day: 'numeric', month: 'short'}));
+const fmtDT = s => s ? new Date(s).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'}) : '';
+const safeUrl = u => { try { return /^https?:$/.test(new URL(u).protocol); } catch (e) { return false; } };
+const hrs = h => (Math.round((h || 0) * 100) / 100) + 'h';
+const keyOf = (p, t) => prefix(p) + '-' + t.num;
+const findProj = t => db.projects.find(pr => allTasks(pr).some(x => x.t === t));
+const me = () => (db.me || '').trim();
+const isMine = t => me() && (t.who || '').trim().toLowerCase() === me().toLowerCase();
+const taskOf = (p, id) => { const x = allTasks(p).find(y => y.t.id === id); return x && x.t; };
+const sprintName = (p, id) => (p.sprints.find(s => s.id === id) || {}).name || '';
+const removeTasks = (p, set) => p.phases.forEach(ph => ph.subs.forEach(sb => { sb.tasks = sb.tasks.filter(t => !set.has(t)); }));
+const stIconOf = t => el('span', {className: 'chip st'}, stIcon(colOf(t)), COLS[colOf(t)]);
+const fld = (label, node) => el('label', {className: 'fld'}, el('span', {textContent: label}), node);
+const assigneeList = () => el('datalist', {id: 'assignees'}, ...[...new Set(db.projects.flatMap(pp => allTasks(pp).map(x => x.t.who)).filter(Boolean))].map(n => el('option', {value: n})));
+const openSprints = (p, keep) => p.sprints.filter(s => s.state !== 'closed' || s.id === keep);
+
+/* ---------- Project tabs ---------- */
+let ptabInit = 0;
+function projectTabs(p) {
+  const T = [['items', 'Work items'], ['roadmap', 'Roadmap'], ['backlog', 'Backlog'], ['sprints', 'Sprints'], ['reports', 'Reports']];
+  const nb = allTasks(p).filter(x => !x.t.done && colOf(x.t) === 'backlog').length;
+  return el('div', {className: 'ptabs'}, ...T.map(([k, l]) => el('button', {className: 'pt' + (ptab === k ? ' on' : ''), on: {click: () => { ptab = k; render(); }}},
+    l, k === 'backlog' && nb ? el('span', {className: 'cnt', textContent: nb}) : '')));
+}
+
+/* ---------- Task page ---------- */
+let taskCtx = null;
+function openTask(t) {
+  const p = findProj(t); if (!p) return;
+  taskCtx = {p, t, back: view === 'task' && taskCtx ? taskCtx.back : {view, mode, ptab}};
+  db.cur = p.id; view = 'task'; save(); render(); scrollTo(0, 0);
+}
+function leaveTask() {
+  const b = taskCtx && taskCtx.back; taskCtx = null;
+  view = b ? b.view : 'project'; if (b) { mode = b.mode; ptab = b.ptab; }
+}
+const closeTask = () => { leaveTask(); render(); };
+
+const REL = {blocks: 'blocks', blocked_by: 'is blocked by', relates: 'relates to'};
+const INV = {blocks: 'blocked_by', blocked_by: 'blocks', relates: 'relates'};
+function addLink(p, t, rel, o) {
+  if (t.links.some(l => l.rel === rel && l.to === o.id)) return;
+  t.links.push({rel, to: o.id}); o.links.push({rel: INV[rel], to: t.id});
+  logT(t, 'Linked: ' + REL[rel] + ' ' + keyOf(p, o)); logT(o, 'Linked: ' + REL[INV[rel]] + ' ' + keyOf(p, t));
+}
+function removeLink(p, t, l) {
+  const o = taskOf(p, l.to);
+  t.links = t.links.filter(x => x !== l); if (o) o.links = o.links.filter(x => !(x.to === t.id && x.rel === INV[l.rel]));
+  logT(t, 'Link removed' + (o ? ': ' + keyOf(p, o) : ''));
+}
+function deleteOpenTask() {
+  const {p, t} = taskCtx, b = taskCtx.back;
+  withUndo('Work item deleted', () => { removeTasks(p, new Set([t])); taskCtx = null; view = b.view; mode = b.mode; ptab = b.ptab; });
+}
+
+function renderTaskPage() {
+  const t = taskCtx && taskCtx.t, p = t && findProj(t);
+  if (!p) { taskCtx = null; view = 'home'; return render(); }
+  const app = $('#app'), loc = allTasks(p).find(x => x.t === t);
+  const sec = (title, ...kids) => el('section', {className: 'tk-sec'}, el('h3', {textContent: title}), ...kids);
+  const upd = (label, oldV, newV, apply) => { if (oldV === newV) return; apply(); logT(t, label + ': ' + (oldV || 'None') + ' → ' + (newV || 'None')); save(); render(); };
+  const sel = (opts, v, fn) => { const s = el('select', {on: {change: e => fn(e.target.value)}}, ...opts.map(([k, l]) => el('option', {value: k, textContent: l}))); s.value = v; return s; };
+  const dateIn = (label, key) => { const x = el('input', {type: 'date', value: t[key] || ''}); x.addEventListener('change', () => upd(label, t[key] || '', x.value, () => { t[key] = x.value; })); return x; };
+
+  // header + description
+  const title = el('input', {type: 'text', className: 'tk-title', value: t.t});
+  title.addEventListener('change', () => { const v = title.value.trim(); if (!v) { title.value = t.t; return; } if (v !== t.t) { logT(t, 'Summary changed'); t.t = v; save(); render(); } });
+  const desc = el('textarea', {className: 'tk-desc', value: t.note || '', placeholder: 'Add a description…'});
+  desc.addEventListener('change', () => { if (desc.value !== (t.note || '')) { t.note = desc.value; logT(t, 'Description updated'); save(); } });
+
+  // sub-tasks
+  const sd = t.subs.filter(s => s.done).length, subIn = el('input', {type: 'text', placeholder: 'Add a sub-task…'});
+  const addSub = () => { const v = subIn.value.trim(); if (!v) return; t.subs.push({id: uid(), t: v, done: false}); logT(t, 'Sub-task added: ' + v); save(); render(); };
+  subIn.addEventListener('keydown', e => { if (e.key === 'Enter') addSub(); });
+  const subs = sec('Sub-tasks' + (t.subs.length ? ' · ' + sd + '/' + t.subs.length : ''),
+    t.subs.length ? bar(Math.round(sd * 100 / t.subs.length)) : '',
+    ...t.subs.map((s, i) => el('div', {className: 'tk-sub' + (s.done ? ' d' : '')},
+      el('input', {type: 'checkbox', checked: s.done, on: {change: e => { s.done = e.target.checked; logT(t, (s.done ? 'Completed' : 'Reopened') + ' sub-task: ' + s.t); save(); render(); }}}),
+      el('span', {className: 'tk-st', textContent: s.t, title: 'Double-click to edit', on: {dblclick: () => rename(s, 't', 'Sub-task')}}),
+      ic('×', 'Delete', () => { t.subs.splice(i, 1); save(); render(); }, 'del'))),
+    el('div', {className: 'add'}, subIn, el('button', {textContent: 'Add', on: {click: addSub}})));
+
+  // linked work items
+  const relSel = el('select', {}, ...Object.entries(REL).map(([k, l]) => el('option', {value: k, textContent: l})));
+  const toSel = el('select', {}, el('option', {value: '', textContent: 'Select work item…'}),
+    ...allTasks(p).filter(x => x.t !== t).map(x => el('option', {value: x.t.id, textContent: keyOf(p, x.t) + ' · ' + x.t.t.slice(0, 60)})));
+  const links = sec('Linked work items', ...t.links.map(l => { const o = taskOf(p, l.to); return o ? el('div', {className: 'tk-link'},
+      el('span', {className: 'mut rl', textContent: REL[l.rel]}), el('a', {href: '#', textContent: keyOf(p, o) + ' ' + o.t, on: {click: e => { e.preventDefault(); openTask(o); }}}),
+      stIconOf(o), ic('×', 'Remove link', () => { removeLink(p, t, l); save(); render(); }, 'del')) : ''; }),
+    el('div', {className: 'add'}, relSel, toSel, el('button', {textContent: 'Link', on: {click: () => { const o = taskOf(p, toSel.value); if (o) { addLink(p, t, relSel.value, o); save(); render(); } }}})));
+
+  // links & attachments (URLs)
+  const uIn = el('input', {type: 'text', placeholder: 'https://…'}), lIn = el('input', {type: 'text', placeholder: 'Label (optional)'}), uErr = el('small', {className: 'mut'});
+  const addUrl = () => { const v = uIn.value.trim(); if (!safeUrl(v)) { uErr.textContent = 'Enter a valid http(s) link.'; return; } t.urls.push({url: v, label: lIn.value.trim()}); logT(t, 'Link added'); save(); render(); };
+  const urls = sec('Links & attachments', ...t.urls.map((u, i) => el('div', {className: 'tk-link'},
+      el('a', {href: u.url, target: '_blank', rel: 'noopener noreferrer', textContent: u.label || u.url}), ic('×', 'Remove', () => { t.urls.splice(i, 1); save(); render(); }, 'del'))),
+    el('div', {className: 'add'}, uIn, lIn, el('button', {textContent: 'Add', on: {click: addUrl}})), uErr);
+
+  // comments
+  const cIn = el('textarea', {className: 'tk-desc', placeholder: 'Add a comment…'});
+  const comments = sec('Comments · ' + t.comments.length,
+    el('div', {className: 'tk-cin'}, cIn, el('button', {className: 'pri', textContent: 'Comment', on: {click: () => { const v = cIn.value.trim(); if (!v) return; t.comments.unshift({id: uid(), at: nowIso(), text: v, by: me() || 'You'}); save(); render(); }}})),
+    ...t.comments.map((c, i) => el('div', {className: 'tk-cm'}, ava(c.by || 'You'),
+      el('div', {className: 'tk-cb'}, el('div', {}, el('b', {textContent: c.by || 'You'}), el('small', {className: 'mut', textContent: ' · ' + fmtDT(c.at)})), el('div', {className: 'tk-ct', textContent: c.text})),
+      ic('×', 'Delete', () => { t.comments.splice(i, 1); save(); render(); }, 'del'))));
+
+  // activity
+  const act = sec('Activity', ...(t.log.length ? t.log.map(l => el('div', {className: 'tk-lg'}, el('small', {className: 'mut', textContent: fmtDT(l.at)}), el('span', {textContent: l.text}))) : [el('p', {className: 'mut', textContent: 'No activity yet.'})]));
+
+  // side panel
+  const who = el('input', {type: 'text', value: t.who || '', placeholder: 'Unassigned'}); who.setAttribute('list', 'assignees');
+  who.addEventListener('change', () => upd('Assignee', t.who || '', who.value.trim(), () => { t.who = who.value.trim(); }));
+  const tags = el('input', {type: 'text', value: t.tags.join(', '), placeholder: 'comma separated'});
+  tags.addEventListener('change', () => { const n = [...new Set(tags.value.split(',').map(x => x.trim().replace(/^#/, '')).filter(Boolean))]; upd('Labels', t.tags.join(', '), n.join(', '), () => { t.tags = n; }); });
+  const numIn = (key, label) => { const x = el('input', {type: 'number', min: '0', step: '0.25', value: t[key] || ''}); x.addEventListener('change', () => { const n = Math.max(0, +x.value || 0); if (n !== t[key]) { logT(t, label + ': ' + hrs(t[key]) + ' → ' + hrs(n)); t[key] = n; save(); render(); } }); return x; };
+  const quick = el('div', {className: 'tk-q'}, ...[['+15m', 0.25], ['+30m', 0.5], ['+1h', 1], ['+4h', 4]].map(([l, v]) => el('button', {textContent: l, on: {click: () => { t.spent = Math.round((t.spent + v) * 100) / 100; logT(t, 'Logged ' + l.slice(1)); save(); render(); }}})));
+  const side = el('aside', {className: 'tk-side'},
+    el('div', {className: 'tk-card form'},
+      fld('Status', sel(Object.entries(COLS), colOf(t), v => { setStatus(t, v); save(); render(); })),
+      fld('Priority', sel([['', 'None'], ...Object.entries(PRI)], t.pri || '', v => upd('Priority', PRI[t.pri] || '', PRI[v] || '', () => { t.pri = v; }))),
+      fld('Assignee', who), fld('Start date', dateIn('Start date', 'start')), fld('Due date', dateIn('Due date', 'due')), fld('Labels', tags),
+      fld('Sprint', sel([['', 'None'], ...openSprints(p, t.sprint).map(s => [s.id, s.name])], t.sprint || '', v => upd('Sprint', sprintName(p, t.sprint), sprintName(p, v), () => { t.sprint = v; if (v && t.st === 'backlog' && !t.done) t.st = 'todo'; })))),
+    el('div', {className: 'tk-card form'}, el('h4', {textContent: 'Time tracking'}),
+      fld('Estimate (hours)', numIn('est', 'Estimate')), fld('Time spent (hours)', numIn('spent', 'Time spent')), quick,
+      t.est ? el('div', {}, bar(Math.min(100, Math.round(t.spent * 100 / t.est))), el('small', {className: 'mut', textContent: hrs(t.spent) + ' of ' + hrs(t.est) + (t.spent > t.est ? ' · over estimate' : '')})) : ''),
+    el('div', {className: 'tk-card'}, el('h4', {textContent: 'Details'}),
+      el('div', {className: 'tk-meta'}, el('span', {className: 'mut', textContent: 'Project'}), el('span', {textContent: p.name})),
+      el('div', {className: 'tk-meta'}, el('span', {className: 'mut', textContent: 'Epic'}), el('span', {textContent: loc.ph.name})),
+      el('div', {className: 'tk-meta'}, el('span', {className: 'mut', textContent: 'Story'}), el('span', {textContent: loc.sb.name}))),
+    assigneeList());
+
+  app.append(el('div', {className: 'tk'},
+    el('div', {className: 'tk-main'},
+      el('div', {className: 'tk-top'}, el('button', {textContent: '← Back', on: {click: closeTask}}), el('span', {className: 'chip', textContent: keyOf(p, t)}), stIconOf(t)),
+      title, sec('Description', desc), subs, links, urls, comments, act), side));
+}
+
+/* ---------- Timeline & Roadmap ---------- */
+let tlZoom = 'weeks';
+const TLW = {days: 32, weeks: 14, months: 5};
+const zoomBar = () => el('div', {className: 'tabs'}, ...[['days', 'Days'], ['weeks', 'Weeks'], ['months', 'Months']]
+  .map(([k, l]) => el('button', {className: tlZoom === k ? 'pri' : '', textContent: l, on: {click: () => { tlZoom = k; render(); }}})));
+
+function renderTimeline(p, level) {
+  const app = $('#app'), DW = TLW[tlZoom], rows = [], epics = level === 'epics';
+  p.phases.forEach((ph, pi) => {
+    const all = ph.subs.flatMap(s => s.tasks), list = epics ? all : all.filter(pass);
+    const spans = list.filter(t => t.start || t.due).map(t => { let a = dn(t.start || t.due), b = dn(t.due || t.start); if (a > b) [a, b] = [b, a]; return {t, a, b}; });
+    if (!spans.length) return;
+    const done = list.filter(t => t.done).length;
+    rows.push({type: 'epic', label: ph.name, a: Math.min(...spans.map(x => x.a)), b: Math.max(...spans.map(x => x.b)), pi, pct: list.length ? Math.round(done * 100 / list.length) : 0});
+    if (!epics) spans.forEach(x => rows.push({type: 'task', t: x.t, label: x.t.t, a: x.a, b: x.b, pi}));
+  });
+  app.append(el('div', {className: 'bartool'}, zoomBar(), el('span', {className: 'mut', textContent: epics ? 'Epics on a time axis. The filled part shows completion.' : 'Bars use each work item\'s start and due date.'})));
+  if (!rows.length) { app.append(el('div', {className: 'empty', textContent: 'No dated work items. Set a start or due date on tasks to see them here.'})); return; }
+
+  const t0 = dn(today());
+  let lo = Math.min(...rows.map(r => r.a)) - 3, hi = Math.max(...rows.map(r => r.b)) + 3;
+  if (t0 >= lo - 30 && t0 <= hi + 30) { lo = Math.min(lo, t0 - 2); hi = Math.max(hi, t0 + 2); }
+  const days = hi - lo + 1;
+
+  const months = [];
+  for (let d = lo; d <= hi;) {
+    const dt = fromDn(d), end = Math.min(hi, Math.round(Date.UTC(dt.getUTCFullYear(), dt.getUTCMonth() + 1, 1) / 864e5) - 1);
+    months.push({d, n: end - d + 1}); d = end + 1;
+  }
+  const mh = el('div', {className: 'tl-mh'}, ...months.map(m => el('div', {className: 'tl-m', style: 'width:' + m.n * DW + 'px',
+    textContent: fmtDn(m.d, m.n * DW > 100 ? {month: 'long', year: 'numeric'} : {month: 'short'})})));
+  const dh = el('div', {className: 'tl-dh'}), body = el('div', {className: 'tl-body'});
+  for (let d = lo; d <= hi; d++) {
+    const wd = (fromDn(d).getUTCDay() + 6) % 7;
+    if (DW >= 24 || (DW >= 10 && wd === 0)) dh.append(el('span', {className: 'tl-d', style: 'left:' + (d - lo) * DW + 'px;width:' + (DW >= 24 ? DW : DW * 7) + 'px', textContent: fromDn(d).getUTCDate()}));
+    if (wd > 4 && DW >= 10 && days < 800) body.append(el('i', {className: 'tl-we', style: 'left:' + (d - lo) * DW + 'px;width:' + DW + 'px'}));
+  }
+  const left = el('div', {className: 'tl-l'}, el('div', {className: 'tl-lh', textContent: epics ? 'Epic' : 'Work item'}));
+  rows.forEach(r => {
+    const pc = '--pc:var(--c' + (r.pi % 5 + 1) + ')', w = (r.b - r.a + 1) * DW;
+    left.append(el('div', {className: 'tl-lr ' + r.type, style: pc, title: r.label},
+      r.type === 'epic' ? [el('span', {className: 'dot'}), el('b', {textContent: r.label}), el('small', {className: 'mut', textContent: '  ' + r.pct + '%'})]
+        : [el('span', {className: 'mut', textContent: keyOf(p, r.t) + '  '}), el('span', {textContent: r.label})]));
+    body.append(el('div', {className: 'tl-row'}, el('div', {className: 'tlb ' + r.type + (r.t && r.t.done ? ' d' : ''), style: pc + ';left:' + (r.a - lo) * DW + 'px;width:' + w + 'px',
+      title: r.label + '\n' + fmtDn(r.a) + (r.b !== r.a ? ' – ' + fmtDn(r.b) : '') + (r.type === 'epic' ? '\n' + r.pct + '% done' : ''),
+      on: r.t ? {click: () => openTask(r.t)} : {}}, r.type === 'epic' ? el('i', {style: 'width:' + r.pct + '%'}) : '', el('span', {textContent: w > 70 ? r.label : ''}))));
+  });
+  if (t0 >= lo && t0 <= hi) body.append(el('i', {className: 'tl-today', title: 'Today', style: 'left:' + ((t0 - lo) * DW + DW / 2) + 'px'}));
+  const right = el('div', {className: 'tl-r'}, el('div', {className: 'tl-in', style: 'width:' + days * DW + 'px'}, el('div', {className: 'tl-head'}, mh, dh), body));
+  app.append(el('div', {className: 'tl'}, left, right));
+  setTimeout(() => { right.scrollLeft = Math.max(0, (t0 - lo) * DW - 160); }, 0);
+}
+const renderRoadmap = p => renderTimeline(p, 'epics');
+
+/* ---------- Backlog ---------- */
+function renderBacklog(p) {
+  const app = $('#app'), items = allTasks(p).filter(x => !x.t.done && colOf(x.t) === 'backlog');
+  items.sort((a, b) => (a.t.rank || 1e9) - (b.t.rank || 1e9));
+  const shift = (i, d) => { const j = i + d; if (j < 0 || j >= items.length) return; [items[i], items[j]] = [items[j], items[i]]; items.forEach((x, k) => { x.t.rank = (k + 1) * 10; }); save(); render(); };
+  app.append(el('div', {className: 'bartool'}, el('b', {textContent: 'Backlog · ' + items.length + ' work items'}), el('span', {className: 'sp'}),
+    el('button', {className: 'pri', textContent: '+ Create', on: {click: () => newTask(p, 'backlog')}})));
+  if (!items.length) { app.append(el('div', {className: 'empty', textContent: 'The backlog is empty. Create work items here to plan them later.'})); return; }
+  app.append(el('div', {className: 'bl'}, ...items.map(({t, ph}, i) => el('div', {className: 'bl-r'},
+    el('span', {className: 'bl-mv'}, ic('▲', 'Move up', () => shift(i, -1), '', i === 0), ic('▼', 'Move down', () => shift(i, 1), '', i === items.length - 1)),
+    el('span', {className: 'mut bl-k', textContent: keyOf(p, t)}),
+    el('span', {className: 'bl-t', textContent: t.t, on: {click: () => openTask(t)}}),
+    el('small', {className: 'mut bl-e', textContent: ph.name}),
+    pbar(t.pri), t.est ? el('span', {className: 'chip', textContent: '⏱ ' + hrs(t.est)}) : '', t.who ? ava(t.who) : '',
+    sprintSelect(p, t), el('button', {textContent: 'To Do →', title: 'Move to To Do', on: {click: () => { setStatus(t, 'todo'); save(); render(); }}})))));
+}
+function sprintSelect(p, t) {
+  const sps = openSprints(p, t.sprint);
+  if (!sps.length) return '';
+  const s = el('select', {title: 'Sprint', on: {change: e => {
+    const v = e.target.value; logT(t, 'Sprint: ' + (sprintName(p, t.sprint) || 'None') + ' → ' + (sprintName(p, v) || 'None'));
+    t.sprint = v; if (v && t.st === 'backlog' && !t.done) setStatus(t, 'todo'); save(); render(); }}},
+    el('option', {value: '', textContent: 'No sprint'}), ...sps.map(x => el('option', {value: x.id, textContent: x.name})));
+  s.value = t.sprint || ''; return s;
+}
+
+/* ---------- Sprints ---------- */
+let spSel = '';
+function sprintDlg(p, sp) {
+  const name = el('input', {type: 'text', value: sp ? sp.name : 'Sprint ' + (p.sprints.length + 1)}), start = el('input', {type: 'date', value: sp ? sp.start : today()}),
+    end = el('input', {type: 'date', value: sp ? sp.end : iso(new Date(Date.now() + 13 * 864e5))}), goal = el('textarea', {value: sp ? sp.goal : '', placeholder: 'What should this sprint achieve?'});
+  openDlg(sp ? 'Edit sprint' : 'Create sprint', el('div', {className: 'form'}, fld('Name', name), fld('Start date', start), fld('End date', end), fld('Goal', goal)), () => {
+    if (!name.value.trim() || !start.value || !end.value || end.value < start.value) { name.focus(); return false; }
+    if (sp) Object.assign(sp, {name: name.value.trim(), start: start.value, end: end.value, goal: goal.value.trim()});
+    else { const n = {id: uid(), name: name.value.trim(), start: start.value, end: end.value, goal: goal.value.trim(), state: 'planned'}; p.sprints.push(n); spSel = n.id; }
+    save(); render();
+  });
+}
+
+function burndownChart(p, sp) {
+  const a = dn(sp.start), b = dn(sp.end);
+  if (!(b >= a)) return el('p', {className: 'mut', textContent: 'Invalid sprint dates.'});
+  const ts = allTasks(p).map(x => x.t).filter(t => t.sprint === sp.id), total = ts.length;
+  if (!total) return el('p', {className: 'mut', textContent: 'Add work items to the sprint to see the burndown.'});
+  const t0 = dn(today()), last = Math.min(b, Math.max(a, t0));
+  const doneDay = t => !t.done ? Infinity : t.doneAt ? Math.max(a, dn(iso(new Date(t.doneAt)))) : a;
+  const actual = []; for (let d = a; d <= last; d++) actual.push([d - a, ts.filter(t => doneDay(t) > d).length]);
+  return el('div', {className: 'chartbox'}, lineChart({n: b - a, max: total, xLabel: x => fmtDn(a + x),
+    series: [{name: 'Ideal', pts: [[0, total], [b - a, 0]], cls: 's-ideal', unit: 'ideal'}, {name: 'Remaining', pts: actual, cls: 's-main', unit: 'remaining'}]}),
+    el('div', {className: 'lg'}, el('span', {}, el('i', {className: 'sw s-main'}), ' Remaining work items'), el('span', {}, el('i', {className: 'sw s-ideal'}), ' Ideal burndown')));
+}
+function lineChart({n, max, series, xLabel}) {
+  const W = 640, H = 220, L = 34, R = 14, T = 12, B = 26, iw = W - L - R, ih = H - T - B;
+  const X = x => L + (n ? x / n : 0) * iw, Y = y => T + ih - (max ? y / max : 0) * ih;
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('class', 'chart'); svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', 'Burndown chart');
+  let h = '';
+  const ticks = Math.min(max, 4);
+  for (let i = 0; i <= ticks; i++) { const v = Math.round(max * i / ticks); h += '<line class="gl" x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v) + '" y2="' + Y(v) + '"/><text class="ax" x="' + (L - 6) + '" y="' + (Y(v) + 4) + '" text-anchor="end">' + v + '</text>'; }
+  [0, Math.round(n / 2), n].filter((v, i, a) => a.indexOf(v) === i).forEach(x => { h += '<text class="ax" x="' + X(x) + '" y="' + (H - 6) + '" text-anchor="' + (x === 0 ? 'start' : x === n ? 'end' : 'middle') + '">' + xLabel(x) + '</text>'; });
+  series.forEach(s => {
+    h += '<polyline class="ln ' + s.cls + '" points="' + s.pts.map(q => X(q[0]) + ',' + Y(q[1])).join(' ') + '"/>';
+    const q = s.pts[s.pts.length - 1]; h += '<circle class="pt ' + s.cls + '" cx="' + X(q[0]) + '" cy="' + Y(q[1]) + '" r="4"/>';
+    if (s.pts.length <= 60) s.pts.forEach(z => { h += '<circle class="hit" cx="' + X(z[0]) + '" cy="' + Y(z[1]) + '" r="8"><title>' + xLabel(z[0]) + ': ' + Math.round(z[1] * 10) / 10 + ' ' + s.unit + '</title></circle>'; });
+  });
+  svg.innerHTML = h; return svg;
+}
+
+function renderSprints(p) {
+  const app = $('#app');
+  if (!p.sprints.some(s => s.id === spSel)) spSel = (p.sprints.find(s => s.state === 'active') || p.sprints[0] || {}).id || '';
+  const sp = p.sprints.find(s => s.id === spSel), TAG = {planned: 'Planned', active: 'Active', closed: 'Closed'};
+  const list = el('div', {className: 'rl-list'}, el('button', {className: 'pri newb', textContent: '+ Create sprint', on: {click: () => sprintDlg(p)}}),
+    ...(p.sprints.length ? p.sprints.map(s => el('button', {className: 'ri' + (s.id === spSel ? ' on' : ''), on: {click: () => { spSel = s.id; render(); }}},
+      el('span', {className: 'pn'}, el('div', {textContent: s.name}), el('small', {className: 'mut', textContent: fmtDn(dn(s.start)) + ' – ' + fmtDn(dn(s.end))})), el('span', {className: 'tagdef st-' + s.state, textContent: TAG[s.state]})))
+      : [el('p', {className: 'mut', textContent: 'No sprints yet.'})]));
+  let main;
+  if (!sp) main = el('div', {className: 'rl-main'}, el('p', {className: 'mut', textContent: 'Create a sprint to group work items into a time-boxed period and track a burndown.'}));
+  else {
+    const ts = allTasks(p).filter(x => x.t.sprint === sp.id), done = ts.filter(x => x.t.done).length, estH = ts.reduce((a, x) => a + (x.t.est || 0), 0);
+    const cand = allTasks(p).filter(x => !x.t.done && !x.t.sprint).sort((a, b) => (colOf(a.t) === 'backlog' ? 0 : 1) - (colOf(b.t) === 'backlog' ? 0 : 1));
+    const addSel = el('select', {on: {change: e => { const t = taskOf(p, e.target.value); if (t) { t.sprint = sp.id; logT(t, 'Sprint: None → ' + sp.name); if (t.st === 'backlog') setStatus(t, 'todo'); save(); render(); } }}},
+      el('option', {value: '', textContent: 'Add work item…'}), ...cand.map(x => el('option', {value: x.t.id, textContent: keyOf(p, x.t) + ' · ' + x.t.t.slice(0, 60) + (colOf(x.t) === 'backlog' ? ' (backlog)' : '')})));
+    const complete = () => withUndo('Sprint completed', () => { sp.state = 'closed'; ts.forEach(({t}) => { if (!t.done) { logT(t, 'Moved to backlog (sprint ' + sp.name + ' completed)'); t.sprint = ''; setStatus(t, 'backlog'); } }); });
+    main = el('div', {className: 'rl-main'},
+      el('div', {className: 'sp-h'}, el('h2', {textContent: sp.name}), el('span', {className: 'tagdef st-' + sp.state, textContent: TAG[sp.state]}), el('span', {className: 'sp'}),
+        sp.state === 'planned' ? el('button', {className: 'pri', textContent: 'Start sprint', on: {click: () => { sp.state = 'active'; save(); render(); }}}) : '',
+        sp.state === 'active' ? el('button', {className: 'pri', textContent: 'Complete sprint', on: {click: complete}}) : '',
+        el('button', {textContent: 'Edit', on: {click: () => sprintDlg(p, sp)}}),
+        el('button', {textContent: 'Delete', on: {click: () => withUndo('Sprint deleted', () => { p.sprints = p.sprints.filter(s => s !== sp); ts.forEach(({t}) => { t.sprint = ''; }); })}})),
+      el('p', {className: 'mut', textContent: fmtDn(dn(sp.start), {day: 'numeric', month: 'short', year: 'numeric'}) + ' – ' + fmtDn(dn(sp.end), {day: 'numeric', month: 'short', year: 'numeric'}) + (sp.goal ? ' · ' + sp.goal : '')}),
+      el('div', {className: 'ins-k'}, ...[[ts.length, 'work items'], [done, 'done'], [ts.length - done, 'remaining'], [estH ? hrs(estH) : '–', 'estimated']].map(([v, l]) => el('div', {className: 'ins-t'}, el('b', {textContent: v}), el('span', {textContent: l})))),
+      ts.length ? bar(Math.round(done * 100 / ts.length)) : '',
+      el('h4', {textContent: 'Burndown'}), burndownChart(p, sp),
+      el('h4', {textContent: 'Work items'}),
+      ts.length ? el('div', {className: 'bl'}, ...ts.map(({t}) => el('div', {className: 'bl-r'}, el('span', {className: 'mut bl-k', textContent: keyOf(p, t)}), el('span', {className: 'bl-t', textContent: t.t, on: {click: () => openTask(t)}}),
+        stIconOf(t), pbar(t.pri), t.who ? ava(t.who) : '', ic('×', 'Remove from sprint', () => { logT(t, 'Sprint: ' + sp.name + ' → None'); t.sprint = ''; save(); render(); }, 'del')))) : el('p', {className: 'mut', textContent: 'No work items in this sprint.'}),
+      sp.state !== 'closed' ? el('div', {className: 'add'}, addSel) : '');
+  }
+  app.append(el('div', {className: 'rl'}, list, main));
+}
+
+/* ---------- Reports / insights ---------- */
+function hbars(rows, max) {
+  return el('div', {className: 'hb'}, ...rows.map(([label, v, cls]) => el('div', {className: 'hb-r', title: label + ': ' + v},
+    el('span', {className: 'hb-l', textContent: label}), el('span', {className: 'hb-t'}, el('i', {className: cls || '', style: 'width:' + (max ? Math.max(v ? 2 : 0, v * 100 / max) : 0) + '%'})), el('b', {className: 'hb-v', textContent: v}))));
+}
+const wkStart = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; };
+
+function insights(pairs, title) {
+  const t0 = today(), wk = iso(new Date(Date.now() + 7 * 864e5)), open = pairs.filter(x => !x.t.done);
+  const overdue = open.filter(x => x.t.due && x.t.due < t0).sort((a, b) => a.t.due < b.t.due ? -1 : 1);
+  const dueSoon = open.filter(x => x.t.due && x.t.due >= t0 && x.t.due <= wk).length;
+  const tile = (v, l, cls) => el('div', {className: 'ins-t ' + (cls || '')}, el('b', {textContent: v}), el('span', {textContent: l}));
+  const card = (h, ...kids) => el('section', {className: 'ins-c'}, el('h3', {textContent: h}), ...kids);
+
+  const cnt = {}; ST_ORDER.forEach(k => { cnt[k] = 0; }); pairs.forEach(x => { cnt[colOf(x.t)]++; });
+  const total = pairs.length;
+  const status = card('Status', total ? el('div', {className: 'stk'}, ...ST_ORDER.filter(k => cnt[k]).map(k => el('i', {className: 'sg-' + k, style: 'flex:' + cnt[k], title: COLS[k] + ': ' + cnt[k]}))) : el('p', {className: 'mut', textContent: 'No work items.'}),
+    el('div', {className: 'lg'}, ...ST_ORDER.filter(k => cnt[k]).map(k => el('span', {}, stIcon(k), ' ' + COLS[k] + ' · ' + cnt[k] + (total ? ' (' + Math.round(cnt[k] * 100 / total) + '%)' : '')))));
+
+  const pc = {high: 0, mid: 0, low: 0, none: 0}; open.forEach(x => { pc[x.t.pri || 'none']++; });
+  const prio = card('Open by priority', hbars([['High', pc.high, 'c-high'], ['Medium', pc.mid, 'c-mid'], ['Low', pc.low, 'c-low'], ['None', pc.none, 'c-none']], Math.max(...Object.values(pc), 1)));
+
+  const wl = {}; open.forEach(x => { const k = x.t.who || 'Unassigned'; wl[k] = (wl[k] || 0) + 1; });
+  const wRows = Object.entries(wl).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const load = card('Open work by assignee', wRows.length ? hbars(wRows.map(([k, v]) => [k, v, 'c-acc']), wRows[0][1]) : el('p', {className: 'mut', textContent: 'Nothing open.'}));
+
+  const w0 = wkStart(new Date()), weeks = [];
+  for (let i = 7; i >= 0; i--) { const s = new Date(w0); s.setDate(s.getDate() - 7 * i); weeks.push({s, n: 0}); }
+  pairs.forEach(x => { if (x.t.done && x.t.doneAt) { const k = wkStart(new Date(x.t.doneAt)).getTime(), w = weeks.find(y => y.s.getTime() === k); if (w) w.n++; } });
+  const wmax = Math.max(...weeks.map(w => w.n), 1);
+  const trend = card('Completed per week', el('div', {className: 'wk'}, ...weeks.map(w => el('div', {className: 'wk-c', title: 'Week of ' + w.s.toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) + ': ' + w.n + ' completed'},
+      el('b', {textContent: w.n || ''}), el('i', {style: 'height:' + (w.n ? Math.max(4, w.n * 100 / wmax) : 0) + '%'}), el('small', {className: 'mut', textContent: w.s.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})})))),
+    weeks.every(w => !w.n) ? el('p', {className: 'mut', textContent: 'Completion history is recorded from now on, so this fills in as you finish work.'}) : '');
+
+  const late = card('Overdue (' + overdue.length + ')', overdue.length ? el('div', {}, ...overdue.slice(0, 8).map(({t, p}) => el('div', {className: 'up', on: {click: () => openTask(t)}},
+    el('span', {className: 'chip late', textContent: '📅 ' + fmt(t.due)}), el('span', {className: 'ut', textContent: keyOf(p, t) + ' · ' + t.t}), el('small', {className: 'mut', textContent: p.name})),
+    ), overdue.length > 8 ? el('small', {className: 'mut', textContent: '+ ' + (overdue.length - 8) + ' more'}) : '') : el('p', {className: 'mut', textContent: 'Nothing overdue. 🎉'}));
+
+  return el('div', {className: 'ins'}, el('h2', {className: 'ins-h', textContent: title || 'Insights'}),
+    el('div', {className: 'ins-k'}, tile(open.length, 'open'), tile(cnt.done, 'done'), tile(overdue.length, 'overdue', overdue.length ? 'bad' : ''), tile(dueSoon, 'due in 7 days')),
+    el('div', {className: 'ins-g'}, status, prio, load, trend, late));
+}
+function renderReports(p) {
+  const app = $('#app'), act = p.sprints.find(s => s.state === 'active');
+  app.append(insights(allTasks(p).map(x => ({t: x.t, p})), 'Reports'));
+  if (act) app.append(el('section', {className: 'ins-c wide'}, el('h3', {textContent: 'Active sprint · ' + act.name}), burndownChart(p, act)));
+}
+
+/* ---------- For you ---------- */
+function renderMe() {
+  const app = $('#app'), name = me();
+  const inp = el('input', {type: 'text', value: name, placeholder: 'Your name, as it appears in Assignee'});
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { db.me = inp.value.trim(); save(); render(); } });
+  app.append(el('div', {className: 'sum'}, el('b', {textContent: 'Your name'}), el('p', {className: 'mut', textContent: 'Work items whose Assignee matches this name are collected here from every project.'}),
+    el('div', {className: 'add'}, inp, el('button', {className: 'pri', textContent: 'Save', on: {click: () => { db.me = inp.value.trim(); save(); render(); }}}))));
+  if (!name) return;
+  const t0 = today(), wk = iso(new Date(Date.now() + 7 * 864e5)), mine = [];
+  db.projects.filter(p => !p.archived).forEach(p => allTasks(p).forEach(({t}) => { if (!t.done && isMine(t)) mine.push({t, p}); }));
+  mine.sort((a, b) => (a.t.due || '9') < (b.t.due || '9') ? -1 : 1);
+  const groups = [['Overdue', x => x.t.due && x.t.due < t0], ['Today', x => x.t.due === t0], ['Next 7 days', x => x.t.due > t0 && x.t.due <= wk], ['Later', x => x.t.due > wk], ['No due date', x => !x.t.due]];
+  if (!mine.length) { app.append(el('div', {className: 'empty', textContent: 'Nothing assigned to "' + name + '". Enjoy the quiet.'})); return; }
+  groups.forEach(([label, fn]) => {
+    const g = mine.filter(fn); if (!g.length) return;
+    app.append(el('section', {className: 'sum'}, el('b', {textContent: label + ' · ' + g.length, style: 'font-size:15px'}), ...g.map(({t, p}) => el('div', {className: 'up', on: {click: () => openTask(t)}},
+      avatar(p), el('span', {className: 'mut', textContent: keyOf(p, t)}), el('span', {className: 'ut', textContent: t.t}), pbar(t.pri), stIconOf(t),
+      t.due ? el('span', {className: 'chip' + (t.due < t0 ? ' late' : ''), textContent: '📅 ' + fmt(t.due)}) : ''))));
+  });
+}
+
+/* ---------- Search (Ctrl+K) ---------- */
+function searchDlg() {
+  const inp = el('input', {type: 'text', placeholder: 'Search work items, keys, assignees, labels…'}), box = el('div', {className: 'sr-list'});
+  const all = []; db.projects.filter(p => !p.archived).forEach(p => allTasks(p).forEach(({t, ph, sb}) => all.push({t, p,
+    hay: (keyOf(p, t) + ' ' + t.t + ' ' + (t.note || '') + ' ' + (t.who || '') + ' ' + t.tags.join(' ') + ' ' + p.name + ' ' + ph.name + ' ' + sb.name).toLowerCase()})));
+  let items = [], idx = 0;
+  const go = x => { dlg.close(); openTask(x.t); };
+  const draw = () => {
+    const words = inp.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    items = (words.length ? all.filter(x => words.every(w => x.hay.includes(w))) : all.slice().sort((a, b) => ((b.t.log[0] || {}).at || '').localeCompare((a.t.log[0] || {}).at || '')).slice(0, 8)).slice(0, 30);
+    idx = Math.min(idx, Math.max(0, items.length - 1));
+    box.replaceChildren(el('small', {className: 'mut', textContent: words.length ? items.length + ' result' + (items.length === 1 ? '' : 's') : 'Recently updated'}),
+      ...items.map((x, i) => el('div', {className: 'sr-it' + (i === idx ? ' on' : ''), on: {click: () => go(x)}},
+        el('span', {className: 'mut', textContent: keyOf(x.p, x.t)}), el('span', {className: 'sr-t', textContent: x.t.t}), stIconOf(x.t), el('small', {className: 'mut', textContent: x.p.name}))));
+    const on = box.querySelector('.on'); if (on) on.scrollIntoView({block: 'nearest'});
+  };
+  inp.addEventListener('input', () => { idx = 0; draw(); });
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); idx = Math.min(idx + 1, items.length - 1); draw(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); idx = Math.max(0, idx - 1); draw(); }
+    else if (e.key === 'Enter' && items[idx]) { e.preventDefault(); go(items[idx]); }
+  });
+  openDlg('Search', el('div', {}, inp, box), null); draw(); inp.focus();
+}
+document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); searchDlg(); } });
 
 const cal = (d => ({y: d.getFullYear(), m: d.getMonth()}))(new Date());
 function renderCal(p) {
@@ -992,21 +1590,31 @@ function renderCal(p) {
 function render() {
   const app = $('#app'); app.replaceChildren();
   document.body.classList.remove('nav');
+  db.projects.forEach(ensureProj);
   renderSidebar(); renderHeader();
   app.append(urgentBox());
   if (view === 'home') return renderHome();
   if (view === 'roles') return renderRoles();
+  if (view === 'me') return renderMe();
+  if (view === 'task') return renderTaskPage();
   const p = cur(), s = projStat(p);
   const setAll = v => { p.phases.forEach(ph => { ph.open = v; ph.subs.forEach(sb => sb.open = v); }); save(); render(); };
 
+  app.append(projectTabs(p));
+  if (ptab === 'roadmap') return renderRoadmap(p);
+  if (ptab === 'backlog') return renderBacklog(p);
+  if (ptab === 'sprints') return renderSprints(p);
+  if (ptab === 'reports') return renderReports(p);
   app.append(el('div', {className: 'bartool'}, el('span', {className: 'sp'}),
+    mode === 'kan' ? columnsMenu(p) : '',
     mode === 'list' ? el('button', {textContent: 'Expand all', on: {click: () => setAll(true)}}) : '',
     mode === 'list' ? el('button', {textContent: 'Collapse all', on: {click: () => setAll(false)}}) : '',
-    el('button', {textContent: 'Archive', on: {click: () => toggleArchive(p)}}),
-    el('button', {textContent: 'Delete', on: {click: () => delProject(p)}})));
+    el('button', {textContent: 'Archive project', on: {click: () => toggleArchive(p)}}),
+    el('button', {textContent: 'Delete project', on: {click: () => delProject(p)}})));
   if (mode === 'kan') return renderKanban(p);
   if (mode === 'cal') return renderCal(p);
   if (mode === 'tbl') return renderTable(p);
+  if (mode === 'tl') return renderTimeline(p, 'tasks');
 
   if (!p.phases.length) app.append(el('div', {className: 'empty', textContent: 'No epics yet. Add one below or create a project from a template.'}));
 
@@ -1019,7 +1627,7 @@ function render() {
       const box = el('section', {className: 'dp', style: pc}, el('h3', {textContent: ph.name}));
       ph.subs.forEach((sb, si) => {
         const inp = el('input', {type: 'text', placeholder: 'What needs to be done?'});
-        const add = () => { const v = inp.value.trim(); if (v) { sb.tasks.push(mk(v)); save(); render(); } };
+        const add = () => { const v = inp.value.trim(); if (v) { const nt = mk(v); logT(nt, 'Created'); sb.tasks.push(nt); save(); render(); } };
         inp.addEventListener('keydown', e => { if (e.key === 'Enter') add(); });
         const sbox = el('div', {className: 'sb'}, head(sb, ph.subs, si, stat(sb.tasks), 'Story name', 'Story deleted'), bar(stat(sb.tasks).pct));
         if (sb.open) {
@@ -1056,7 +1664,7 @@ function ask(label, def, cb) {
 }
 $('#dlgX').onclick = () => dlg.close();
 $('#scrim').onclick = () => document.body.classList.remove('nav');
-const addProject = p => { collapse(p); db.projects.push(p); db.cur = p.id; view = 'project'; mode = 'list'; flt.pri = flt.tag = flt.who = flt.st = ''; save(); render(); };
+const addProject = p => { collapse(p); db.projects.push(p); db.cur = p.id; view = 'project'; mode = 'list'; ptab = 'items'; flt.pri = flt.tag = flt.who = flt.st = ''; save(); render(); };
 
 function newProject() {
   const list = el('div', {});

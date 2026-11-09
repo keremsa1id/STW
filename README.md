@@ -29,7 +29,23 @@ Projeleri **Başlık → Alt başlık → Görev** hiyerarşisiyle planlar ve il
 - **Filtre:** Öncelik, etiket ve kişiye göre (liste, Kanban ve takvimde geçerli).
 - **Sürükleme:** Görevler başka alt başlığa da taşınır (alt başlığın üstüne bırakınca sona eklenir). Dokunmatik ekranlarda tutamaçtan (⠿) sürüklenir.
 - **Ana sayfa:** "Bu hafta ve geciken işler" listesi.
-- **Görünümler:** Liste, Kanban (Backlog / Todo / In progress / Done; ◀ ▶ ile taşı, sütundan + ile yeni görev), aylık takvim ve Tablo. Görünüm simgeleri ve Filtreler (durum, öncelik, etiket, kişi) sağ üstte.
+- **Görünümler:** Liste, Board (Jira tarzı 10 durum; ◀ ▶ ile taşı, sütundan + ile yeni görev, Columns ile sütun seç), aylık takvim ve Tablo. Görünüm simgeleri ve Filtreler (durum, öncelik, etiket, kişi) sağ üstte.
+
+### Durumlar ve renkleri (Jira mantığı)
+Renk, durumun bağlı olduğu **kategoriden** gelir.
+- **Gri (To Do kategorisi):** Backlog, Defined, Selected for Development, To Do
+- **Mavi (In Progress kategorisi):** In Progress, In Review, Blocked, Ready for QA
+- **Yeşil (Done kategorisi):** Done, Cancelled (iptal edilen iş "tamamlandı" sayılmaz, haftalık tamamlanma grafiğine girmez)
+
+### Çalışma öğesi özellikleri (yerel, bulut gerektirmez)
+- **Görev sayfası:** Görevin ✎ düğmesi artık tam sayfa açar: açıklama, alt görevler (checklist), bağlı görevler (blocks / is blocked by / relates to), bağlantılar, yorumlar, etkinlik geçmişi, başlangıç ve bitiş tarihi, tahmini ve harcanan süre.
+- **Proje sekmeleri:** Work items, Roadmap, Backlog, Sprints, Reports. Work items içinde List, Board, Calendar, Table ve **Timeline (Gantt)** görünümleri var.
+- **Sprints:** Sprint oluştur, başlat, tamamla (biten dışındakiler Backlog'a döner). Yanmamış iş grafiği (burndown) çıkar.
+- **Reports ve Dashboard:** Duruma, önceliğe, kişiye göre dağılım, haftalık tamamlanan iş ve geciken işler. Tamamlanma geçmişi bu özellikten sonra kaydedilir.
+- **For you:** Adınızı girin; Assignee alanı eşleşen işler tüm projelerden toplanır.
+- **Arama:** Ctrl+K ile tüm projelerde görev arama.
+- **Kayıtlı filtreler ve toplu işlem:** Filters içinde filtreyi isimle kaydedin. Table görünümünde birden fazla görevi seçip durum, öncelik, sprint, kişi değiştirin ya da silin.
+- Görev numaraları (`MOB-12`) sabittir; görev silinse de diğerleri değişmez.
 
 ### Hazır şablonlar
 Mobil Oyun, Mobil Uygulama, Web Sitesi / Web Uygulaması, Yazılım Ürünü (MVP), Kurumsal Proje Yönetimi, Pazarlama Kampanyası, Finans: Ajan Destekli Piyasa Analizi ve İşlem.
