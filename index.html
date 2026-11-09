@@ -26,6 +26,7 @@ input[type=text],textarea{background:var(--card);border:1px solid var(--line);bo
 .sum{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
 .sum b{font-size:28px}
 .sum small,.mut{color:var(--mut)}
+.urg{border-color:var(--bad);border-left:4px solid var(--bad)}
 .tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .ph{--pc:var(--c1);border-left:4px solid var(--pc)!important;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
 .hd{display:flex;gap:4px;align-items:center}
@@ -492,18 +493,59 @@ function renderHeader() {
   const themeBtn = el('button', {textContent: L[th], title: 'Tema: otomatik → açık → koyu', on: {click: () => {
     const o = ['auto', 'light', 'dark']; db.theme = o[(o.indexOf(th) + 1) % 3]; applyTheme(); save(); render();
   }}});
+  const notifBtn = 'Notification' in window && Notification.permission === 'granted' ? '' :
+    el('button', {textContent: '🔔 Bildirimleri aç', title: 'Acil görevler için sistem bildirimi', on: {click: askNotify}});
   if (view === 'home') {
     const na = db.projects.filter(p => p.archived).length;
     top.append(el('h1', {textContent: showArch ? 'Arşiv' : 'Proje Takip'}),
       showArch ? el('button', {textContent: '← Projeler', on: {click: () => { showArch = false; render(); }}})
         : el('button', {className: 'pri', textContent: '+ Yeni proje', on: {click: newProject}}),
       !showArch && na ? el('button', {textContent: '📦 Arşiv (' + na + ')', on: {click: () => { showArch = true; render(); }}}) : '',
-      showArch ? '' : el('button', {textContent: 'İçe aktar', on: {click: importProject}}), themeBtn);
+      showArch ? '' : el('button', {textContent: 'İçe aktar', on: {click: importProject}}), notifBtn, themeBtn);
   } else {
     top.append(el('button', {textContent: '← Ana sayfa', on: {click: home}}),
       el('h1', {textContent: cur().name, style: 'margin-left:8px'}),
-      el('button', {textContent: 'Dışa aktar', on: {click: exportProject}}), themeBtn);
+      el('button', {textContent: 'Dışa aktar', on: {click: exportProject}}), notifBtn, themeBtn);
   }
+}
+
+/* ---------- Acil görev bildirimi ---------- */
+// Acil: önceliği "Yüksek" ya da #acil / #kritik etiketli, bitmemiş ve bitiş tarihi bugün ya da geçmiş olan görevler
+const NKEY = 'proje-takip-bildirim';
+const isUrgent = t => !t.done && t.due && t.due <= today() && (t.pri === 'high' || (t.tags || []).some(g => /^(acil|kritik)$/i.test(g)));
+function urgent() {
+  const out = [];
+  db.projects.filter(p => !p.archived).forEach(p => allTasks(p).forEach(({t}) => { if (isUrgent(t)) out.push({t, p}); }));
+  return out.sort((a, b) => a.t.due < b.t.due ? -1 : a.t.due > b.t.due ? 1 : 0);
+}
+// Yapılmayan her acil görev için saat başı sistem bildirimi (izin verilmişse; sayfa açıkken)
+function notifyUrgent() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  let s = null; try { s = JSON.parse(localStorage.getItem(NKEY)); } catch (e) {}
+  const hk = today() + 'T' + pad(new Date().getHours());
+  if (!s || s.h !== hk || !Array.isArray(s.ids)) s = {h: hk, ids: []};
+  urgent().filter(({t}) => !s.ids.includes(t.id)).forEach(({t, p}) => {
+    s.ids.push(t.id);
+    try { new Notification((t.due < today() ? 'Gecikti: ' : 'Bugün: ') + t.t, {body: p.name + (t.who ? ' · ' + t.who : '') + ' · yapılınca işaretle, bildirim durur', tag: t.id, renotify: true}); } catch (e) {}
+  });
+  try { localStorage.setItem(NKEY, JSON.stringify(s)); } catch (e) {}
+}
+function askNotify() {
+  if (!('Notification' in window)) { openDlg('Bildirim', el('p', {textContent: 'Bu tarayıcı sistem bildirimini desteklemiyor. Acil görevler sayfanın üstündeki kırmızı kutuda yine görünür.'}), null); return; }
+  Notification.requestPermission().then(r => {
+    if (r === 'granted') notifyUrgent();
+    else openDlg('Bildirim', el('p', {textContent: 'İzin verilmedi. Tarayıcının adres çubuğundaki site ayarlarından bildirimlere izin verebilirsin. Acil görevler sayfanın üstündeki kırmızı kutuda yine görünür.'}), null);
+    render();
+  });
+}
+function urgentBox() {
+  const ug = urgent(); if (!ug.length) return '';
+  const box = el('div', {className: 'sum urg'}, el('b', {textContent: '🔔 Acil görevler (' + ug.length + ')', style: 'font-size:16px;color:var(--bad)'}));
+  ug.slice(0, 6).forEach(({t, p}) => box.append(el('div', {className: 'up', on: {click: () => open(p.id)}},
+    el('span', {className: 'chip late', textContent: '📅 ' + fmt(t.due) + (t.due < today() ? ' · gecikti' : ' · bugün')}),
+    el('span', {className: 'ut', textContent: t.t}), el('small', {className: 'mut', textContent: p.name}))));
+  if (ug.length > 6) box.append(el('small', {className: 'mut', textContent: '+ ' + (ug.length - 6) + ' acil görev daha'}));
+  return box;
 }
 
 // Bu hafta bitmesi gerekenler + gecikenler (arşivlenmemiş projelerden)
@@ -620,6 +662,7 @@ function render() {
   const app = $('#app'); app.replaceChildren();
   renderHeader();
   $('main').style.maxWidth = view === 'project' ? '1800px' : '';
+  app.append(urgentBox());
   if (view === 'home') return renderHome();
   const p = cur(), s = projStat(p);
   const setAll = v => { p.phases.forEach(ph => { ph.open = v; ph.subs.forEach(sb => sb.open = v); }); save(); render(); };
@@ -710,6 +753,9 @@ function importProject() {
 
 applyTheme();
 render();
+notifyUrgent();
+setInterval(notifyUrgent, 60 * 1000);
+addEventListener('focus', notifyUrgent);
 </script>
 </body>
 </html>
