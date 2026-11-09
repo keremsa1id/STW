@@ -92,6 +92,12 @@ dialog textarea{height:260px;font-family:ui-monospace,monospace;font-size:13px}
 .empty{color:var(--mut);text-align:center;padding:30px}
 .ph:nth-of-type(5n+2){--pc:var(--c2)}.ph:nth-of-type(5n+3){--pc:var(--c3)}.ph:nth-of-type(5n+4){--pc:var(--c4)}.ph:nth-of-type(5n+5){--pc:var(--c5)}
 .ph>.hd .nm{color:var(--pc)}
+.split{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+.side{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;padding:2px}
+.side .ph.on{box-shadow:0 0 0 1px var(--pc)}
+.dp{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--pc);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.dp>h3{margin:0 0 4px;font-size:16px;color:var(--pc)}
+@media(max-width:800px){.split{grid-template-columns:1fr}.side{position:static;max-height:none;order:-1}}
 .card{--pc:var(--c1);border-top:4px solid var(--pc)!important}
 .card:nth-child(5n+2){--pc:var(--c2)}.card:nth-child(5n+3){--pc:var(--c3)}.card:nth-child(5n+4){--pc:var(--c4)}.card:nth-child(5n+5){--pc:var(--c5)}
 .card .pct{color:var(--pc)}
@@ -593,7 +599,7 @@ function renderCal(p) {
 function render() {
   const app = $('#app'); app.replaceChildren();
   renderHeader();
-  $('main').style.maxWidth = view === 'project' && mode !== 'list' ? '1100px' : '';
+  $('main').style.maxWidth = view === 'project' ? '1200px' : '';
   if (view === 'home') return renderHome();
   const p = cur(), s = projStat(p);
   const setAll = v => { p.phases.forEach(ph => { ph.open = v; ph.subs.forEach(sb => sb.open = v); }); save(); render(); };
@@ -615,9 +621,13 @@ function render() {
 
   if (!p.phases.length) app.append(el('div', {className: 'empty', textContent: 'Henüz başlık yok. Aşağıdan ekle ya da "Yeni proje" ile bir şablon seç.'}));
 
+  // İki sütun: solda açık başlıkların alt başlık ve görevleri, sağda başlık listesi
+  const side = el('div', {className: 'side'}), detail = el('div', {className: 'detail'});
   p.phases.forEach((ph, pi) => {
-    const box = el('section', {className: 'ph'}, head(ph, p.phases, pi, stat(tasksOf(ph)), 'Başlık adı', 'Başlık silindi'), bar(stat(tasksOf(ph)).pct));
+    const pc = '--pc:var(--c' + (pi % 5 + 1) + ')';
+    side.append(el('section', {className: 'ph' + (ph.open ? ' on' : ''), style: pc}, head(ph, p.phases, pi, stat(tasksOf(ph)), 'Başlık adı', 'Başlık silindi'), bar(stat(tasksOf(ph)).pct)));
     if (ph.open) {
+      const box = el('section', {className: 'dp', style: pc}, el('h3', {textContent: ph.name}));
       ph.subs.forEach((sb, si) => {
         const inp = el('input', {type: 'text', placeholder: 'Yeni görev ekle…'});
         const add = () => { const v = inp.value.trim(); if (v) { sb.tasks.push(mk(v)); save(); render(); } };
@@ -630,11 +640,13 @@ function render() {
         box.append(dropTasks(sbox, sb));
       });
       box.append(el('div', {className: 'tools'}, el('button', {textContent: '+ Alt başlık', on: {click: () => ask('Alt başlık adı', '', n => { ph.subs.push({id: uid(), name: n, open: true, tasks: []}); save(); render(); })}})));
+      detail.append(box);
     }
-    app.append(box);
   });
+  if (!detail.children.length && p.phases.length) detail.append(el('div', {className: 'empty', textContent: 'Sağdaki listeden bir başlık seç; alt başlık ve görevleri burada açılır.'}));
 
-  app.append(el('button', {className: 'pri', textContent: '+ Başlık ekle', on: {click: () => ask('Başlık adı', '', n => { p.phases.push({id: uid(), name: n, open: true, subs: [{id: uid(), name: 'Görevler', open: true, tasks: []}]}); save(); render(); })}}));
+  side.append(el('button', {className: 'pri', textContent: '+ Başlık ekle', on: {click: () => ask('Başlık adı', '', n => { p.phases.push({id: uid(), name: n, open: true, subs: [{id: uid(), name: 'Görevler', open: true, tasks: []}]}); save(); render(); })}}));
+  app.append(el('div', {className: 'split'}, detail, side));
 }
 
 /* ---------- Pencere ---------- */
