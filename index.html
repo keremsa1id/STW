@@ -196,7 +196,7 @@ dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
   .split{grid-template-columns:minmax(0,1fr);gap:12px}
   main,#app{min-width:0;max-width:100vw}
   #top .crumb,#top .sep{display:none}
-  #top .tabs,#top .fwrap,#top>button:last-child{order:8}
+  #top .tabs,#top .fwrap,#top .mbtn,#top>button:last-child{order:8}
   .side{position:static;max-height:none;overflow:visible}
   .bartool{gap:6px}
   .kan{grid-template-columns:repeat(4,minmax(260px,84vw));scroll-snap-type:x mandatory;margin:0 -12px;padding:0 12px 8px;scroll-padding-left:12px}
@@ -219,6 +219,31 @@ dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
   .grip{padding:6px 8px}
   .calg{min-width:620px}
 }
+
+
+/* --- Accounts / roles --- */
+.badge{font-size:10px;font-weight:700;letter-spacing:.03em;padding:0 7px;border-radius:99px;background:color-mix(in srgb,var(--c4) 22%,transparent);color:color-mix(in srgb,var(--c4) 70%,var(--ink));border:1px solid color-mix(in srgb,var(--c4) 50%,transparent)}
+.soonbar{border:1px dashed color-mix(in srgb,var(--c4) 70%,var(--line));background:color-mix(in srgb,var(--c4) 10%,var(--card));border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:13px}
+.soon{text-align:center;padding:10px 6px}.soonico{font-size:34px}
+.soon p{margin:6px 0 0}
+.rl{display:grid;grid-template-columns:260px minmax(0,1fr);gap:20px;align-items:start}
+.rl-list{background:var(--sub);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:2px}
+.rl-list .newb{margin-bottom:6px}
+.rl-list .sec{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);padding:10px 6px 4px}
+.ri{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:0;background:none;border-radius:6px;padding:7px 8px}
+.ri:hover{background:var(--hov)}
+.ri.on{background:color-mix(in srgb,var(--acc) 13%,transparent);color:var(--acc);font-weight:600}
+.ri .pn{flex:1}
+.tagdef{font-size:11px;padding:0 7px;border-radius:6px;background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok);font-weight:600}
+.rl-main{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.rl-main h2{margin:0 0 2px;font-size:18px}
+.rl-main h4{margin:16px 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}
+.rtabs{display:inline-flex;margin:8px 0 6px}
+.pr{display:flex;align-items:center;gap:10px;padding:7px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.pr input{width:16px;height:16px;accent-color:var(--acc)}
+.mrow{display:flex;align-items:center;gap:10px;padding:6px 0}.mrow .mi{flex:1;display:grid}
+.form hr{width:100%;border:0;border-top:1px solid var(--line);margin:2px 0}
+@media(max-width:900px){.rl{grid-template-columns:minmax(0,1fr)}}
 
 /* --- Pencere, bildirim --- */
 dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(600px,92vw);box-shadow:0 12px 40px #0004}
@@ -568,7 +593,10 @@ function taskDlg(t) {
     pri = sel([['', 'None'], ['high', 'High'], ['mid', 'Medium'], ['low', 'Low']], t.pri || ''),
     st = sel(Object.entries(COLS), colOf(t)),
     tags = el('input', {type: 'text', value: (t.tags || []).join(', '), placeholder: 'comma separated: design, urgent'});
-  openDlg('Edit task', el('div', {className: 'form'}, f('Summary', title), f('Description', note), f('Due date', due), f('Assignee', who), f('Priority', pri), f('Labels', tags), f('Status', st)), () => {
+  who.setAttribute('list', 'assignees');
+  const names = [...new Set(db.projects.flatMap(pp => allTasks(pp).map(x => x.t.who)).filter(Boolean))];
+  const dl = el('datalist', {id: 'assignees'}, ...names.map(n => el('option', {value: n})));
+  openDlg('Edit task', el('div', {className: 'form'}, f('Summary', title), f('Description', note), f('Due date', due), f('Assignee', who), f('Priority', pri), f('Labels', tags), f('Status', st), dl), () => {
     const v = title.value.trim(); if (!v) { title.focus(); return false; }
     t.t = v; t.note = note.value.trim(); t.due = due.value; t.who = who.value.trim(); t.pri = pri.value;
     t.tags = [...new Set(tags.value.split(',').map(x => x.trim().replace(/^#/, '')).filter(Boolean))];
@@ -606,6 +634,95 @@ const delProject = p => withUndo('Project deleted', () => {
 });
 const toggleArchive = p => withUndo(p.archived ? 'Project restored' : 'Project archived', () => { p.archived = !p.archived; if (view === 'project') view = 'home'; });
 
+/* ---------- Accounts, members & roles ----------
+   Sign-in, invites and role enforcement need cloud accounts (Firebase), which are not set up yet.
+   The screens exist; actions that need the cloud show a "Coming soon" notice. */
+const PERM_GROUPS = [
+  ['Projects', [['p_create', 'Create projects'], ['p_view_all', 'View all projects'], ['p_archive', 'Archive / delete projects'], ['p_export', 'Export projects'], ['p_import', 'Import projects']]],
+  ['Members', [['m_manage', 'Add / remove project members'], ['u_manage', 'Manage users and roles']]],
+  ['Structure', [['e_edit', 'Edit epics and stories']]],
+  ['Tasks', [['t_create', 'Create tasks'], ['t_edit_any', 'Edit any task'], ['t_edit_own', 'Edit assigned tasks / change status'], ['t_delete', 'Delete tasks']]]];
+const ALL_PERMS = PERM_GROUPS.flatMap(g => g[1].map(x => x[0]));
+const ROLES = [
+  {id: 'admin', name: 'Admin', scope: 'Organization', locked: true, desc: 'Full access. Manages users, roles and all projects.', perms: ALL_PERMS},
+  {id: 'executive', name: 'Executive', scope: 'Organization', desc: 'Read-only view of all projects.', perms: ['p_view_all', 'p_export']},
+  {id: 'member', name: 'Member', scope: 'Organization', default: true, desc: 'Default for new users. Sees only the projects they are added to.', perms: []},
+  {id: 'pm', name: 'Project Manager', scope: 'Project', desc: 'Owns projects and manages their members.', perms: ['p_create', 'p_archive', 'p_export', 'p_import', 'm_manage', 'e_edit', 't_create', 't_edit_any', 't_edit_own', 't_delete']},
+  {id: 'lead', name: 'Team Lead', scope: 'Project', desc: 'Manages epics, stories and all tasks.', perms: ['e_edit', 't_create', 't_edit_any', 't_edit_own', 't_delete']},
+  {id: 'contrib', name: 'Contributor', scope: 'Project', desc: 'Creates tasks and updates assigned work.', perms: ['t_create', 't_edit_own']},
+  {id: 'viewer', name: 'Viewer', scope: 'Project', desc: 'Read-only access to a project.', perms: []}];
+const rolePerms = r => r.locked ? ALL_PERMS : (db.roles && db.roles[r.id]) || r.perms;
+let roleSel = 'admin', roleTab = 'perm';
+const SOON_WHY = 'This feature needs cloud accounts (Firebase), which are not enabled yet. Everything else works locally and your data stays on this device.';
+const soonBar = txt => el('div', {className: 'soonbar'}, el('b', {textContent: '🚧 Coming soon'}), el('span', {textContent: ' — ' + txt}));
+
+function soon(feature, why) {
+  openDlg('Coming soon', el('div', {className: 'soon'}, el('div', {className: 'soonico', textContent: '🚧'}), el('b', {textContent: feature}), el('p', {className: 'mut', textContent: why || SOON_WHY})), null);
+}
+
+function signInDlg() {
+  const f = (l, n) => el('label', {className: 'fld'}, el('span', {textContent: l}), n);
+  openDlg('Sign in', el('div', {className: 'form'},
+    soonBar('accounts need Firebase, which is not set up yet. Accounts will be invite-only.'),
+    f('Email', el('input', {type: 'text', placeholder: 'name@company.com'})), f('Password', el('input', {type: 'password', placeholder: 'Password'})),
+    el('button', {className: 'pri', textContent: 'Sign in', on: {click: () => soon('Sign in')}}),
+    el('button', {textContent: 'Create account (invite only)', on: {click: () => soon('Create account')}}),
+    el('hr'),
+    el('button', {textContent: '☁ Upload local projects to cloud', on: {click: () => soon('Upload to cloud')}})), null);
+}
+
+function membersDlg(p) {
+  const role = el('select', {}, ...ROLES.filter(r => r.scope === 'Project').map(r => el('option', {value: r.id, textContent: r.name})));
+  const em = el('input', {type: 'text', placeholder: 'email@company.com'});
+  const row = (name, sub, r) => el('div', {className: 'mrow'}, ava(name), el('div', {className: 'mi'}, el('b', {textContent: name}), el('small', {className: 'mut', textContent: sub})), el('span', {className: 'chip', textContent: r}));
+  openDlg('Members · ' + p.name, el('div', {className: 'form'},
+    soonBar('inviting members needs cloud accounts (Firebase).'),
+    row('You', 'This device · owner', 'Project Manager'),
+    el('label', {className: 'fld'}, el('span', {textContent: 'Invite by email'}), em), el('label', {className: 'fld'}, el('span', {textContent: 'Project role'}), role),
+    el('button', {className: 'pri', textContent: 'Send invite', on: {click: () => soon('Invite members')}})), null);
+}
+
+function renderRoles() {
+  const r = ROLES.find(x => x.id === roleSel) || ROLES[0];
+  const item = x => el('button', {className: 'ri' + (x.id === r.id ? ' on' : ''), on: {click: () => { roleSel = x.id; render(); }}},
+    el('span', {className: 'pn', textContent: x.name}), x.default ? el('span', {className: 'tagdef', textContent: 'Default'}) : '');
+  const list = el('div', {className: 'rl-list'},
+    el('button', {className: 'newb', textContent: '+ New role', on: {click: () => soon('Custom roles', 'Custom roles will be added in a later release. The seven standard roles are available now.')}}),
+    el('div', {className: 'sec', textContent: 'Organization roles'}), ...ROLES.filter(x => x.scope === 'Organization').map(item),
+    el('div', {className: 'sec', textContent: 'Project roles'}), ...ROLES.filter(x => x.scope === 'Project').map(item));
+
+  let body;
+  if (roleTab === 'perm') {
+    const on = new Set(rolePerms(r));
+    body = el('div', {});
+    PERM_GROUPS.forEach(([g, items]) => {
+      body.append(el('h4', {textContent: g}));
+      items.forEach(([k, l]) => {
+        const cb = el('input', {type: 'checkbox', checked: on.has(k), disabled: !!r.locked, on: {change: () => {
+          cb.checked ? on.add(k) : on.delete(k); db.roles = db.roles || {}; db.roles[r.id] = [...on]; save();
+        }}});
+        body.append(el('label', {className: 'pr'}, cb, el('span', {textContent: l})));
+      });
+    });
+    if (r.locked) body.append(el('p', {className: 'mut', textContent: 'The Admin role is locked and always has every permission.'}));
+    else if (db.roles && db.roles[r.id]) body.append(el('button', {textContent: 'Reset to default', on: {click: () => { delete db.roles[r.id]; save(); render(); }}}));
+  } else {
+    const mine = r.id === 'admin' || r.id === 'pm';
+    body = el('div', {}, el('div', {className: 'tblw'}, el('table', {className: 'tbl'},
+      el('thead', {}, el('tr', {}, ...['User', 'Email', 'Status'].map(h => el('th', {textContent: h})))),
+      el('tbody', {}, mine ? el('tr', {}, el('td', {}, ava('You'), ' You'), el('td', {className: 'mut', textContent: 'This device'}), el('td', {}, el('span', {className: 'chip', textContent: 'Active'}))) : ''))),
+      mine ? '' : el('p', {className: 'mut', textContent: 'No users with this role yet.'}),
+      el('p', {}, el('button', {className: 'pri', textContent: '+ Invite user', on: {click: () => soon('Invite users')}})));
+  }
+
+  const main = el('div', {className: 'rl-main'},
+    soonBar('roles are only enforced once cloud accounts are enabled. Changes here are saved on this device as a preview.'),
+    el('h2', {textContent: r.name}), el('p', {className: 'mut', textContent: r.scope + ' role · ' + r.desc}),
+    el('div', {className: 'tabs rtabs'}, ...[['perm', 'Permissions'], ['users', 'Users']].map(([k, l]) => el('button', {className: roleTab === k ? 'pri' : '', textContent: l, on: {click: () => { roleTab = k; render(); }}}))),
+    body);
+  $('#app').append(el('div', {className: 'rl'}, list, main));
+}
+
 const avatar = p => el('span', {className: 'av', style: '--pc:var(--c' + (db.projects.indexOf(p) % 5 + 1) + ')', textContent: ([...p.name.trim()][0] || '?').toLocaleUpperCase('en')});
 
 function renderSidebar() {
@@ -617,6 +734,7 @@ function renderSidebar() {
     el('button', {className: 'pri newb', textContent: '+ Create project', on: {click: newProject}}),
     nv('🏠 Dashboard', view === 'home' && !showArch, () => { showArch = false; view = 'home'; render(); }),
     na ? nv('📦 Archive (' + na + ')', view === 'home' && showArch, () => { showArch = true; view = 'home'; render(); }) : '',
+    nv('👥 Members & Roles', view === 'roles', () => { view = 'roles'; render(); }),
     el('div', {className: 'sec', textContent: 'Projects'}));
   db.projects.forEach(p => {
     if (p.archived) return;
@@ -626,6 +744,7 @@ function renderSidebar() {
   sb.append(el('div', {className: 'grow'}),
     'Notification' in window && Notification.permission === 'granted' ? '' : nv('🔔 Enable notifications', false, askNotify),
     nv('⬆ Import', false, importProject),
+    el('button', {className: 'nv', on: {click: signInDlg}}, el('span', {className: 'pn', textContent: '👤 Sign in'}), el('span', {className: 'badge', textContent: 'Soon'})),
     nv(L[th], false, () => { const o = ['auto', 'light', 'dark']; db.theme = o[(o.indexOf(th) + 1) % 3]; applyTheme(); save(); render(); }));
 }
 
@@ -635,12 +754,16 @@ function renderHeader() {
   if (view === 'home') {
     top.append(el('h1', {textContent: showArch ? 'Archive' : 'Dashboard'}), el('span', {className: 'sp'}),
       showArch ? el('button', {textContent: '← Projects', on: {click: () => { showArch = false; render(); }}}) : el('button', {className: 'pri', textContent: '+ Create project', on: {click: newProject}}));
+  } else if (view === 'roles') {
+    top.append(el('h1', {textContent: 'Members & Roles'}), el('span', {className: 'sp'}),
+      el('button', {className: 'pri', textContent: '+ Invite user', on: {click: () => soon('Invite users')}}));
   } else {
     const p = cur(), s = projStat(p);
     top.append(el('button', {className: 'crumb', textContent: 'Projects', on: {click: home}}), el('span', {className: 'sep', textContent: '/'}),
       avatar(p), el('h1', {textContent: p.name}), ic('✎', 'Rename project', () => rename(p, 'name', 'Project name')), el('span', {className: 'sp'}),
       el('div', {className: 'mini'}, el('span', {textContent: s.pct + '% · ' + s.d + '/' + s.n + ' tasks'}), bar(s.pct)),
       viewSwitch(), filterBar(p),
+      el('button', {className: 'mbtn', textContent: '👥 Members', on: {click: () => membersDlg(p)}}),
       el('button', {textContent: 'Export', on: {click: exportProject}}));
   }
 }
@@ -872,6 +995,7 @@ function render() {
   renderSidebar(); renderHeader();
   app.append(urgentBox());
   if (view === 'home') return renderHome();
+  if (view === 'roles') return renderRoles();
   const p = cur(), s = projStat(p);
   const setAll = v => { p.phases.forEach(ph => { ph.open = v; ph.subs.forEach(sb => sb.open = v); }); save(); render(); };
 
