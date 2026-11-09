@@ -229,6 +229,33 @@ const TEMPLATES = [
     ['Ölçümleme', [
       ['Analiz', ['Metrikleri haftalık topla', 'Hedeflerle karşılaştır', 'A/B test sonuçlarını değerlendir']],
       ['Raporlama', ['Kampanya sonuç raporu', 'Öğrenilenler ve öneriler', 'Bir sonraki kampanyaya girdi hazırla']]]]
+  ]},
+  {name: 'Finans: Ajan Destekli Piyasa Analizi ve İşlem', desc: 'Ajan/skill kurulumu, ABD hisse, kripto ve kademeli (merdiven) analiz, canlı işlem takibi', data: [
+    ['1. Hedef ve Çerçeve', [
+      ['Kapsam', ['Hedefi yaz: getiri beklentisi, vade, işlem sıklığı', 'Varlık evrenini belirle (ABD hisseleri, kripto, diğer)', 'Başlangıç sermayesi ve kaybedilebilir tutar sınırını yaz']],
+      ['Kurallar ve Uyum', ['Risk kurallarını yaz (işlem başı risk %, günlük/aylık maksimum kayıp)', 'Vergi ve yasal yükümlülükleri araştır', 'Ajanların yetki sınırını belirle: sadece analiz mi, emir de verebilir mi?']]]],
+    ['2. Ajan ve Skill Altyapısı', [
+      ['Claude Kurulumu', ['Claude Code / Agent SDK ortamını kur', 'Proje klasör yapısı ve CLAUDE.md talimatlarını yaz', 'API anahtarlarını güvenli sakla (.env, depoya ekleme)']],
+      ['Skill Keşfi ve Ekleme', ['Finans için mevcut skill ve MCP sunucularını araştır', 'Aday skill listesi çıkar: kaynak, güvenlik ve lisans kontrolü', 'Seçilen skilleri ekle ve örnek görevle test et', 'Eksik yetenekler için kendi skillini yaz (ör. rapor şablonu, risk hesabı)']],
+      ['Ajan Tasarımı', ['Ajan rollerini tanımla: veri toplayıcı, analist, risk denetçisi, raporlayıcı', 'Ajanlar arası iş akışı ve çıktı biçimini belirle', 'Hata ve halüsinasyon kontrolü: her sayı kaynağıyla doğrulansın']]]],
+    ['3. Veri Kaynakları', [
+      ['Piyasa Verisi', ['ABD hisse verisi kaynağı seç (fiyat, bilanço, haber)', 'Kripto verisi kaynağı seç (borsa API, zincir üstü veri)', 'Veri kalitesi ve gecikme kontrolü', 'Geçmiş veriyi indir ve sakla']],
+      ['Haber ve Makro', ['Ekonomik takvim (faiz kararı, enflasyon, istihdam)', 'Şirket kazanç takvimi', 'Haber ve duyarlılık kaynakları']]]],
+    ['4. Piyasa Analizi', [
+      ['ABD Hisseleri', ['İzleme listesi oluştur', 'Temel analiz: gelir, kâr, borç, değerleme', 'Teknik analiz: trend, destek/direnç, hacim', 'Sektör ve endeks karşılaştırması']],
+      ['Kripto', ['İzleme listesi oluştur', 'Teknik analiz ve piyasa yapısı', 'Likidite, hacim ve borsa riski kontrolü', 'BTC ve genel piyasa korelasyonu']],
+      ['Merdiven (Kademeli) İşlemler', ['Kademeli alım/satım seviyelerini belirle (giriş aralığı, adım, her kademenin tutarı)', 'Toplam pozisyon ve ortalama maliyet hesabı', 'Zarar durdur ve çıkış kademelerini yaz', 'Geçmiş veride merdiven stratejisini simüle et']],
+      ['Raporlama', ['Günlük piyasa özeti şablonu', 'Haftalık görünüm ve senaryolar (yükseliş / yatay / düşüş)', 'Her fikir için tez, risk ve iptal koşulunu yaz']]]],
+    ['5. Strateji ve Test', [
+      ['Geriye Dönük Test', ['Kuralları koda dök', 'Komisyon, kayma ve vergiyi hesaba kat', 'Farklı piyasa dönemlerinde test et (aşırı uyumdan kaçın)']],
+      ['Kâğıt Üzerinde İşlem', ['Sanal hesapla en az 4-8 hafta ileriye dönük test yap', 'Her sinyali ve sonucu kayda al', 'Canlıya geçiş ölçütlerini yaz (isabet, maksimum düşüş, tutarlılık)']]]],
+    ['6. Canlı İşlem ve Takip', [
+      ['Canlıya Geçiş', ['Aracı kurum / borsa hesabı ve API izinlerini ayarla (yalnız gerekli yetki, para çekme kapalı)', 'Küçük sermayeyle başla', 'Emir öncesi insan onayı adımı ekle']],
+      ['İşlem Defteri', ['Her işlemi kaydet: tarih, varlık, giriş/çıkış, miktar, gerekçe', 'Açık pozisyonlar ve merdiven kademeleri tablosu', 'Gerçekleşen ve gerçekleşmemiş kâr/zarar takibi']],
+      ['Risk ve Uyarılar', ['Fiyat ve zarar durdur uyarıları', 'Portföy dağılımı ve konsantrasyon kontrolü', 'Maksimum kayıp aşılırsa işlemi durdurma kuralı']]]],
+    ['7. Operasyon ve İyileştirme', [
+      ['Düzenli Süreç', ['Günlük: piyasa özeti ve açık pozisyon kontrolü', 'Haftalık: performans ve kural uyum raporu', 'Aylık: strateji gözden geçirme ve vergi kaydı']],
+      ['Sürekli Geliştirme', ['Hatalı kararların analizi (neden yanıldık?)', 'Yeni skill ve veri kaynağı araştırması', 'Ajan talimatlarını ve risk kurallarını güncelle']]]]
   ]}
 ];
 
