@@ -29,7 +29,7 @@ Projeleri **Başlık → Alt başlık → Görev** hiyerarşisiyle planlar ve il
 - **Filtre:** Öncelik, etiket ve kişiye göre (liste, Kanban ve takvimde geçerli).
 - **Sürükleme:** Görevler başka alt başlığa da taşınır (alt başlığın üstüne bırakınca sona eklenir). Dokunmatik ekranlarda tutamaçtan (⠿) sürüklenir.
 - **Ana sayfa:** "Bu hafta ve geciken işler" listesi.
-- **Görünümler:** Liste, Kanban (Yapılacak / Sürüyor / Bitti; ◀ ▶ ile taşı) ve aylık takvim.
+- **Görünümler:** Liste, Kanban (Backlog / Todo / In progress / Done; ◀ ▶ ile taşı, sütundan + ile yeni görev), aylık takvim ve Tablo. Görünüm simgeleri ve Filtreler (durum, öncelik, etiket, kişi) sağ üstte.
 
 ### Hazır şablonlar
 Mobil Oyun, Mobil Uygulama, Web Sitesi / Web Uygulaması, Yazılım Ürünü (MVP), Kurumsal Proje Yönetimi, Pazarlama Kampanyası, Finans: Ajan Destekli Piyasa Analizi ve İşlem.

@@ -114,18 +114,47 @@ dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
 .up .ut{flex:1;min-width:120px}
 
 /* --- Kanban --- */
-.kan{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:start}
-.kcol{background:var(--sub);border-radius:10px;padding:10px;min-height:80px}
-.kcol h3{margin:0 0 10px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
-.kcol h3::before{content:'';width:10px;height:10px;border-radius:50%;border:2px solid var(--mut)}
-.kcol.k-doing h3::before{border-color:var(--c4);background:linear-gradient(90deg,var(--c4) 50%,transparent 50%)}
-.kcol.k-done h3::before{border-color:var(--ok);background:var(--ok)}
 .kc{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px;box-shadow:0 1px 2px #0000000d}
 .kc:hover{border-color:color-mix(in srgb,var(--pc,var(--acc)) 55%,var(--line));box-shadow:0 2px 8px #0000001a}
 .kc .kt{font-weight:500}
 .kc.d .kt{color:var(--mut);text-decoration:line-through}
-.kc .ka{display:flex;justify-content:flex-end;gap:2px}
-@media(max-width:640px){.kan{grid-template-columns:1fr}}
+
+.kan{display:grid;grid-template-columns:repeat(4,minmax(270px,1fr));gap:16px;align-items:start;overflow-x:auto;padding-bottom:8px}
+.kcol{min-height:60px}
+.kh{display:flex;align-items:center;gap:8px;padding:2px 2px 10px}
+.kh b{font-size:14px;font-weight:600}.kn{color:var(--mut);font-size:13px}
+.kk{display:flex;align-items:center;gap:6px;margin-bottom:6px;color:var(--mut);font-size:12px;font-weight:500}
+.kico{width:18px;height:18px;border-radius:5px;flex:none;background:color-mix(in srgb,var(--pc) 22%,var(--card));border:1px solid color-mix(in srgb,var(--pc) 50%,transparent)}
+.kk .ka{display:flex;opacity:0;transition:opacity .12s}.kc:hover .ka{opacity:1}
+.kp{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.knew{border:0;background:none;color:var(--mut);width:100%;text-align:left;padding:8px 6px;border-radius:6px}
+.knew:hover{background:var(--hov);color:var(--ink)}
+.si{width:14px;height:14px;border-radius:50%;border:1.8px solid var(--mut);display:inline-block;flex:none;vertical-align:-2px}
+.si-backlog{border-style:dotted}
+.si-doing{border-color:var(--c4);background:linear-gradient(90deg,var(--c4) 50%,transparent 50%)}
+.si-done{border-color:var(--ok);background:var(--ok)}
+.chip.st{display:inline-flex;align-items:center;gap:5px;padding:1px 8px}
+.pb{display:inline-flex;align-items:flex-end;gap:2px;height:22px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--card)}
+.pb i{width:3px;border-radius:1px;background:var(--line)}
+.pb i:nth-child(1){height:5px}.pb i:nth-child(2){height:8px}.pb i:nth-child(3){height:11px}
+.pb.p-high i{background:var(--bad)}
+.pb.p-mid i:nth-child(-n+2){background:var(--c4)}
+.pb.p-low i:nth-child(1){background:var(--c1)}
+.ava{width:22px;height:22px;border-radius:50%;color:#fff;font-size:10px;font-weight:700;display:inline-grid;place-items:center;flex:none}
+.fwrap{position:relative}
+.fbtn.on{border-color:var(--acc);color:var(--acc)}
+.pop{position:absolute;right:0;top:calc(100% + 6px);z-index:20;width:240px;display:grid;gap:10px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px #0003}
+.pop .fld{display:grid;gap:3px;font-size:12px;color:var(--mut)}.pop select{width:100%}
+.tabs button{display:grid;place-items:center;padding:5px 8px}
+.tabs svg{display:block}
+.t.s-backlog input{border-style:dotted}
+.tblw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;font-weight:600;color:var(--mut);padding:8px 10px;background:var(--sub);border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tbody tr{cursor:pointer}.tbl tbody tr:hover{background:var(--hov)}
+.tbl .tt{font-weight:500;min-width:240px}.tbl tr.d .tt{color:var(--mut);text-decoration:line-through}
+.tbl .late{color:var(--bad)}
 
 /* --- Takvim --- */
 .calnav{display:flex;gap:8px;align-items:center;margin-bottom:10px}
@@ -324,7 +353,7 @@ const TEMPLATES = [
 
 // Görev: açıklama (note), bitiş (due, YYYY-AA-GG), sorumlu (who), öncelik (pri: high|mid|low), etiketler (tags), durum (st: todo|doing; done ayrı)
 const mk = (t, done, x = {}) => ({id: uid(), t, done: !!done, note: String(x.note || ''), due: String(x.due || ''), who: String(x.who || ''),
-  pri: ['high', 'mid', 'low'].includes(x.pri) ? x.pri : '', tags: Array.isArray(x.tags) ? x.tags.map(String) : [], st: x.st === 'doing' ? 'doing' : 'todo'});
+  pri: ['high', 'mid', 'low'].includes(x.pri) ? x.pri : '', tags: Array.isArray(x.tags) ? x.tags.map(String) : [], st: ['doing', 'backlog'].includes(x.st) ? x.st : 'todo'});
 function fromTemplate(tpl, name) {
   return {id: uid(), name: name || tpl.name, phases: tpl.data.map(([pn, subs]) => ({
     id: uid(), name: pn, open: true,
@@ -367,8 +396,9 @@ const fmt = s => new Date(s + 'T00:00').toLocaleDateString('tr-TR', {day: 'numer
 const isLate = t => !t.done && t.due && t.due < today();
 const PRI = {high: 'Yüksek', mid: 'Orta', low: 'Düşük'};
 const allTasks = p => p.phases.flatMap(ph => ph.subs.flatMap(sb => sb.tasks.map(t => ({t, ph, sb}))));
-const COLS = {todo: 'Yapılacak', doing: 'Sürüyor', done: 'Bitti'};
-const colOf =t => t.done ? 'done' : t.st === 'doing' ? 'doing' : 'todo';
+const COLS = {backlog: 'Backlog', todo: 'Todo', doing: 'In progress', done: 'Done'};
+const ST_ORDER = Object.keys(COLS);
+const colOf = t => t.done ? 'done' : t.st === 'doing' || t.st === 'backlog' ? t.st : 'todo';
 const setStatus = (t, s) => { t.done = s === 'done'; if (s !== 'done') t.st = s; };
 
 /* ---------- Arayüz ---------- */
@@ -489,7 +519,7 @@ function taskDlg(t) {
   const title = el('input', {type: 'text', value: t.t}), note = el('textarea', {value: t.note || '', placeholder: 'Kısa açıklama'}),
     due = el('input', {type: 'date', value: t.due || ''}), who = el('input', {type: 'text', value: t.who || '', placeholder: 'Sorumlu kişi'}),
     pri = sel([['', 'Yok'], ['high', 'Yüksek'], ['mid', 'Orta'], ['low', 'Düşük']], t.pri || ''),
-    st = sel([['todo', 'Yapılacak'], ['doing', 'Sürüyor'], ['done', 'Bitti']], colOf(t)),
+    st = sel(Object.entries(COLS), colOf(t)),
     tags = el('input', {type: 'text', value: (t.tags || []).join(', '), placeholder: 'virgülle ayır: tasarım, acil'});
   openDlg('Görev ayrıntıları', el('div', {className: 'form'}, f('Görev', title), f('Not', note), f('Bitiş tarihi', due), f('Sorumlu', who), f('Öncelik', pri), f('Etiketler', tags), f('Durum', st)), () => {
     const v = title.value.trim(); if (!v) { title.focus(); return false; }
@@ -500,7 +530,7 @@ function taskDlg(t) {
 }
 
 function taskRow(t, arr, i) {
-  const row = el('div', {className: 't' + (t.pri ? ' p-' + t.pri : '') + (colOf(t) === 'doing' ? ' s-doing' : '') + (t.done ? ' d' : '')},
+  const row = el('div', {className: 't' + (t.pri ? ' p-' + t.pri : '') + (' s-' + colOf(t)) + (t.done ? ' d' : '')},
     grip(arr, i, () => row, 'task'),
     el('input', {type: 'checkbox', id: t.id, checked: t.done, on: {change: e => { t.done = e.target.checked; save(); render(); }}}),
     el('div', {className: 'tb'},
@@ -512,11 +542,11 @@ function taskRow(t, arr, i) {
 }
 
 let view = 'home', mode = 'list', showArch = false;
-const flt = {pri: '', tag: '', who: ''};
-const pass = t => (!flt.pri || t.pri === flt.pri) && (!flt.tag || (t.tags || []).includes(flt.tag)) && (!flt.who || t.who === flt.who);
+const flt = {pri: '', tag: '', who: '', st: ''};
+const pass = t => (!flt.pri || t.pri === flt.pri) && (!flt.tag || (t.tags || []).includes(flt.tag)) && (!flt.who || t.who === flt.who) && (!flt.st || colOf(t) === flt.st);
 const collapse = p => p.phases.forEach(ph => { ph.open = false; ph.subs.forEach(sb => sb.open = false); });
 const open = id => {
-  db.cur = id; view = 'project'; mode = 'list'; flt.pri = flt.tag = flt.who = '';
+  db.cur = id; view = 'project'; mode = 'list'; flt.pri = flt.tag = flt.who = flt.st = '';
   collapse(cur()); // proje kapalı açılsın
   save(); render();
 };
@@ -562,6 +592,7 @@ function renderHeader() {
     top.append(el('button', {className: 'crumb', textContent: 'Projeler', on: {click: home}}), el('span', {className: 'sep', textContent: '/'}),
       avatar(p), el('h1', {textContent: p.name}), ic('✎', 'Projeyi adlandır', () => rename(p, 'name', 'Proje adı')), el('span', {className: 'sp'}),
       el('div', {className: 'mini'}, el('span', {textContent: '%' + s.pct + ' · ' + s.d + '/' + s.n + ' görev'}), bar(s.pct)),
+      viewSwitch(), filterBar(p),
       el('button', {textContent: 'Dışa aktar', on: {click: exportProject}}));
   }
 }
@@ -653,36 +684,102 @@ function renderHome() {
   app.append(grid);
 }
 
+let fOpen = false;
+const kcl = new Set();
+const ICONS = {
+  list: '<path d="M5.5 4h8M5.5 8h8M5.5 12h8M2.5 4h.01M2.5 8h.01M2.5 12h.01"/>',
+  kan: '<rect x="2.5" y="2.5" width="4" height="11" rx="1"/><rect x="9.5" y="2.5" width="4" height="7" rx="1"/>',
+  cal: '<rect x="2.5" y="3.5" width="11" height="10" rx="1.5"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/>',
+  tbl: '<rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/><path d="M2.5 6.5h11M2.5 10h11M7 6.5v7"/>'};
+function svgIcon(k) {
+  const v = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  [['viewBox', '0 0 16 16'], ['width', '16'], ['height', '16'], ['fill', 'none'], ['stroke', 'currentColor'], ['stroke-width', '1.5'], ['stroke-linecap', 'round']].forEach(([n, x]) => v.setAttribute(n, x));
+  v.innerHTML = ICONS[k]; return v;
+}
+const viewSwitch = () => el('div', {className: 'tabs'}, ...[['list', 'Liste'], ['kan', 'Kanban'], ['cal', 'Takvim'], ['tbl', 'Tablo']]
+  .map(([k, l]) => el('button', {className: mode === k ? 'pri' : '', title: l, on: {click: () => { mode = k; render(); }}}, svgIcon(k))));
+document.addEventListener('click', e => { if (fOpen && !e.target.closest('.fwrap')) { fOpen = false; render(); } });
+
+const stIcon = k => el('span', {className: 'si si-' + k});
+const pbar = pri => pri ? el('span', {className: 'pb p-' + pri, title: 'Öncelik: ' + PRI[pri]}, el('i'), el('i'), el('i')) : '';
+const ava = name => {
+  const h = [...name].reduce((x, c) => (x * 31 + c.charCodeAt(0)) % 360, 11);
+  return el('span', {className: 'ava', title: name, style: 'background:hsl(' + h + ' 55% 45%)', textContent: name.trim().split(/\s+/).slice(0, 2).map(w => [...w][0]).join('').toLocaleUpperCase('tr')});
+};
+const prefix = p => ([...p.name].filter(c => /\p{L}/u.test(c)).slice(0, 3).join('') || 'PRJ').toLocaleUpperCase('tr');
+const idxMap = p => new Map(allTasks(p).map((x, i) => [x.t, i + 1]));
+
 function filterBar(p) {
   const all = allTasks(p).map(x => x.t);
   const tags = [...new Set(all.flatMap(t => t.tags || []))].sort(), whos = [...new Set(all.map(t => t.who).filter(Boolean))].sort();
   if (!tags.includes(flt.tag)) flt.tag = '';
   if (!whos.includes(flt.who)) flt.who = '';
-  if (!all.some(t => t.pri) && !tags.length && !whos.length) { flt.pri = ''; return ''; }
-  const sel = (key, ph, opts) => {
-    const s = el('select', {on: {change: e => { flt[key] = e.target.value; render(); }}}, el('option', {value: '', textContent: ph}), ...opts.map(([v, l]) => el('option', {value: v, textContent: l})));
-    s.value = flt[key]; return s;
+  const n = ['st', 'pri', 'tag', 'who'].filter(k => flt[k]).length;
+  const sel = (key, label, opts) => {
+    const x = el('select', {on: {change: e => { flt[key] = e.target.value; render(); }}}, el('option', {value: '', textContent: 'Tümü'}), ...opts.map(([v, l]) => el('option', {value: v, textContent: l})));
+    x.value = flt[key]; return el('label', {className: 'fld'}, el('span', {textContent: label}), x);
   };
-  return el('div', {className: 'flt'}, sel('pri', 'Tüm öncelikler', Object.entries(PRI)), sel('tag', 'Tüm etiketler', tags.map(x => [x, '#' + x])), sel('who', 'Tüm kişiler', whos.map(x => [x, x])),
-    flt.pri || flt.tag || flt.who ? el('button', {textContent: 'Filtreyi temizle', on: {click: () => { flt.pri = flt.tag = flt.who = ''; render(); }}}) : '');
+  const pop = fOpen ? el('div', {className: 'pop'}, sel('st', 'Durum', Object.entries(COLS)), sel('pri', 'Öncelik', Object.entries(PRI)),
+    tags.length ? sel('tag', 'Etiket', tags.map(x => [x, '#' + x])) : '', whos.length ? sel('who', 'Kişi', whos.map(x => [x, x])) : '',
+    n ? el('button', {textContent: 'Filtreyi temizle', on: {click: () => { flt.pri = flt.tag = flt.who = flt.st = ''; render(); }}}) : '') : '';
+  return el('div', {className: 'fwrap'}, el('button', {className: 'fbtn' + (n ? ' on' : ''), textContent: 'Filtreler' + (n ? ' (' + n + ')' : '') + ' ▾',
+    on: {click: e => { e.stopPropagation(); fOpen = !fOpen; render(); }}}), pop);
+}
+
+// Seçilen durumda yeni görev: başlık ve alt başlık seçtirir
+function newTask(p, st) {
+  const opts = p.phases.flatMap(ph => ph.subs.map(sb => [sb, ph.name + ' › ' + sb.name]));
+  if (!opts.length) { openDlg('Yeni görev', el('p', {textContent: 'Önce Liste görünümünden bir başlık ve alt başlık ekle.'}), null); return; }
+  const title = el('input', {type: 'text', placeholder: 'Görev adı'}), where = el('select', {}, ...opts.map(([, l], i) => el('option', {value: i, textContent: l})));
+  title.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#dlgOk').click(); } });
+  const f = (l, n) => el('label', {className: 'fld'}, el('span', {textContent: l}), n);
+  openDlg('Yeni görev · ' + COLS[st], el('div', {className: 'form'}, f('Görev', title), f('Konum (başlık › alt başlık)', where)), () => {
+    const v = title.value.trim(); if (!v) { title.focus(); return false; }
+    const t = mk(v); setStatus(t, st); opts[+where.value][0].tasks.push(t); save(); render();
+  });
+  title.focus();
 }
 
 function renderKanban(p) {
-  const cols = [['todo', 'Yapılacak'], ['doing', 'Sürüyor'], ['done', 'Bitti']];
-  const items = allTasks(p).filter(x => pass(x.t)), wrap = el('div', {className: 'kan'});
+  const items = allTasks(p).filter(x => pass(x.t)), wrap = el('div', {className: 'kan'}), idx = idxMap(p), pre = prefix(p);
   const go = (t, k) => { setStatus(t, k); save(); render(); };
-  cols.forEach(([k, label], ci) => {
-    const list = items.filter(x => colOf(x.t) === k), col = el('div', {className: 'kcol k-' + k}, el('h3', {textContent: label + ' · ' + list.length}));
-    list.forEach(({t, ph, sb}) => col.append(el('div', {className: 'kc' + (t.pri ? ' p-' + t.pri : '') + (t.done ? ' d' : ''), style: '--pc:var(--c' + (p.phases.indexOf(ph) % 5 + 1) + ')'},
-      el('div', {className: 'kt', textContent: t.t}), el('small', {className: 'mut', textContent: ph.name + ' › ' + sb.name}),
-      t.note ? el('div', {className: 'note', textContent: t.note}) : '', chipsOf(t),
-      el('div', {className: 'ka'},
-        ic('◀', 'Geri', () => go(t, cols[ci - 1][0]), '', ci === 0),
-        ic('✎', 'Ayrıntılar', () => taskDlg(t)),
-        ic('▶', 'İleri', () => go(t, cols[ci + 1][0]), '', ci === 2)))));
+  ST_ORDER.forEach((k, ci) => {
+    const list = items.filter(x => colOf(x.t) === k), shut = kcl.has(k), col = el('div', {className: 'kcol k-' + k});
+    col.append(el('div', {className: 'kh'}, stIcon(k), el('b', {textContent: COLS[k]}), el('span', {className: 'kn', textContent: list.length}), el('span', {className: 'sp'}),
+      ic(shut ? '⤢' : '⤡', shut ? 'Aç' : 'Daralt', () => { shut ? kcl.delete(k) : kcl.add(k); render(); }), ic('+', 'Yeni görev', () => newTask(p, k))));
+    if (!shut) {
+      list.forEach(({t, ph, sb}) => col.append(el('div', {className: 'kc' + (t.done ? ' d' : ''), style: '--pc:var(--c' + (p.phases.indexOf(ph) % 5 + 1) + ')', title: ph.name + ' › ' + sb.name + (t.note ? '\n\n' + t.note : '')},
+        el('div', {className: 'kk'}, el('span', {className: 'kico'}), el('span', {textContent: pre + ' ' + idx.get(t)}), el('span', {className: 'sp'}),
+          el('span', {className: 'ka'},
+            ic('◀', 'Geri', () => go(t, ST_ORDER[ci - 1]), '', ci === 0),
+            ic('✎', 'Ayrıntılar', () => taskDlg(t)),
+            ic('▶', 'İleri', () => go(t, ST_ORDER[ci + 1]), '', ci === ST_ORDER.length - 1))),
+        el('div', {className: 'kt', textContent: t.t}),
+        el('div', {className: 'kp'}, pbar(t.pri), el('span', {className: 'chip st'}, stIcon(k), COLS[k]),
+          t.due ? el('span', {className: 'chip' + (isLate(t) ? ' late' : ''), textContent: '📅 ' + fmt(t.due)}) : '', t.who ? ava(t.who) : ''),
+        (t.tags || []).length ? el('div', {className: 'chips'}, t.tags.map(g => el('span', {className: 'chip', style: tagStyle(g), textContent: '#' + g}))) : '')));
+      col.append(el('button', {className: 'knew', textContent: '+ Yeni görev', on: {click: () => newTask(p, k)}}));
+    }
     wrap.append(col);
   });
   $('#app').append(wrap);
+}
+
+// Tablo (e-tablo) görünümü
+function renderTable(p) {
+  const items = allTasks(p).filter(x => pass(x.t)), idx = idxMap(p), pre = prefix(p);
+  if (!items.length) { $('#app').append(el('div', {className: 'empty', textContent: 'Görev yok.'})); return; }
+  $('#app').append(el('div', {className: 'tblw'}, el('table', {className: 'tbl'},
+    el('thead', {}, el('tr', {}, ...['ID', 'Görev', 'Durum', 'Öncelik', 'Bitiş', 'Sorumlu', 'Etiketler', 'Konum'].map(h => el('th', {textContent: h})))),
+    el('tbody', {}, ...items.map(({t, ph, sb}) => el('tr', {className: t.done ? 'd' : '', on: {click: () => taskDlg(t)}},
+      el('td', {className: 'mut', textContent: pre + ' ' + idx.get(t)}),
+      el('td', {className: 'tt', textContent: t.t}),
+      el('td', {}, el('span', {className: 'chip st'}, stIcon(colOf(t)), COLS[colOf(t)])),
+      el('td', {}, t.pri ? el('span', {className: 'chip p-' + t.pri, textContent: PRI[t.pri]}) : ''),
+      el('td', {className: isLate(t) ? 'late' : '', textContent: t.due ? fmt(t.due) : ''}),
+      el('td', {}, t.who ? [ava(t.who), ' ' + t.who] : ''),
+      el('td', {}, (t.tags || []).map(g => el('span', {className: 'chip', style: tagStyle(g), textContent: '#' + g}))),
+      el('td', {className: 'mut', textContent: ph.name + ' › ' + sb.name})))))));
 }
 
 const cal = (d => ({y: d.getFullYear(), m: d.getMonth()}))(new Date());
@@ -723,16 +820,14 @@ function render() {
   const p = cur(), s = projStat(p);
   const setAll = v => { p.phases.forEach(ph => { ph.open = v; ph.subs.forEach(sb => sb.open = v); }); save(); render(); };
 
-  app.append(el('div', {className: 'bartool'},
-    el('div', {className: 'tabs'}, ...[['list', '☰ Liste'], ['kan', '▥ Kanban'], ['cal', '▦ Takvim']]
-      .map(([k, l]) => el('button', {className: mode === k ? 'pri' : '', textContent: l, on: {click: () => { mode = k; render(); }}}))),
-    filterBar(p), el('span', {className: 'sp'}),
+  app.append(el('div', {className: 'bartool'}, el('span', {className: 'sp'}),
     mode === 'list' ? el('button', {textContent: 'Tümünü aç', on: {click: () => setAll(true)}}) : '',
     mode === 'list' ? el('button', {textContent: 'Tümünü kapat', on: {click: () => setAll(false)}}) : '',
     el('button', {textContent: 'Arşivle', on: {click: () => toggleArchive(p)}}),
     el('button', {textContent: 'Sil', on: {click: () => delProject(p)}})));
   if (mode === 'kan') return renderKanban(p);
   if (mode === 'cal') return renderCal(p);
+  if (mode === 'tbl') return renderTable(p);
 
   if (!p.phases.length) app.append(el('div', {className: 'empty', textContent: 'Henüz başlık yok. Aşağıdan ekle ya da "Yeni proje" ile bir şablon seç.'}));
 
@@ -781,7 +876,7 @@ function ask(label, def, cb) {
   inp.focus(); inp.select();
 }
 $('#dlgX').onclick = () => dlg.close();
-const addProject = p => { collapse(p); db.projects.push(p); db.cur = p.id; view = 'project'; mode = 'list'; flt.pri = flt.tag = flt.who = ''; save(); render(); };
+const addProject = p => { collapse(p); db.projects.push(p); db.cur = p.id; view = 'project'; mode = 'list'; flt.pri = flt.tag = flt.who = flt.st = ''; save(); render(); };
 
 function newProject() {
   const list = el('div', {});
