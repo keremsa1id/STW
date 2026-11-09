@@ -44,8 +44,12 @@ input[type=text],textarea{background:var(--card);border:1px solid var(--line);bo
 .sb{background:var(--sub);border-radius:10px;padding:8px 12px;margin-top:10px}
 .sb .bar{height:5px;margin:6px 0 4px}
 .sb .hd .nm{font-size:14px}
-.t{display:flex;gap:8px;align-items:flex-start;padding:3px 0}
-.t input{margin-top:4px;width:18px;height:18px;accent-color:var(--ok);flex:none}
+.t{--tc:var(--pc,var(--acc));display:flex;gap:8px;align-items:flex-start;padding:7px 10px 7px 6px;margin-top:6px;border:1px solid color-mix(in srgb,var(--tc) 35%,var(--line));border-left:4px solid var(--tc);border-radius:8px;background:color-mix(in srgb,var(--tc) 10%,var(--card))}
+.t:hover{background:color-mix(in srgb,var(--tc) 18%,var(--card))}
+.t.p-high{--tc:var(--bad)}.t.p-mid{--tc:var(--c4)}.t.p-low{--tc:var(--c3)}
+.t label{font-weight:600}
+.t .note{color:color-mix(in srgb,var(--ink) 78%,var(--mut))}
+.t input{margin-top:4px;width:18px;height:18px;accent-color:var(--tc);flex:none}
 .t label{display:block;cursor:pointer;word-break:break-word}
 .tb{flex:1;min-width:0}
 .note{color:var(--mut);font-size:13px;word-break:break-word}
@@ -69,7 +73,11 @@ dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
 .kan{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:start}
 .kcol{background:var(--sub);border-radius:12px;padding:10px;min-height:80px}
 .kcol h3{margin:0 0 8px;font-size:14px;color:var(--mut)}
-.kc{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px}
+.kc{--tc:var(--pc,var(--acc));background:color-mix(in srgb,var(--tc) 10%,var(--card));border:1px solid color-mix(in srgb,var(--tc) 35%,var(--line));border-left:4px solid var(--tc);border-radius:10px;padding:8px 10px;margin-bottom:8px}
+.kc:hover{background:color-mix(in srgb,var(--tc) 18%,var(--card))}
+.kc.p-high{--tc:var(--bad)}.kc.p-mid{--tc:var(--c4)}.kc.p-low{--tc:var(--c3)}
+.kc .kt{font-weight:600}
+.kc .note{color:color-mix(in srgb,var(--ink) 78%,var(--mut))}
 .kc.d .kt{color:var(--mut);text-decoration:line-through}
 .kc .ka{display:flex;justify-content:flex-end;gap:2px}
 .calnav{display:flex;gap:8px;align-items:center;margin-bottom:10px}
@@ -80,9 +88,10 @@ dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
 .cd{background:var(--card);border:1px solid var(--line);border-radius:8px;min-height:84px;padding:4px}
 .cd.today{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
 .cd .dn{font-size:12px;color:var(--mut)}
-.ct{font-size:12px;border-left:3px solid var(--line);background:var(--sub);border-radius:4px;padding:1px 5px;margin-top:3px;cursor:pointer;word-break:break-word}
-.ct small{display:block;color:var(--mut);font-size:11px;line-height:1.3}
-.ct.p-high{border-color:var(--bad)}.ct.p-mid{border-color:var(--c4)}.ct.p-low{border-color:var(--c3)}
+.ct{--tc:var(--acc);font-size:12px;font-weight:600;border:1px solid color-mix(in srgb,var(--tc) 35%,var(--line));border-left:4px solid var(--tc);background:color-mix(in srgb,var(--tc) 14%,var(--card));border-radius:5px;padding:2px 6px;margin-top:3px;cursor:pointer;word-break:break-word}
+.ct:hover{background:color-mix(in srgb,var(--tc) 24%,var(--card))}
+.ct small{display:block;color:color-mix(in srgb,var(--ink) 75%,var(--mut));font-weight:400;font-size:11px;line-height:1.3}
+.ct.p-high{--tc:var(--bad)}.ct.p-mid{--tc:var(--c4)}.ct.p-low{--tc:var(--c3)}
 .ct.d{text-decoration:line-through;color:var(--mut)}
 .ct.late{color:var(--bad)}
 @media(max-width:640px){.kan{grid-template-columns:1fr}}
@@ -448,7 +457,7 @@ function taskDlg(t) {
 }
 
 function taskRow(t, arr, i) {
-  const row = el('div', {className: 't' + (t.done ? ' d' : '')},
+  const row = el('div', {className: 't' + (t.pri ? ' p-' + t.pri : '') + (t.done ? ' d' : '')},
     grip(arr, i, () => row, 'task'),
     el('input', {type: 'checkbox', id: t.id, checked: t.done, on: {change: e => { t.done = e.target.checked; save(); render(); }}}),
     el('div', {className: 'tb'},
@@ -565,7 +574,7 @@ function renderKanban(p) {
   const go = (t, k) => { setStatus(t, k); save(); render(); };
   cols.forEach(([k, label], ci) => {
     const list = items.filter(x => colOf(x.t) === k), col = el('div', {className: 'kcol'}, el('h3', {textContent: label + ' · ' + list.length}));
-    list.forEach(({t, ph, sb}) => col.append(el('div', {className: 'kc' + (t.done ? ' d' : '')},
+    list.forEach(({t, ph, sb}) => col.append(el('div', {className: 'kc' + (t.pri ? ' p-' + t.pri : '') + (t.done ? ' d' : ''), style: '--pc:var(--c' + (p.phases.indexOf(ph) % 5 + 1) + ')'},
       el('div', {className: 'kt', textContent: t.t}), el('small', {className: 'mut', textContent: ph.name + ' › ' + sb.name}),
       t.note ? el('div', {className: 'note', textContent: t.note}) : '', chipsOf(t),
       el('div', {className: 'ka'},
