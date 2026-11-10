@@ -29,7 +29,7 @@ Projeleri **Başlık → Alt başlık → Görev** hiyerarşisiyle planlar ve il
 - **Filtre:** Öncelik, etiket ve kişiye göre (liste, Kanban ve takvimde geçerli).
 - **Sürükleme:** Görevler başka alt başlığa da taşınır (alt başlığın üstüne bırakınca sona eklenir). Dokunmatik ekranlarda tutamaçtan (⠿) sürüklenir.
 - **Ana sayfa:** "Bu hafta ve geciken işler" listesi.
-- **Görünümler:** Liste, Board (Jira tarzı 10 durum; ◀ ▶ ile taşı, sütundan + ile yeni görev, Columns ile sütun seç), aylık takvim ve Tablo. Görünüm simgeleri ve Filtreler (durum, öncelik, etiket, kişi) sağ üstte.
+- **Görünümler:** Liste, Board (Jira tarzı 10 durum; kartı sürükleyip başka sütuna bırak ya da ◀ ▶ ile taşı; yeni görevler Backlog'da başlar, sütundan + ile yeni görev, Columns ile sütun seç), aylık takvim ve Tablo. Görünüm simgeleri ve Filtreler (durum, öncelik, etiket, kişi) sağ üstte.
 
 ### Durumlar ve renkleri (Jira mantığı)
 Renk, durumun bağlı olduğu **kategoriden** gelir.

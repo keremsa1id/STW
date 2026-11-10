@@ -124,7 +124,9 @@ dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
 .kc.d .kt{color:var(--mut);text-decoration:line-through}
 
 .kan{display:grid;grid-template-columns:repeat(var(--n,4),minmax(270px,1fr));gap:16px;align-items:start;overflow-x:auto;padding-bottom:8px}
-.kcol{min-height:60px}
+.kcol{min-height:140px;border-radius:10px;padding:2px}
+.kc.dragging{opacity:.4}
+.kc[draggable=true]{cursor:grab}
 .kh{display:flex;align-items:center;gap:8px;padding:2px 2px 10px}
 .kh b{font-size:14px;font-weight:600}.kn{color:var(--mut);font-size:13px}
 .kk{display:flex;align-items:center;gap:6px;margin-bottom:6px;color:var(--mut);font-size:12px;font-weight:500}
@@ -569,7 +571,7 @@ const TEMPLATES = [
 const safeUrl0 = u => { try { return /^https?:$/.test(new URL(u).protocol); } catch (e) { return false; } };
 const arr0 = (v, f) => Array.isArray(v) ? v.map(f) : [];
 const mk = (t, done, x = {}) => ({id: typeof x.id === 'string' && x.id ? x.id : uid(), t, done: !!done || x.st === 'cancelled', note: String(x.note || ''), due: String(x.due || ''), who: String(x.who || ''),
-  pri: ['high', 'mid', 'low'].includes(x.pri) ? x.pri : '', tags: Array.isArray(x.tags) ? x.tags.map(String) : [], st: ['defined', 'selected', 'doing', 'review', 'blocked', 'qa', 'backlog', 'cancelled'].includes(x.st) ? x.st : 'todo',
+  pri: ['high', 'mid', 'low'].includes(x.pri) ? x.pri : '', tags: Array.isArray(x.tags) ? x.tags.map(String) : [], st: ['backlog', 'defined', 'selected', 'todo', 'doing', 'review', 'blocked', 'qa', 'cancelled'].includes(x.st) ? x.st : 'backlog',
   start: String(x.start || ''), est: +x.est > 0 ? +x.est : 0, spent: +x.spent > 0 ? +x.spent : 0, num: +x.num || 0, sprint: String(x.sprint || ''), doneAt: String(x.doneAt || ''), rank: +x.rank || 0,
   subs: arr0(x.subs, s => ({id: String(s.id || uid()), t: String(s.t || ''), done: !!s.done})),
   comments: arr0(x.comments, c => ({id: String(c.id || uid()), at: String(c.at || ''), text: String(c.text || ''), by: String(c.by || '')})),
@@ -626,7 +628,7 @@ const CAT = {backlog: 'todo', defined: 'todo', selected: 'todo', todo: 'todo', d
 const CATNAME = {todo: 'To Do', prog: 'In Progress', done: 'Done'};
 const DEFCOLS = ['backlog', 'todo', 'doing', 'review', 'blocked', 'done'];
 const ST_ORDER = Object.keys(COLS);
-const colOf = t => t.done ? (t.st === 'cancelled' ? 'cancelled' : 'done') : COLS[t.st] && CAT[t.st] !== 'done' ? t.st : 'todo';
+const colOf = t => t.done ? (t.st === 'cancelled' ? 'cancelled' : 'done') : COLS[t.st] && CAT[t.st] !== 'done' ? t.st : 'backlog';
 const logT = (t, text) => { (t.log = t.log || []).unshift({at: new Date().toISOString(), text}); if (t.log.length > 200) t.log.length = 200; };
 const setStatus = (t, s) => {
   const old = colOf(t), closing = CAT[s] === 'done';
@@ -1100,18 +1102,30 @@ function columnsMenu(p) {
       stIcon(k), el('span', {textContent: COLS[k]})))) : '';
   return el('div', {className: 'fwrap'}, el('button', {className: 'fbtn', textContent: 'Columns ▾', on: {click: e => { e.stopPropagation(); cOpen = !cOpen; render(); }}}), pop);
 }
+// Drag a card to another column to change its status (mouse: whole card; touch: the ⠿ handle)
+function cardDnd(t, card) {
+  if (!COARSE) {
+    card.draggable = true;
+    card.addEventListener('dragstart', e => { drag = {kind: 'card', t}; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'x'); card.classList.add('dragging'); });
+    card.addEventListener('dragend', () => { drag = null; clearOver(); card.classList.remove('dragging'); });
+  }
+  card.querySelector('.kk').prepend(el('span', {className: 'grip', textContent: '⠿', title: 'Drag to another column', on: {pointerdown: e => touchDrag(e, {kind: 'card', t})}}));
+  return card;
+}
 function renderKanban(p) {
   const all = allTasks(p), items = all.filter(x => pass(x.t)), pre = prefix(p);
   const used = new Set(all.map(x => colOf(x.t))), shown = new Set(colsShown());
   const vis = Object.keys(COLS).filter(k => shown.has(k) || used.has(k));
   const wrap = el('div', {className: 'kan', style: '--n:' + vis.length});
+  wrap.addEventListener('dragover', e => { const r = wrap.getBoundingClientRect(); if (e.clientX > r.right - 70) wrap.scrollLeft += 20; else if (e.clientX < r.left + 70) wrap.scrollLeft -= 20; });
   const go = (t, k) => { setStatus(t, k); save(); render(); };
   vis.forEach((k, ci) => {
     const list = items.filter(x => colOf(x.t) === k), shut = kcl.has(k), col = el('div', {className: 'kcol k-' + k});
+    bindDz(col, {ok: () => drag && drag.kind === 'card' && colOf(drag.t) !== k, go: () => { const t = drag.t; drag = null; setStatus(t, k); save(); render(); }});
     col.append(el('div', {className: 'kh'}, stIcon(k), el('b', {textContent: COLS[k]}), el('span', {className: 'kn', textContent: list.length}), el('span', {className: 'sp'}),
       ic(shut ? '⤢' : '⤡', shut ? 'Expand' : 'Collapse', () => { shut ? kcl.delete(k) : kcl.add(k); render(); }), ic('+', 'Create', () => newTask(p, k))));
     if (!shut) {
-      list.forEach(({t, ph, sb}) => col.append(el('div', {className: 'kc' + (t.done ? ' d' : ''), style: '--pc:var(--c' + (p.phases.indexOf(ph) % 5 + 1) + ')', title: ph.name + ' › ' + sb.name + (t.note ? '\n\n' + t.note : '')},
+      list.forEach(({t, ph, sb}) => col.append(cardDnd(t, el('div', {className: 'kc' + (t.done ? ' d' : ''), style: '--pc:var(--c' + (p.phases.indexOf(ph) % 5 + 1) + ')', title: ph.name + ' › ' + sb.name + (t.note ? '\n\n' + t.note : '')},
         el('div', {className: 'kk'}, el('span', {className: 'kico'}), el('span', {textContent: pre + '-' + t.num}), el('span', {className: 'sp'}),
           el('span', {className: 'ka'},
             ic('◀', 'Move back', () => go(t, vis[ci - 1]), '', ci === 0),
@@ -1121,7 +1135,7 @@ function renderKanban(p) {
         el('div', {className: 'kepic', title: 'Epic: ' + ph.name + '\nStory: ' + sb.name}, el('i'), el('span', {textContent: ph.name})),
         el('div', {className: 'kp'}, pbar(t.pri), el('span', {className: 'chip st'}, stIcon(k), COLS[k]),
           t.due ? el('span', {className: 'chip' + (isLate(t) ? ' late' : ''), textContent: '📅 ' + fmt(t.due)}) : '', t.who ? ava(t.who) : ''),
-        (t.tags || []).length ? el('div', {className: 'chips'}, t.tags.map(g => el('span', {className: 'chip', style: tagStyle(g), textContent: '#' + g}))) : '')));
+        (t.tags || []).length ? el('div', {className: 'chips'}, t.tags.map(g => el('span', {className: 'chip', style: tagStyle(g), textContent: '#' + g}))) : ''))));
       col.append(el('button', {className: 'knew', textContent: '+ Create', on: {click: () => newTask(p, k)}}));
     }
     wrap.append(col);
@@ -1607,6 +1621,7 @@ function render() {
   if (ptab === 'reports') return renderReports(p);
   app.append(el('div', {className: 'bartool'}, el('span', {className: 'sp'}),
     mode === 'kan' ? columnsMenu(p) : '',
+    mode === 'kan' && allTasks(p).some(x => colOf(x.t) === 'todo') ? el('button', {textContent: 'Move all To Do → Backlog', title: 'Send every To Do item back to the backlog', on: {click: () => withUndo('Moved to Backlog', () => allTasks(p).forEach(({t}) => { if (colOf(t) === 'todo') setStatus(t, 'backlog'); }))}}) : '',
     mode === 'list' ? el('button', {textContent: 'Expand all', on: {click: () => setAll(true)}}) : '',
     mode === 'list' ? el('button', {textContent: 'Collapse all', on: {click: () => setAll(false)}}) : '',
     el('button', {textContent: 'Archive project', on: {click: () => toggleArchive(p)}}),
