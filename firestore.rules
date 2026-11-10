@@ -38,6 +38,21 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Audit log: append-only. A signed-in, active person can add an entry only as themselves, with the server's time.
+    // Only admins can read. Nobody can edit or delete entries.
+    match /audit/{id} {
+      allow create: if signedIn() && active()
+                    && request.resource.data.keys().hasOnly(['uid', 'email', 'action', 'target', 'detail', 'at'])
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.email == myEmail()
+                    && request.resource.data.at == request.time
+                    && request.resource.data.action is string && request.resource.data.action.size() < 40
+                    && request.resource.data.target is string && request.resource.data.target.size() <= 200
+                    && request.resource.data.detail is string && request.resource.data.detail.size() <= 300;
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
     // Role permissions shared with everyone, editable by admins only.
     match /config/{docId} {
       allow read: if active();
