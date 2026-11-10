@@ -75,7 +75,7 @@ main{padding:16px 20px 80px}
 
 /* --- List: epics on the left, details on the right --- */
 .split{display:grid;grid-template-columns:320px minmax(0,1fr);gap:20px;align-items:start}
-.side{position:sticky;top:68px;max-height:calc(100vh - 84px);overflow:auto;padding:2px}
+.side{padding:2px}
 .ph{--pc:var(--c1);background:var(--card);border:1px solid var(--line);border-left:3px solid var(--pc);border-radius:8px;padding:8px 10px;margin-bottom:8px}
 .ph.on{background:color-mix(in srgb,var(--pc) 7%,var(--card));border-color:color-mix(in srgb,var(--pc) 45%,var(--line));border-left-color:var(--pc)}
 .ph>.hd .nm{font-size:13.5px}
@@ -292,7 +292,7 @@ kbd{font:11px/1 ui-monospace,monospace;padding:2px 5px;border:1px solid var(--li
 .tk-meta{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:13px}
 .tk-meta span:last-child{text-align:right}
 .tk-q{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 8px}
-.tk-side{position:sticky;top:68px}
+.tk-side{position:static}
 @media(max-width:900px){.tk{grid-template-columns:minmax(0,1fr)}.tk-side{position:static}}
 
 .tlbar{display:flex;gap:10px;align-items:center;margin-bottom:10px}
@@ -422,7 +422,7 @@ kbd{font:11px/1 ui-monospace,monospace;padding:2px 5px;border:1px solid var(--li
 
 /* --- Locked (view-only / missing permissions) --- */
 input:disabled,textarea:disabled,select:disabled{opacity:.6;cursor:not-allowed}
-.ro .grip,.ro .add,.ro .knew,.ro .tk-cin{display:none}
+.ro .grip,.ro .add,.ro .knew,.ro .tk-cin,.ro .side>button.pri,.ro .dp .tools,.ro .hd .ic:not([title="Collapse"]):not([title="Expand"]),.ro .t>.ic.del,.ro .kk .ka .ic:not([title="Edit"]),.ro .pj{display:none}
 .ro .t input:disabled{cursor:not-allowed}
 .no-t_create .sb>.add,.no-t_create .knew,.no-t_create .kh .ic[title="Create"]{display:none}
 .no-t_delete .t .ic.del,.no-t_delete .bulk button:nth-last-child(2){display:none}
@@ -1459,10 +1459,10 @@ function renderHome() {
     const card = el('div', {className: 'card', on: {click: () => open(p.id)}},
       el('div', {className: 'top'},
         el('span', {className: 'ttl', textContent: p.name}),
-        ic('✎', 'Rename', e => { e.stopPropagation(); rename(p, 'name', 'Project name'); }),
+        ...(canProjectActions(p) ? [ic('✎', 'Rename', e => { e.stopPropagation(); rename(p, 'name', 'Project name'); }),
         ic('⧉', 'Duplicate', e => { e.stopPropagation(); const c = normalize(p); c.name = p.name + ' (copy)'; db.projects.splice(i + 1, 0, c); save(); render(); }),
         ic('📦', p.archived ? 'Unarchive' : 'Archive', e => { e.stopPropagation(); toggleArchive(p); }),
-        ic('×', 'Delete', e => { e.stopPropagation(); delProject(p); }, 'del')),
+        ic('×', 'Delete', e => { e.stopPropagation(); delProject(p); }, 'del')] : [])),
       el('div', {}, el('span', {className: 'pct', textContent: s.pct + '%'}), el('small', {textContent: '  ' + s.d + '/' + s.n + ' tasks · ' + p.phases.length + ' epics'})),
       bar(s.pct));
     card.prepend(grip(db.projects, i, () => card));
@@ -2053,6 +2053,8 @@ function renderCal(p) {
 const RO_OK_TITLES = new Set(['Collapse', 'Expand', 'Previous month', 'Next month']);
 const RO_OK_TEXT = new Set(['← Back', 'Expand all', 'Collapse all', 'Today', 'Columns ▾']);
 const roOk = b => !!b.closest('.tabs,.ptabs,.fwrap,.ri') || RO_OK_TITLES.has(b.title) || RO_OK_TEXT.has(b.textContent.trim());
+// Rename / duplicate / archive / delete a project: only when the role allows it (device-only projects always)
+const canProjectActions = p => { if (!p.cloudId || !cloud.user) return true; const i = roleIn(p); return i.all || (canEditProject(p) && i.perms.has('p_archive')); };
 function applyLock() {
   const cl = document.body.classList;
   ['ro', 'no-t_create', 'no-t_delete', 'no-e_edit', 'no-p_archive'].forEach(c => cl.remove(c));
