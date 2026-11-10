@@ -40,6 +40,7 @@ Projeleri **Başlık → Alt başlık → Görev** hiyerarşisiyle planlar ve il
 - **Davet:** Projede **Members** → e-posta ve proje rolü yazıp davet edin. Kişi aynı e-postayla kayıt olur, e-postasını doğrular, proje listesinde görünür. Bekleyen davetler Members penceresinde görünür ve iptal edilebilir.
 - **Roller:** Members & Roles sayfasında Admin gerçek kullanıcıları listeler, şirket rolünü (Admin / Executive / Member) değiştirir ve rol yetkilerini düzenler. Yetkiler herkes için ortaktır (Firestore `config/roles`).
 - **Yetki uygulaması:** Sunucu (Firestore kuralları) kimin projeyi okuyup düzenleyip sileceğini, uygulama ise ince yetkileri (görev oluştur/sil/düzenle, epic düzenle) uygular. Yetkisiz bir değişiklik geri alınır ve uyarı çıkar. Salt okunur projelerde üstte "View only" uyarısı görünür.
+- **Kilitli ekranlar:** Salt okunur rollerde (Viewer, Executive) düzenleme alanları ve düğmeleri pasif gelir, sürükleme kapanır, üstte "View only" uyarısı çıkar. Yalnızca bazı yetkisi eksik rollerde (ör. Contributor) sadece o işin düğmeleri (silme, epic düzenleme, proje arşivleme) gizlenir.
 - Davetin kabulü için e-posta doğrulaması şarttır (hesap penceresinden tekrar gönderilebilir).
 
 ### Durumlar ve renkleri (Jira mantığı)
