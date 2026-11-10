@@ -9,6 +9,7 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Project Tracker</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml">
 <style>
 :root{--bg:#fff;--card:#fff;--ink:#1f2430;--mut:#667085;--line:#e4e7ec;--acc:#3f76ff;--ok:#16a34a;--sub:#f7f8fa;--hov:#eef0f4;--c1:#3f76ff;--c2:#8b5cf6;--c3:#0ea5a4;--c4:#f59e0b;--c5:#ec4899;--bad:#e5484d}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#15171c;--card:#1b1e25;--ink:#e6e8ec;--mut:#8c94a5;--line:#2a2f3a;--acc:#6f97ff;--ok:#3ec48c;--sub:#191c22;--hov:#242832;--c1:#6f97ff;--c2:#a78bfa;--c3:#2dd4bf;--c4:#fbbf24;--c5:#f472b6;color-scheme:dark}}
@@ -31,7 +32,7 @@ input[type=text]:focus,textarea:focus,select:focus{outline:2px solid color-mix(i
 #shell{display:flex;min-height:100vh}
 #sbar{width:248px;flex:none;background:var(--sub);border-right:1px solid var(--line);padding:12px 10px;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:100vh;overflow:auto}
 #sbar .brand{display:flex;align-items:center;gap:8px;padding:4px 6px 12px;font-size:15px}
-#sbar .logo{width:26px;height:26px;border-radius:7px;background:var(--acc);color:#fff;display:grid;place-items:center;font-weight:700}
+#sbar .logo{width:30px;height:30px;border-radius:8px;display:block}
 #sbar .newb{margin:0 0 8px;padding:6px 10px}
 #sbar .sec{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);padding:12px 8px 4px}
 #sbar .grow{flex:1;min-height:12px}
@@ -889,7 +890,7 @@ function renderSidebar() {
   const L = {auto: '🌓 Theme: auto', light: '☀ Theme: light', dark: '🌙 Theme: dark'}, th = db.theme || 'auto';
   const nv = (txt, on, fn) => el('button', {className: 'nv' + (on ? ' on' : ''), textContent: txt, on: {click: fn}});
   const na = db.projects.filter(p => p.archived).length;
-  sb.append(el('div', {className: 'brand'}, el('span', {className: 'logo', textContent: 'P'}), el('b', {textContent: 'Project Tracker'})),
+  sb.append(el('div', {className: 'brand'}, el('img', {className: 'logo', src: 'logo.svg', alt: 'Project Tracker'}), el('b', {textContent: 'Project Tracker'})),
     el('button', {className: 'pri newb', textContent: '+ Create project', on: {click: newProject}}),
     el('button', {className: 'nv', on: {click: searchDlg}}, el('span', {className: 'pn', textContent: '🔍 Search'}), el('kbd', {textContent: 'Ctrl K'})),
     nv('🏠 Dashboard', view === 'home' && !showArch, () => { showArch = false; view = 'home'; render(); }),
