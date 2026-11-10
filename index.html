@@ -10,9 +10,9 @@
 <link rel="apple-touch-icon" href="icon-192.png?v=3">
 <title>Project Tracker</title>
 <style>
-:root{--bg:#fff;--card:#fff;--ink:#1f2430;--mut:#667085;--line:#e4e7ec;--acc:#d71920;--ok:#16a34a;--sub:#f7f8fa;--hov:#eef0f4;--c1:#d71920;--c2:#8b5cf6;--c3:#0ea5a4;--c4:#f59e0b;--c5:#ec4899;--bad:#e5484d}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#15171c;--card:#1b1e25;--ink:#e6e8ec;--mut:#8c94a5;--line:#2a2f3a;--acc:#ff5a60;--ok:#3ec48c;--sub:#191c22;--hov:#242832;--c1:#ff5a60;--c2:#a78bfa;--c3:#2dd4bf;--c4:#fbbf24;--c5:#f472b6;color-scheme:dark}}
-:root[data-theme=dark]{--bg:#15171c;--card:#1b1e25;--ink:#e6e8ec;--mut:#8c94a5;--line:#2a2f3a;--acc:#ff5a60;--ok:#3ec48c;--sub:#191c22;--hov:#242832;--c1:#ff5a60;--c2:#a78bfa;--c3:#2dd4bf;--c4:#fbbf24;--c5:#f472b6;color-scheme:dark}
+:root{--bg:#fff;--card:#fff;--ink:#1f2430;--mut:#667085;--line:#e4e7ec;--acc:#d71920;--ok:#16a34a;--sub:#f7f8fa;--hov:#eef0f4;--c1:#d71920;--c2:#8b5cf6;--c3:#0ea5a4;--c4:#f59e0b;--c5:#ec4899;--bad:#e5484d;--st-todo:#667085;--st-prog:#2f6fed;--st-done:#16a34a;--pri-high:#e5484d;--pri-mid:#f59e0b;--pri-low:#2f6fed}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#15171c;--card:#1b1e25;--ink:#e6e8ec;--mut:#8c94a5;--line:#2a2f3a;--acc:#ff5a60;--ok:#3ec48c;--sub:#191c22;--hov:#242832;--c1:#ff5a60;--c2:#a78bfa;--c3:#2dd4bf;--c4:#fbbf24;--c5:#f472b6;--st-todo:#8c94a5;--st-prog:#5b8def;--st-done:#3ec48c;--pri-high:#ff6b70;--pri-mid:#fbbf24;--pri-low:#5b8def;color-scheme:dark}}
+:root[data-theme=dark]{--bg:#15171c;--card:#1b1e25;--ink:#e6e8ec;--mut:#8c94a5;--line:#2a2f3a;--acc:#ff5a60;--ok:#3ec48c;--sub:#191c22;--hov:#242832;--c1:#ff5a60;--c2:#a78bfa;--c3:#2dd4bf;--c4:#fbbf24;--c5:#f472b6;--st-todo:#8c94a5;--st-prog:#5b8def;--st-done:#3ec48c;--pri-high:#ff6b70;--pri-mid:#fbbf24;--pri-low:#5b8def;color-scheme:dark}
 :root[data-theme=light]{color-scheme:light}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -93,9 +93,10 @@ main{padding:16px 20px 80px}
 .t{--tc:var(--pc,var(--acc));display:flex;gap:8px;align-items:flex-start;padding:8px 6px 8px 2px;border-bottom:1px solid var(--line);border-radius:6px}
 .t:hover{background:var(--hov)}
 .t input{appearance:none;-webkit-appearance:none;margin:2px 0 0;width:16px;height:16px;border:1.6px solid color-mix(in srgb,var(--mut) 80%,transparent);border-radius:50%;flex:none;cursor:pointer;background:transparent center/10px no-repeat}
-.t input:hover{border-color:var(--ok)}
-.t input:checked{background-color:var(--ok);border-color:var(--ok);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.5l2.3 2.3 4.7-5' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
-.t.s-doing input,.t.s-review input,.t.s-blocked input,.t.s-qa input{border-color:var(--c1);background-image:linear-gradient(90deg,var(--c1) 50%,transparent 50%)}
+.t input:hover{border-color:var(--st-done)}
+.t input:checked{background-color:var(--st-done);border-color:var(--st-done);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.5l2.3 2.3 4.7-5' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.t.s-doing input,.t.s-review input,.t.s-blocked input,.t.s-qa input{border-color:var(--st-prog);background-image:linear-gradient(90deg,var(--st-prog) 50%,transparent 50%)}
+.t.s-backlog input,.t.s-defined input,.t.s-selected input,.t.s-todo input{border-color:var(--st-todo)}
 .t label{display:block;cursor:pointer;word-break:break-word;font-weight:500}
 .t.d label{color:var(--mut);text-decoration:line-through}
 .tb{flex:1;min-width:0}
@@ -103,9 +104,9 @@ main{padding:16px 20px 80px}
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
 .chip{font-size:12px;line-height:1.55;padding:0 7px;border-radius:6px;background:var(--card);border:1px solid var(--line);color:var(--ink);white-space:nowrap}
 .chip.late{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 55%,var(--line))}
-.chip.p-high{background:color-mix(in srgb,var(--bad) 12%,var(--card));border-color:color-mix(in srgb,var(--bad) 45%,var(--line));color:var(--bad)}
-.chip.p-mid{background:color-mix(in srgb,var(--c4) 14%,var(--card));border-color:color-mix(in srgb,var(--c4) 50%,var(--line));color:color-mix(in srgb,var(--c4) 75%,var(--ink))}
-.chip.p-low{background:color-mix(in srgb,var(--c1) 11%,var(--card));border-color:color-mix(in srgb,var(--c1) 40%,var(--line));color:var(--c1)}
+.chip.p-high{background:color-mix(in srgb,var(--pri-high) 12%,var(--card));border-color:color-mix(in srgb,var(--pri-high) 45%,var(--line));color:var(--pri-high)}
+.chip.p-mid{background:color-mix(in srgb,var(--pri-mid) 14%,var(--card));border-color:color-mix(in srgb,var(--pri-mid) 50%,var(--line));color:color-mix(in srgb,var(--pri-mid) 75%,var(--ink))}
+.chip.p-low{background:color-mix(in srgb,var(--pri-low) 11%,var(--card));border-color:color-mix(in srgb,var(--pri-low) 40%,var(--line));color:var(--pri-low)}
 .add{display:flex;gap:6px;margin-top:8px}
 .empty{color:var(--mut);text-align:center;padding:30px}
 .form{display:grid;gap:10px}
@@ -138,26 +139,24 @@ dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
 .kp{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
 .knew{border:0;background:none;color:var(--mut);width:100%;text-align:left;padding:8px 6px;border-radius:6px}
 .knew:hover{background:var(--hov);color:var(--ink)}
-.si{width:14px;height:14px;border-radius:50%;border:1.8px solid var(--mut);display:inline-block;flex:none;vertical-align:-2px;box-sizing:border-box}
-/* gray = To Do category */
+.si{width:14px;height:14px;border-radius:50%;border:1.8px solid var(--st-todo);display:inline-block;flex:none;vertical-align:-2px;box-sizing:border-box}
+/* STATUS COLOURS ARE FIXED: gray = To Do category, blue = In Progress category, green = Done category. They do not follow the theme colour. */
 .si-backlog{border-style:dotted}
-.si-defined{background:radial-gradient(circle,var(--mut) 30%,transparent 34%)}
-.si-selected{background:conic-gradient(var(--mut) 0 25%,transparent 0)}
-/* blue = In Progress category */
-.si-doing{border-color:var(--c1);background:conic-gradient(var(--c1) 0 50%,transparent 0)}
-.si-review{border-color:var(--c1);background:conic-gradient(var(--c1) 0 75%,transparent 0)}
-.si-blocked{border-color:var(--c1);background:linear-gradient(var(--card),var(--card)) center/6px 2px no-repeat,var(--c1)}
-.si-qa{border-color:var(--c1);background:radial-gradient(circle,var(--c1) 30%,transparent 34%)}
-/* green = Done category */
-.si-done{border-color:var(--ok);background:var(--ok)}
-.si-cancelled{border-color:var(--ok);background:linear-gradient(135deg,transparent 42%,var(--ok) 42% 58%,transparent 58%)}
+.si-defined{background:radial-gradient(circle,var(--st-todo) 30%,transparent 34%)}
+.si-selected{background:conic-gradient(var(--st-todo) 0 25%,transparent 0)}
+.si-doing{border-color:var(--st-prog);background:conic-gradient(var(--st-prog) 0 50%,transparent 0)}
+.si-review{border-color:var(--st-prog);background:conic-gradient(var(--st-prog) 0 75%,transparent 0)}
+.si-blocked{border-color:var(--st-prog);background:linear-gradient(var(--card),var(--card)) center/6px 2px no-repeat,var(--st-prog)}
+.si-qa{border-color:var(--st-prog);background:radial-gradient(circle,var(--st-prog) 30%,transparent 34%)}
+.si-done{border-color:var(--st-done);background:var(--st-done)}
+.si-cancelled{border-color:var(--st-done);background:linear-gradient(135deg,transparent 42%,var(--st-done) 42% 58%,transparent 58%)}
 .chip.st{display:inline-flex;align-items:center;gap:5px;padding:1px 8px}
 .pb{display:inline-flex;align-items:flex-end;gap:2px;height:22px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--card)}
 .pb i{width:3px;border-radius:1px;background:var(--line)}
 .pb i:nth-child(1){height:5px}.pb i:nth-child(2){height:8px}.pb i:nth-child(3){height:11px}
-.pb.p-high i{background:var(--bad)}
-.pb.p-mid i:nth-child(-n+2){background:var(--c4)}
-.pb.p-low i:nth-child(1){background:var(--c1)}
+.pb.p-high i{background:var(--pri-high)}
+.pb.p-mid i:nth-child(-n+2){background:var(--pri-mid)}
+.pb.p-low i:nth-child(1){background:var(--pri-low)}
 .ava{width:22px;height:22px;border-radius:50%;color:#fff;font-size:10px;font-weight:700;display:inline-grid;place-items:center;flex:none}
 .fwrap{position:relative}
 .fbtn.on{border-color:var(--acc);color:var(--acc)}
@@ -166,7 +165,7 @@ dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
 .tabs button{display:grid;place-items:center;padding:5px 8px}
 .tabs svg{display:block}
 .t.s-backlog input{border-style:dotted}
-.t.s-cancelled input:checked{background-color:var(--card);border-color:var(--ok);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 3l6 6M9 3l-6 6' fill='none' stroke='%2316a34a' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E")}
+.t.s-cancelled input:checked{background-color:var(--card);border-color:var(--st-done);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 3l6 6M9 3l-6 6' fill='none' stroke='%2316a34a' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E")}
 .tblw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
 .tbl{width:100%;border-collapse:collapse;font-size:13px}
 .tbl th{text-align:left;font-weight:600;color:var(--mut);padding:8px 10px;background:var(--sub);border-bottom:1px solid var(--line);white-space:nowrap}
@@ -189,7 +188,7 @@ dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
 .ct{--tc:var(--acc);font-size:12px;border:1px solid var(--line);border-left:3px solid var(--tc);background:var(--card);border-radius:5px;padding:2px 6px;margin-top:3px;cursor:pointer;word-break:break-word;box-shadow:0 1px 1px #0000000a}
 .ct:hover{background:var(--hov)}
 .ct small{display:block;color:var(--mut);font-size:11px;line-height:1.3}
-.ct.p-high{--tc:var(--bad)}.ct.p-mid{--tc:var(--c4)}.ct.p-low{--tc:var(--c1)}
+.ct.p-high{--tc:var(--pri-high)}.ct.p-mid{--tc:var(--pri-mid)}.ct.p-low{--tc:var(--pri-low)}
 .ct.d{text-decoration:line-through;color:var(--mut)}
 .ct.late{color:var(--bad)}
 
@@ -351,9 +350,9 @@ kbd{font:11px/1 ui-monospace,monospace;padding:2px 5px;border:1px solid var(--li
 .ins-c h3{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}
 .stk{display:flex;height:14px;gap:2px;margin-bottom:10px}
 .stk i{border-radius:4px;min-width:6px}
-.sg-backlog{background:color-mix(in srgb,var(--mut) 40%,var(--card))}.sg-defined{background:color-mix(in srgb,var(--mut) 55%,var(--card))}.sg-selected{background:color-mix(in srgb,var(--mut) 70%,var(--card))}.sg-todo{background:var(--mut)}
-.sg-doing{background:var(--c1)}.sg-review{background:color-mix(in srgb,var(--c1) 80%,var(--card))}.sg-blocked{background:color-mix(in srgb,var(--c1) 62%,var(--card))}.sg-qa{background:color-mix(in srgb,var(--c1) 46%,var(--card))}
-.sg-done{background:var(--ok)}.sg-cancelled{background:color-mix(in srgb,var(--ok) 50%,var(--card))}
+.sg-backlog{background:color-mix(in srgb,var(--st-todo) 40%,var(--card))}.sg-defined{background:color-mix(in srgb,var(--st-todo) 55%,var(--card))}.sg-selected{background:color-mix(in srgb,var(--st-todo) 70%,var(--card))}.sg-todo{background:var(--st-todo)}
+.sg-doing{background:var(--st-prog)}.sg-review{background:color-mix(in srgb,var(--st-prog) 80%,var(--card))}.sg-blocked{background:color-mix(in srgb,var(--st-prog) 62%,var(--card))}.sg-qa{background:color-mix(in srgb,var(--st-prog) 46%,var(--card))}
+.sg-done{background:var(--st-done)}.sg-cancelled{background:color-mix(in srgb,var(--st-done) 50%,var(--card))}
 .lg{display:flex;gap:6px 16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink)}
 .lg span{display:inline-flex;align-items:center;gap:6px}
 .hb-r{display:grid;grid-template-columns:110px minmax(0,1fr) 34px;gap:8px;align-items:center;padding:3px 0;font-size:13px}
@@ -361,7 +360,7 @@ kbd{font:11px/1 ui-monospace,monospace;padding:2px 5px;border:1px solid var(--li
 .hb-t{height:10px;background:var(--hov);border-radius:5px;overflow:hidden}
 .hb-t i{display:block;height:100%;border-radius:5px}
 .hb-v{text-align:right;font-variant-numeric:tabular-nums}
-.c-high{background:var(--bad)}.c-mid{background:var(--c4)}.c-low{background:var(--c1)}.c-none{background:color-mix(in srgb,var(--mut) 55%,var(--card))}.c-acc{background:var(--acc)}
+.c-high{background:var(--pri-high)}.c-mid{background:var(--pri-mid)}.c-low{background:var(--pri-low)}.c-none{background:color-mix(in srgb,var(--mut) 55%,var(--card))}.c-acc{background:var(--acc)}
 .wk{display:flex;gap:8px;align-items:flex-end;height:150px}
 .wk-c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px}
 .wk-c b{font-size:12px;min-height:16px}
@@ -388,6 +387,19 @@ kbd{font:11px/1 ui-monospace,monospace;padding:2px 5px;border:1px solid var(--li
 .sr-it.on,.sr-it:hover{background:color-mix(in srgb,var(--acc) 13%,transparent)}
 .sr-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sv{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:10px}.sv-r{display:flex;gap:4px}.sv-r button:first-child{flex:1;text-align:left}
+
+
+/* --- Colour picker, task colour accents --- */
+.sw-grid{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.swc{width:26px;height:26px;min-height:0;border-radius:50%;border:2px solid var(--card);box-shadow:0 0 0 1px var(--line);padding:0;cursor:pointer}
+.swc:hover{transform:scale(1.1)}
+.swc.on{box-shadow:0 0 0 2px var(--ink)}
+.swc.def{width:auto;border-radius:99px;padding:0 10px;font-size:12px;color:var(--mut);background:var(--card)}
+.sw-grid .swc-in,.form .sw-grid .swc-in{width:26px;height:26px;min-height:0;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;overflow:hidden}
+.swc-in::-webkit-color-swatch-wrapper{padding:0}.swc-in::-webkit-color-swatch{border:0;border-radius:50%}
+.t.hasc{border-left:4px solid var(--tcol);padding-left:6px}
+.kc.hasc{border-left:4px solid var(--tcol)}
+.tbl tr.hasc td:nth-child(2){box-shadow:inset 4px 0 0 var(--tcol)}
 
 /* --- Pencere, bildirim --- */
 dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(600px,92vw);box-shadow:0 12px 40px #0004}
@@ -570,7 +582,7 @@ const TEMPLATES = [
 // Task: description (note), due date (due, YYYY-MM-DD), assignee (who), priority (pri: high|mid|low), labels (tags), status (st: backlog|todo|doing; done is separate)
 const safeUrl0 = u => { try { return /^https?:$/.test(new URL(u).protocol); } catch (e) { return false; } };
 const arr0 = (v, f) => Array.isArray(v) ? v.map(f) : [];
-const mk = (t, done, x = {}) => ({id: typeof x.id === 'string' && x.id ? x.id : uid(), t, done: !!done || x.st === 'cancelled', note: String(x.note || ''), due: String(x.due || ''), who: String(x.who || ''),
+const mk = (t, done, x = {}) => ({id: typeof x.id === 'string' && x.id ? x.id : uid(), t, done: !!done || x.st === 'cancelled', color: /^#[0-9a-f]{6}$/i.test(x.color || '') ? x.color : '', note: String(x.note || ''), due: String(x.due || ''), who: String(x.who || ''),
   pri: ['high', 'mid', 'low'].includes(x.pri) ? x.pri : '', tags: Array.isArray(x.tags) ? x.tags.map(String) : [], st: ['backlog', 'defined', 'selected', 'todo', 'doing', 'review', 'blocked', 'qa', 'cancelled'].includes(x.st) ? x.st : 'backlog',
   start: String(x.start || ''), est: +x.est > 0 ? +x.est : 0, spent: +x.spent > 0 ? +x.spent : 0, num: +x.num || 0, sprint: String(x.sprint || ''), doneAt: String(x.doneAt || ''), rank: +x.rank || 0,
   subs: arr0(x.subs, s => ({id: String(s.id || uid()), t: String(s.t || ''), done: !!s.done})),
@@ -594,7 +606,7 @@ function normalize(o) {
   const task = t => typeof t === 'string' ? mk(t) : mk(String(t.t || t.gorev || t.name || ''), t.done || t.bitti, t);
   return {id: uid(), name: String(o.name || o.ad || 'Untitled project'), sprints: normSprints(o.sprints), seq: +o.seq || 0, phases: ph.map(p => {
     const subs = p.subs || p.altbasliklar;
-    return {id: uid(), name: String(p.name || p.ad || 'Epic'), open: true,
+    return {id: uid(), name: String(p.name || p.ad || 'Epic'), open: true, color: /^#[0-9a-f]{6}$/i.test(p.color || '') ? p.color : '',
       subs: Array.isArray(subs)
         ? subs.map(s => ({id: uid(), name: String(s.name || s.ad || 'Story'), open: true, tasks: (s.tasks || s.gorevler || []).map(task)}))
         : [{id: uid(), name: 'Tasks', open: true, tasks: (p.tasks || p.gorevler || []).map(task)}]};
@@ -638,7 +650,7 @@ const setStatus = (t, s) => {
 };
 // Older saved data lacks the newer fields; fill defaults and give every task a stable number (key = PREFIX-number)
 const ensureTask = t => { t.subs = t.subs || []; t.comments = t.comments || []; t.log = t.log || []; t.links = t.links || []; t.urls = t.urls || [];
-  t.start = t.start || ''; t.est = +t.est || 0; t.spent = +t.spent || 0; t.sprint = t.sprint || ''; t.doneAt = t.doneAt || ''; t.rank = +t.rank || 0; return t; };
+  t.color = t.color || ''; t.start = t.start || ''; t.est = +t.est || 0; t.spent = +t.spent || 0; t.sprint = t.sprint || ''; t.doneAt = t.doneAt || ''; t.rank = +t.rank || 0; return t; };
 const ensureProj = p => {
   p.sprints = p.sprints || [];
   const ts = allTasks(p).map(x => ensureTask(x.t));
@@ -743,6 +755,7 @@ function head(obj, arr, i, st, nameLabel, delMsg) {
     el('span', {className: 'nm', textContent: obj.name, title: 'Expand / collapse', on: {click: () => { obj.open = !obj.open; save(); render(); }}}),
     rg ? el('span', {className: 'rng', textContent: rg, title: 'Due date range'}) : '',
     el('em', {textContent: st.d + '/' + st.n + ' · ' + st.pct + '%'}),
+    obj.subs ? ic('🎨', 'Change epic colour', () => colorDlg(obj, 'Epic colour')) : '',
     ic('✎', 'Rename', () => rename(obj, 'name', nameLabel)),
     ic('×', 'Delete', () => withUndo(delMsg, () => arr.splice(i, 1)), 'del'));
   return dropZone(hd, arr, i);
@@ -764,7 +777,7 @@ function chipsOf(t) {
 function taskDlg(t) { openTask(t); }
 
 function taskRow(t, arr, i) {
-  const row = el('div', {className: 't' + (t.pri ? ' p-' + t.pri : '') + (' s-' + colOf(t)) + (t.done ? ' d' : '')},
+  const row = el('div', {className: 't' + (t.pri ? ' p-' + t.pri : '') + (' s-' + colOf(t)) + (t.color ? ' hasc' : '') + (t.done ? ' d' : ''), style: t.color ? '--tcol:' + t.color : ''},
     grip(arr, i, () => row, 'task'),
     el('input', {type: 'checkbox', id: t.id, checked: t.done, on: {change: e => { setStatus(t, e.target.checked ? 'done' : (t.pst && CAT[t.pst] !== 'done' ? t.pst : 'todo')); save(); render(); }}}),
     el('div', {className: 'tb'},
@@ -880,6 +893,22 @@ function renderRoles() {
     el('div', {className: 'tabs rtabs'}, ...[['perm', 'Permissions'], ['users', 'Users']].map(([k, l]) => el('button', {className: roleTab === k ? 'pri' : '', textContent: l, on: {click: () => { roleTab = k; render(); }}}))),
     body);
   $('#app').append(el('div', {className: 'rl'}, list, main));
+}
+
+/* ---------- Colours for epics and tasks ---------- */
+const PALETTE = [['#d71920', 'Red'], ['#f97316', 'Orange'], ['#f59e0b', 'Amber'], ['#16a34a', 'Green'], ['#0ea5a4', 'Teal'], ['#2f6fed', 'Blue'], ['#6366f1', 'Indigo'], ['#8b5cf6', 'Violet'], ['#ec4899', 'Pink'], ['#667085', 'Gray']];
+const isHex = c => /^#[0-9a-f]{6}$/i.test(c || '');
+const epicColor = (ph, i) => isHex(ph.color) ? ph.color : 'var(--c' + (i % 5 + 1) + ')';
+function swatches(cur, pick) {
+  const custom = el('input', {type: 'color', className: 'swc-in', value: isHex(cur) ? cur : '#2f6fed', title: 'Custom colour'});
+  custom.addEventListener('change', () => pick(custom.value));
+  return el('div', {className: 'sw-grid'},
+    el('button', {className: 'swc def' + (!cur ? ' on' : ''), textContent: 'Auto', title: 'Default colour', on: {click: () => pick('')}}),
+    ...PALETTE.map(([c, n]) => el('button', {className: 'swc' + (cur && cur.toLowerCase() === c ? ' on' : ''), style: 'background:' + c, title: n, on: {click: () => pick(c)}})), custom);
+}
+const swatchRow = t => swatches(t.color, c => { t.color = c; save(); render(); });
+function colorDlg(obj, title) {
+  openDlg(title, el('div', {}, el('p', {className: 'mut', textContent: 'Pick a colour, or Auto to use the default.'}), swatches(obj.color, c => { obj.color = c; save(); dlg.close(); render(); })), null);
 }
 
 const avatar = p => el('span', {className: 'av', style: '--pc:var(--c' + (db.projects.indexOf(p) % 5 + 1) + ')', textContent: ([...p.name.trim()][0] || '?').toLocaleUpperCase('en')});
@@ -1125,7 +1154,7 @@ function renderKanban(p) {
     col.append(el('div', {className: 'kh'}, stIcon(k), el('b', {textContent: COLS[k]}), el('span', {className: 'kn', textContent: list.length}), el('span', {className: 'sp'}),
       ic(shut ? '⤢' : '⤡', shut ? 'Expand' : 'Collapse', () => { shut ? kcl.delete(k) : kcl.add(k); render(); }), ic('+', 'Create', () => newTask(p, k))));
     if (!shut) {
-      list.forEach(({t, ph, sb}) => col.append(cardDnd(t, el('div', {className: 'kc' + (t.done ? ' d' : ''), style: '--pc:var(--c' + (p.phases.indexOf(ph) % 5 + 1) + ')', title: ph.name + ' › ' + sb.name + (t.note ? '\n\n' + t.note : '')},
+      list.forEach(({t, ph, sb}) => col.append(cardDnd(t, el('div', {className: 'kc' + (t.color ? ' hasc' : '') + (t.done ? ' d' : ''), style: '--pc:' + epicColor(ph, p.phases.indexOf(ph)) + (t.color ? ';--tcol:' + t.color : ''), title: ph.name + ' › ' + sb.name + (t.note ? '\n\n' + t.note : '')},
         el('div', {className: 'kk'}, el('span', {className: 'kico'}), el('span', {textContent: pre + '-' + t.num}), el('span', {className: 'sp'}),
           el('span', {className: 'ka'},
             ic('◀', 'Move back', () => go(t, vis[ci - 1]), '', ci === 0),
@@ -1165,7 +1194,7 @@ function renderTable(p) {
   const hcb = el('input', {type: 'checkbox', checked: items.every(x => bsel.has(x.t)), title: 'Select all', on: {change: e => { items.forEach(x => e.target.checked ? bsel.add(x.t) : bsel.delete(x.t)); render(); }}});
   $('#app').append(bar2, el('div', {className: 'tblw'}, el('table', {className: 'tbl'},
     el('thead', {}, el('tr', {}, el('th', {className: 'cb'}, hcb), ...['Key', 'Summary', 'Status', 'Priority', 'Due date', 'Assignee', 'Labels', 'Location'].map(h => el('th', {textContent: h})))),
-    el('tbody', {}, ...items.map(({t, ph, sb}) => el('tr', {className: (t.done ? 'd' : '') + (bsel.has(t) ? ' sel' : ''), on: {click: () => openTask(t)}},
+    el('tbody', {}, ...items.map(({t, ph, sb}) => el('tr', {className: (t.done ? 'd' : '') + (bsel.has(t) ? ' sel' : '') + (t.color ? ' hasc' : ''), style: t.color ? '--tcol:' + t.color : '', on: {click: () => openTask(t)}},
       el('td', {className: 'cb', on: {click: e => e.stopPropagation()}}, el('input', {type: 'checkbox', checked: bsel.has(t), on: {change: e => { e.target.checked ? bsel.add(t) : bsel.delete(t); render(); }}})),
       el('td', {className: 'mut', textContent: pre + '-' + t.num}),
       el('td', {className: 'tt', textContent: t.t}),
@@ -1304,6 +1333,7 @@ function renderTaskPage() {
       fld('Status', sel(Object.entries(COLS), colOf(t), v => { setStatus(t, v); save(); render(); })),
       fld('Priority', sel([['', 'None'], ...Object.entries(PRI)], t.pri || '', v => upd('Priority', PRI[t.pri] || '', PRI[v] || '', () => { t.pri = v; }))),
       fld('Assignee', who), fld('Start date', dateIn('Start date', 'start')), fld('Due date', dateIn('Due date', 'due')), fld('Labels', tags),
+      fld('Colour', swatchRow(t)),
       fld('Sprint', sel([['', 'None'], ...openSprints(p, t.sprint).map(s => [s.id, s.name])], t.sprint || '', v => upd('Sprint', sprintName(p, t.sprint), sprintName(p, v), () => { t.sprint = v; if (v && t.st === 'backlog' && !t.done) t.st = 'todo'; })))),
     el('div', {className: 'tk-card form'}, el('h4', {textContent: 'Time tracking'}),
       fld('Estimate (hours)', numIn('est', 'Estimate')), fld('Time spent (hours)', numIn('spent', 'Time spent')), quick,
@@ -1333,8 +1363,8 @@ function renderTimeline(p, level) {
     const spans = list.filter(t => t.start || t.due).map(t => { let a = dn(t.start || t.due), b = dn(t.due || t.start); if (a > b) [a, b] = [b, a]; return {t, a, b}; });
     if (!spans.length) return;
     const done = list.filter(t => t.done).length;
-    rows.push({type: 'epic', label: ph.name, a: Math.min(...spans.map(x => x.a)), b: Math.max(...spans.map(x => x.b)), pi, pct: list.length ? Math.round(done * 100 / list.length) : 0});
-    if (!epics) spans.forEach(x => rows.push({type: 'task', t: x.t, label: x.t.t, a: x.a, b: x.b, pi}));
+    rows.push({type: 'epic', label: ph.name, a: Math.min(...spans.map(x => x.a)), b: Math.max(...spans.map(x => x.b)), pi, col: epicColor(ph, pi), pct: list.length ? Math.round(done * 100 / list.length) : 0});
+    if (!epics) spans.forEach(x => rows.push({type: 'task', t: x.t, label: x.t.t, a: x.a, b: x.b, pi, col: x.t.color || epicColor(ph, pi)}));
   });
   app.append(el('div', {className: 'bartool'}, zoomBar(), el('span', {className: 'mut', textContent: epics ? 'Epics on a time axis. The filled part shows completion.' : 'Bars use each work item\'s start and due date.'})));
   if (!rows.length) { app.append(el('div', {className: 'empty', textContent: 'No dated work items. Set a start or due date on tasks to see them here.'})); return; }
@@ -1359,7 +1389,7 @@ function renderTimeline(p, level) {
   }
   const left = el('div', {className: 'tl-l'}, el('div', {className: 'tl-lh', textContent: epics ? 'Epic' : 'Work item'}));
   rows.forEach(r => {
-    const pc = '--pc:var(--c' + (r.pi % 5 + 1) + ')', w = (r.b - r.a + 1) * DW;
+    const pc = '--pc:' + r.col, w = (r.b - r.a + 1) * DW;
     left.append(el('div', {className: 'tl-lr ' + r.type, style: pc, title: r.label},
       r.type === 'epic' ? [el('span', {className: 'dot'}), el('b', {textContent: r.label}), el('small', {className: 'mut', textContent: '  ' + r.pct + '%'})]
         : [el('span', {className: 'mut', textContent: keyOf(p, r.t) + '  '}), el('span', {textContent: r.label})]));
@@ -1649,7 +1679,7 @@ function renderInner() {
   // Two columns: epic list on the left, stories and tasks of open epics on the right
   const side = el('div', {className: 'side'}), detail = el('div', {className: 'detail'});
   p.phases.forEach((ph, pi) => {
-    const pc = '--pc:var(--c' + (pi % 5 + 1) + ')';
+    const pc = '--pc:' + epicColor(ph, pi);
     side.append(el('section', {className: 'ph' + (ph.open ? ' on' : ''), style: pc}, head(ph, p.phases, pi, stat(tasksOf(ph)), 'Epic name', 'Epic deleted'), bar(stat(tasksOf(ph)).pct)));
     if (ph.open) {
       const box = el('section', {className: 'dp', style: pc}, el('h3', {textContent: ph.name}));
