@@ -413,6 +413,12 @@ kbd{font:11px/1 ui-monospace,monospace;padding:2px 5px;border:1px solid var(--li
 
 .mrow select{max-width:190px}
 
+.gated #sbar,.gated #top{display:none}
+.gate{max-width:440px;margin:12vh auto 0;text-align:center;display:grid;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 24px}
+.gate-logo{width:56px;height:56px;margin:0 auto;border-radius:14px}
+.gate h2{margin:0 0 4px}
+.allow{margin-top:20px;border-top:1px solid var(--line);padding-top:6px}
+
 /* --- Pencere, bildirim --- */
 dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(600px,92vw);box-shadow:0 12px 40px #0004}
 dialog::backdrop{background:#0006}
@@ -849,8 +855,8 @@ function soon(feature, why) {
 
 /* ---------- Cloud accounts, sharing & roles (Firebase) ----------
    Sign-in, cloud copies of projects, offline-tolerant sync, invitations, members and role enforcement. */
-const cloud = {state: 'loading', user: null, role: '', loaded: false, flagged: false, err: '', meta: {}, rj: {}, sj: {}, unsub: null, unsubRoles: null, timer: 0, users: null, loadingUsers: false};
-const projJson = p => JSON.stringify(p, (k, v) => (k === 'open' || k === 'cloudId' || k === 'localOnly') ? undefined : v);
+const cloud = {state: 'loading', access: 'checking', allow: null, loadingAllow: false, user: null, role: '', loaded: false, flagged: false, err: '', meta: {}, rj: {}, sj: {}, unsub: null, unsubRoles: null, timer: 0, users: null, loadingUsers: false};
+const projJson = p => JSON.stringify(p, (k, v) => (k === 'open' || k === 'cloudId' || k === 'localOnly' || k === 'owner') ? undefined : v);
 const saveLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} };
 const info = msg => toast(msg, null, 'OK');
 const CLOUD_ERR = {
@@ -871,24 +877,81 @@ function cloudBoot() {
   setTimeout(() => { if (!window.FB && cloud.state === 'loading') { cloud.state = 'unavailable'; render(); } }, 10000);
 }
 
+// Invitation-only access. Nothing is shown until the signed-in person is an admin/executive,
+// or their email is on the allowlist (set when someone invites them) and verified.
 async function onAuth(u) {
   if (cloud.unsub) { cloud.unsub(); cloud.unsub = null; }
   if (cloud.unsubRoles) { cloud.unsubRoles(); cloud.unsubRoles = null; }
-  Object.assign(cloud, {loaded: false, flagged: false, err: '', meta: {}, rj: {}, sj: {}, users: null});
+  Object.assign(cloud, {loaded: false, flagged: false, err: '', meta: {}, rj: {}, sj: {}, users: null, allow: null});
   clearTimeout(cloud.timer);
   if (!u) {
-    cloud.user = null; cloud.role = '';
+    cloud.user = null; cloud.role = ''; cloud.access = 'out';
     db.projects = db.projects.filter(p => !p.cloudId);            // cloud projects are not kept on the device after sign-out
-    if (db.cur && !db.projects.some(p => p.id === db.cur)) db.cur = db.projects[0] ? db.projects[0].id : '';
+    partitionLocal();                                             // device-only projects are parked until their owner signs in
     if (view === 'project' || view === 'task') { taskCtx = null; view = 'home'; }
     saveLocal(); render(); return;
   }
-  cloud.user = {uid: u.uid, email: u.email, verified: !!u.emailVerified}; render();
-  try { cloud.role = await FB.ensureUser(u.uid, u.email); } catch (e) { cloud.role = ''; }
-  const all = cloud.role === 'admin' || cloud.role === 'executive';      // admins and executives can see every project
+  cloud.user = {uid: u.uid, email: u.email, verified: !!u.emailVerified};
+  await startSession();
+}
+
+async function startSession() {
+  const u = cloud.user; if (!u) return;
+  cloud.access = 'checking'; render();
+  let listed = false, role = '';
+  try { listed = await FB.isAllowed(u.email.toLowerCase()); } catch (e) { listed = false; }
+  try { role = await FB.ensureUser(u.uid, u.email, listed && u.verified); } catch (e) { role = ''; }
+  if (cloud.user !== u) return;                                   // signed out meanwhile
+  cloud.role = role;
+  if (role === 'admin' || role === 'executive') cloud.access = 'ok';
+  else if (!listed) cloud.access = 'denied';
+  else if (!u.verified) cloud.access = 'verify';
+  else cloud.access = role ? 'ok' : 'denied';
+  if (cloud.access !== 'ok') { db.projects = db.projects.filter(p => !p.cloudId); partitionLocal(); saveLocal(); render(); return; }
+  partitionLocal();
+  const all = role === 'admin' || role === 'executive';           // admins and executives can see every project
   cloud.unsub = FB.watchProjects(u.uid, onSnap, e => { cloud.err = cloudErr(e); info(cloud.err); render(); }, all);
   cloud.unsubRoles = FB.watchRoles(perms => { if (perms && JSON.stringify(perms) !== JSON.stringify(db.roles || {})) { db.roles = perms; saveLocal(); render(); } }, () => {});
-  if (cloud.user.verified) claimInvites();
+  if (u.verified) claimInvites();
+  saveLocal(); render();
+}
+
+async function refreshAccess(msgEl) {
+  try {
+    cloud.user.verified = await FB.refresh();
+    if (cloud.user.verified) { if (dlg.open) dlg.close(); info('Email verified.'); await startSession(); }
+    else if (msgEl) { msgEl.textContent = 'Not verified yet. Open the link in the email (check spam too), then try again.'; msgEl.className = 'form-msg err'; }
+  } catch (e) { if (msgEl) { msgEl.textContent = cloudErr(e); msgEl.className = 'form-msg err'; } else info(cloudErr(e)); }
+}
+
+// Device-only projects belong to whoever created them here. Others are parked (kept on the device, not shown).
+// Old projects without an owner are only shown to an admin, who then becomes their owner.
+function partitionLocal() {
+  const uid = cloud.user && cloud.access === 'ok' ? cloud.user.uid : null;
+  const pool = [...(db.parked || []), ...db.projects.filter(p => !p.cloudId)];
+  db.projects = db.projects.filter(p => p.cloudId); db.parked = [];
+  pool.forEach(p => {
+    if (uid && (p.owner === uid || (!p.owner && cloud.role === 'admin'))) { if (!p.owner) p.owner = uid; db.projects.push(p); }
+    else db.parked.push(p);
+  });
+  if (!db.projects.some(p => p.id === db.cur)) db.cur = db.projects[0] ? db.projects[0].id : '';
+}
+
+const gateNeeded = () => cloud.access !== 'ok';
+function renderGate() {
+  const p = t => el('p', {className: 'mut', textContent: t}), msg = el('div', {className: 'form-msg'});
+  const box = el('div', {className: 'gate'}, el('img', {className: 'gate-logo', src: 'logo.svg?v=3', alt: ''}), el('h2', {textContent: 'Project Tracker'}));
+  const out = el('button', {textContent: 'Sign out', on: {click: () => FB.signOut()}});
+  if (cloud.state === 'unavailable') box.append(p('Cannot reach the server. Check your internet connection and reload the page.'), el('button', {className: 'pri', textContent: 'Reload', on: {click: () => location.reload()}}));
+  else if (cloud.state === 'loading' || cloud.access === 'checking') box.append(p('Connecting…'));
+  else if (!cloud.user) box.append(p('This workspace is invitation only. Sign in with the email address you were invited with.'),
+    el('button', {className: 'pri', textContent: 'Sign in', on: {click: () => signInDlg()}}),
+    el('button', {textContent: 'I was invited: create my account', on: {click: () => signInDlg('up')}}));
+  else if (cloud.access === 'verify') box.append(p('One more step: verify ' + cloud.user.email + '. We sent you a link (check the spam folder too).'), msg,
+    el('button', {className: 'pri', textContent: 'I have verified', on: {click: () => refreshAccess(msg)}}),
+    el('button', {textContent: 'Send the email again', on: {click: async () => { try { await FB.verify(); msg.textContent = 'Verification email sent.'; msg.className = 'form-msg'; } catch (e) { msg.textContent = cloudErr(e); msg.className = 'form-msg err'; } }}}), out);
+  else box.append(p(cloud.user.email + ' has not been invited to this workspace. Ask an admin or a project manager to invite this address, then sign in again.'), out);
+  $('#app').append(box);
 }
 
 async function claimInvites() {
@@ -1076,7 +1139,7 @@ function signInDlg(mode) {
   (up ? pw2 : pw).addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
   const show2 = el('label', {className: 'chk'}, el('input', {type: 'checkbox', on: {change: e => { pw.type = e.target.checked ? 'text' : 'password'; if (pw2) pw2.type = pw.type; }}}), el('span', {textContent: 'Show password'}));
   openDlg(up ? 'Create account' : 'Sign in', el('div', {className: 'form'},
-    up ? el('small', {className: 'mut', textContent: 'Use your work email. After signing up you only see the projects you are added to.'}) : '',
+    up ? el('small', {className: 'mut', textContent: 'Only invited email addresses can join. Use the exact address the invitation was sent to.'}) : '',
     fld('Email', em), fld('Password', pw), up ? fld('Repeat password', pw2) : '', show2, msg,
     el('button', {className: 'pri', textContent: up ? 'Create account' : 'Sign in', on: {click: submit}}),
     up ? '' : el('button', {textContent: 'Forgot password?', on: {click: async () => {
@@ -1096,9 +1159,7 @@ function accountDlg() {
     v ? '' : el('div', {className: 'infobar'}, el('b', {textContent: 'Verify your email. '}), el('span', {textContent: 'You need a verified email to accept project invitations.'}),
       el('div', {className: 'tools'},
         el('button', {textContent: 'Send verification email', on: {click: async () => { try { await FB.verify(); msg.textContent = 'Verification email sent. Check your inbox.'; msg.className = 'form-msg'; } catch (e) { msg.textContent = cloudErr(e); msg.className = 'form-msg err'; } }}}),
-        el('button', {className: 'pri', textContent: 'I have verified', on: {click: async () => {
-          try { cloud.user.verified = await FB.refresh(); if (cloud.user.verified) { dlg.close(); claimInvites(); render(); info('Email verified.'); } else { msg.textContent = 'Not verified yet. Open the link in the email, then try again.'; msg.className = 'form-msg err'; } }
-          catch (e) { msg.textContent = cloudErr(e); msg.className = 'form-msg err'; } }}}))),
+        el('button', {className: 'pri', textContent: 'I have verified', on: {click: () => refreshAccess(msg)}}))),
     msg,
     cloud.err ? el('div', {className: 'form-msg err', textContent: cloud.err}) : el('small', {className: 'mut', textContent: nc + ' cloud project' + (nc === 1 ? '' : 's') + ' · changes are saved automatically'}),
     n ? el('button', {className: 'pri', textContent: '☁ Upload ' + n + ' device-only project' + (n === 1 ? '' : 's') + ' to the cloud', on: {click: () => {
@@ -1154,6 +1215,24 @@ function inviteUserDlg() {
 
 const saveRolesCloud = () => FB.saveRoles(db.roles || {}).catch(e => info(cloudErr(e)));
 
+function allowSection() {
+  if (!cloud.allow && !cloud.loadingAllow) {
+    cloud.loadingAllow = true;
+    FB.listAllowlist().then(l => { cloud.allow = l; }, e => { cloud.allow = []; info(cloudErr(e)); }).finally(() => { cloud.loadingAllow = false; render(); });
+  }
+  const inp = el('input', {type: 'text', placeholder: 'email@company.com'});
+  const add = async () => {
+    const m = inp.value.trim().toLowerCase();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m)) return info('Enter a valid email address.');
+    try { await FB.allow(m, cloud.user.uid); cloud.allow = null; render(); info(m + ' can now create an account and sign in.'); } catch (e) { info(cloudErr(e)); }
+  };
+  return el('section', {className: 'allow'}, el('h4', {textContent: 'Allowed email addresses' + (cloud.allow ? ' (' + cloud.allow.length + ')' : '')}),
+    el('p', {className: 'mut', textContent: 'Only these addresses, plus admins and executives, can use the workspace. Inviting someone to a project adds them here automatically.'}),
+    ...(cloud.allow || []).map(x => el('div', {className: 'mrow'}, ava(x.email), el('div', {className: 'mi'}, el('b', {textContent: x.email}), el('small', {className: 'mut', textContent: x.pid ? 'Invited to a project' : 'Added by an admin'})),
+      ic('×', 'Remove access', async () => { try { await FB.disallow(x.email); cloud.allow = null; render(); info(x.email + ' can no longer sign in.'); } catch (e) { info(cloudErr(e)); } }, 'del'))),
+    el('div', {className: 'add'}, inp, el('button', {textContent: 'Allow', on: {click: add}})));
+}
+
 function usersBody(r) {
   const wrap = el('div', {});
   const invite = el('p', {}, el('button', {className: 'pri', textContent: '+ Invite user', on: {click: inviteUserDlg}}));
@@ -1175,7 +1254,7 @@ function usersBody(r) {
       return el('tr', {}, el('td', {}, ava(u.email || '?'), ' ' + (u.email || u.id) + (u.id === cloud.user.uid ? ' (you)' : '')), el('td', {}, sel));
     });
     wrap.append(el('div', {className: 'tblw'}, el('table', {className: 'tbl'}, el('thead', {}, el('tr', {}, ...['User', 'Organization role'].map(h => el('th', {textContent: h})))), el('tbody', {}, ...rows))),
-      !cloud.users ? el('p', {className: 'mut', textContent: 'Loading users…'}) : list.length ? '' : el('p', {className: 'mut', textContent: 'No users with this role yet.'}), invite);
+      !cloud.users ? el('p', {className: 'mut', textContent: 'Loading users…'}) : list.length ? '' : el('p', {className: 'mut', textContent: 'No users with this role yet.'}), invite, allowSection());
     return wrap;
   }
   const rows = [];
@@ -1308,6 +1387,7 @@ function showNote(title, opts) {
 }
 // Hourly system notification for every unfinished urgent task (if permitted; only while the page is open)
 function notifyUrgent() {
+  if (cloud.access !== 'ok') return;
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
   let s = null; try { s = JSON.parse(localStorage.getItem(NKEY)); } catch (e) {}
   const hk = today() + 'T' + pad(new Date().getHours());
@@ -1973,6 +2053,7 @@ function render() {
 function renderInner() {
   const app = $('#app'); app.replaceChildren();
   document.body.classList.remove('nav');
+  const gated = gateNeeded(); document.body.classList.toggle('gated', gated); if (gated) return renderGate();
   db.projects.forEach(ensureProj);
   renderSidebar(); renderHeader();
   app.append(urgentBox());
@@ -2049,7 +2130,7 @@ function ask(label, def, cb) {
 }
 $('#dlgX').onclick = () => dlg.close();
 $('#scrim').onclick = () => document.body.classList.remove('nav');
-const addProject = p => { collapse(p); db.projects.push(p); db.cur = p.id; view = 'project'; mode = 'list'; ptab = 'items'; flt.pri = flt.tag = flt.who = flt.st = ''; save(); render(); };
+const addProject = p => { collapse(p); if (cloud.user) p.owner = cloud.user.uid; db.projects.push(p); db.cur = p.id; view = 'project'; mode = 'list'; ptab = 'items'; flt.pri = flt.tag = flt.who = flt.st = ''; save(); render(); };
 
 function newProject() {
   const list = el('div', {});
@@ -2116,12 +2197,17 @@ window.FB = {
   async refresh() { await auth.currentUser.reload(); await auth.currentUser.getIdToken(true); return auth.currentUser.emailVerified; },
   ts: () => serverTimestamp(),
   newId: () => doc(collection(fs, 'projects')).id,
-  async ensureUser(uid, email) {
+  async ensureUser(uid, email, mayCreate) {
     const ref = doc(fs, 'users', uid), s = await getDoc(ref);
     if (s.exists()) return s.data().role || 'member';
+    if (!mayCreate) return '';
     await setDoc(ref, {email, role: 'member', createdAt: serverTimestamp()});
     return 'member';
   },
+  async isAllowed(email) { return (await getDoc(doc(fs, 'allowlist', email))).exists(); },
+  allow: (email, byUid, pid) => setDoc(doc(fs, 'allowlist', email), Object.assign({email, invitedBy: byUid, createdAt: serverTimestamp()}, pid ? {pid} : {})),
+  disallow: email => deleteDoc(doc(fs, 'allowlist', email)),
+  async listAllowlist() { const s = await getDocs(collection(fs, 'allowlist')); return s.docs.map(d => d.data()); },
   // --- projects ---
   watchProjects: (uid, next, err, all) => onSnapshot(all ? collection(fs, 'projects') : query(collection(fs, 'projects'), where('memberIds', 'array-contains', uid)), next, err),
   createProject: (id, data) => setDoc(doc(fs, 'projects', id), data),
@@ -2130,7 +2216,10 @@ window.FB = {
   // --- members and invitations ---
   setMember: (pid, uid, role) => updateDoc(doc(fs, 'projects', pid), {['members.' + uid]: role}),
   removeMember: (pid, uid) => updateDoc(doc(fs, 'projects', pid), {['members.' + uid]: deleteField(), ['memberEmails.' + uid]: deleteField(), memberIds: arrayRemove(uid)}),
-  invite: (pid, projectName, email, role, byUid) => setDoc(doc(fs, 'invites', pid + '_' + email), {pid, projectName, email, role, invitedBy: byUid, createdAt: serverTimestamp()}),
+  async invite(pid, projectName, email, role, byUid) {
+    await setDoc(doc(fs, 'allowlist', email), {email, pid, invitedBy: byUid, createdAt: serverTimestamp()});
+    await setDoc(doc(fs, 'invites', pid + '_' + email), {pid, projectName, email, role, invitedBy: byUid, createdAt: serverTimestamp()});
+  },
   async listInvites(pid) { const s = await getDocs(query(collection(fs, 'invites'), where('pid', '==', pid))); return s.docs.map(d => Object.assign({id: d.id}, d.data())); },
   revokeInvite: id => deleteDoc(doc(fs, 'invites', id)),
   async claimInvites(uid, email) {

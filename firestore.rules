@@ -1,21 +1,37 @@
 rules_version = '2';
 
 // Paste this into Firebase console -> Firestore Database -> Rules, then Publish.
-// Covers: sign-in, per-user project access, cloud sync, invitations, members and admin-managed roles.
+// Invitation-only workspace: only admins, executives and allowlisted (invited + verified) people get any data.
 service cloud.firestore {
   match /databases/{database}/documents {
 
     function signedIn() { return request.auth != null; }
+    function myEmail() { return request.auth.token.email.lower(); }
+    function verified() { return request.auth.token.email_verified == true; }
     function userPath() { return /databases/$(database)/documents/users/$(request.auth.uid); }
     function isAdmin() { return signedIn() && exists(userPath()) && get(userPath()).data.role == 'admin'; }
     function isExec()  { return signedIn() && exists(userPath()) && get(userPath()).data.role == 'executive'; }
-    function verified() { return request.auth.token.email_verified == true; }
+    function allowlisted() { return signedIn() && exists(/databases/$(database)/documents/allowlist/$(myEmail())); }
+    function active() { return isAdmin() || isExec() || (allowlisted() && verified()); }
+    function pmOf(p) { return get(/databases/$(database)/documents/projects/$(p)).data.members.get(request.auth.uid, '') == 'pm'; }
 
-    // A user document is created by the user on first sign-in, always as a plain "member".
+    // Who may use the workspace. Written when someone is invited (by a project manager) or by an admin.
+    match /allowlist/{addr} {
+      allow read: if signedIn() && (addr == myEmail() || isAdmin());
+      allow create, update: if signedIn()
+                    && request.resource.data.keys().hasOnly(['email', 'pid', 'invitedBy', 'createdAt'])
+                    && request.resource.data.email == addr
+                    && addr == addr.lower()
+                    && request.resource.data.invitedBy == request.auth.uid
+                    && (isAdmin() || (active() && ('pid' in request.resource.data) && pmOf(request.resource.data.pid)));
+      allow delete: if isAdmin();
+    }
+
+    // A user document is created by an invited, verified person on first sign-in, always as a plain "member".
     // Only an admin can change roles (first admin: set role to "admin" by hand in the console).
     match /users/{uid} {
       allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
-      allow create: if signedIn() && request.auth.uid == uid
+      allow create: if signedIn() && request.auth.uid == uid && allowlisted() && verified()
                     && request.resource.data.role == 'member'
                     && request.resource.data.keys().hasOnly(['email', 'role', 'createdAt']);
       allow update: if isAdmin() && request.resource.data.role in ['admin', 'executive', 'member'];
@@ -24,18 +40,18 @@ service cloud.firestore {
 
     // Role permissions shared with everyone, editable by admins only.
     match /config/{docId} {
-      allow read: if signedIn();
+      allow read: if active();
       allow write: if isAdmin();
     }
 
     // One document per project. memberIds / members decide who can see and edit it.
     match /projects/{pid} {
       function myRole() { return resource.data.members.get(request.auth.uid, ''); }
-      function inviteDoc() { return /databases/$(database)/documents/invites/$(pid + '_' + request.auth.token.email.lower()); }
+      function inviteDoc() { return /databases/$(database)/documents/invites/$(pid + '_' + myEmail()); }
 
-      // A verified person with a pending invitation may add exactly themselves, with exactly the invited role.
+      // An invited, verified person may add exactly themselves, with exactly the invited role.
       function joining() {
-        return signedIn() && verified() && exists(inviteDoc())
+        return signedIn() && allowlisted() && verified() && exists(inviteDoc())
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'memberIds', 'memberEmails'])
           && request.resource.data.members.diff(resource.data.members).affectedKeys().hasOnly([request.auth.uid])
           && request.resource.data.members[request.auth.uid] == get(inviteDoc()).data.role
@@ -44,9 +60,9 @@ service cloud.firestore {
           && request.resource.data.memberIds.size() == resource.data.memberIds.size() + 1;
       }
 
-      allow read: if signedIn() && (request.auth.uid in resource.data.memberIds || isAdmin() || isExec());
+      allow read: if signedIn() && active() && (request.auth.uid in resource.data.memberIds || isAdmin() || isExec());
 
-      allow create: if signedIn()
+      allow create: if signedIn() && active()
                     && request.resource.data.ownerId == request.auth.uid
                     && request.resource.data.memberIds == [request.auth.uid]
                     && request.resource.data.members[request.auth.uid] == 'pm'
@@ -57,21 +73,20 @@ service cloud.firestore {
                     && request.resource.data.json.size() < 900000
                     && (
                       isAdmin()
-                      || myRole() == 'pm'
-                      || (myRole() in ['lead', 'contrib']
+                      || (active() && myRole() == 'pm')
+                      || (active() && myRole() in ['lead', 'contrib']
                           && request.resource.data.members == resource.data.members
                           && request.resource.data.memberIds == resource.data.memberIds
                           && request.resource.data.ownerId == resource.data.ownerId)
                       || joining()
                     );
 
-      allow delete: if signedIn() && (isAdmin() || myRole() == 'pm');
+      allow delete: if signedIn() && (isAdmin() || (active() && myRole() == 'pm'));
     }
 
     // Invitations: one document per (project, email). Document id = projectId_email (lowercase).
     match /invites/{iid} {
-      function projRole(p) { return get(/databases/$(database)/documents/projects/$(p)).data.members.get(request.auth.uid, ''); }
-      function mine() { return verified() && resource.data.email == request.auth.token.email.lower(); }
+      function mine() { return verified() && resource.data.email == myEmail(); }
 
       allow create: if signedIn()
                     && request.resource.data.keys().hasOnly(['pid', 'projectName', 'email', 'role', 'invitedBy', 'createdAt'])
@@ -79,9 +94,9 @@ service cloud.firestore {
                     && request.resource.data.invitedBy == request.auth.uid
                     && request.resource.data.email == request.resource.data.email.lower()
                     && iid == request.resource.data.pid + '_' + request.resource.data.email
-                    && (isAdmin() || projRole(request.resource.data.pid) == 'pm');
+                    && (isAdmin() || (active() && pmOf(request.resource.data.pid)));
 
-      allow read, delete: if signedIn() && (mine() || isAdmin() || projRole(resource.data.pid) == 'pm');
+      allow read, delete: if signedIn() && (mine() || isAdmin() || (active() && pmOf(resource.data.pid)));
       allow update: if false;
     }
   }
