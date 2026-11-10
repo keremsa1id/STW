@@ -408,6 +408,9 @@ kbd{font:11px/1 ui-monospace,monospace;padding:2px 5px;border:1px solid var(--li
 .chk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);cursor:pointer}.chk input{width:auto!important}
 .form .link{border:0;background:none;color:var(--acc);padding:2px 0}.form .link:hover:not(:disabled){background:none;text-decoration:underline}
 
+.infobar{border:1px solid var(--line);background:var(--sub);border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:13px}
+.rob{border-color:color-mix(in srgb,var(--c4) 60%,var(--line));background:color-mix(in srgb,var(--c4) 10%,var(--card));font-size:13px;padding:10px 14px}
+
 /* --- Pencere, bildirim --- */
 dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(600px,92vw);box-shadow:0 12px 40px #0004}
 dialog::backdrop{background:#0006}
@@ -626,7 +629,7 @@ if (!db) {
   try { const old = JSON.parse(localStorage.getItem(OLD)); if (old && old.projects) { db = {projects: old.projects.map(normalize)}; db.cur = db.projects[0].id; } } catch (e) {}
 }
 if (!db || !db.projects || !db.projects.length) { const s = fromTemplate(TEMPLATES[0]); db = {cur: s.id, projects: [s]}; }
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} if (typeof scheduleCloud === 'function') scheduleCloud(); };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} if (typeof guardPerms === 'function' && guardPerms()) return; if (typeof scheduleCloud === 'function') scheduleCloud(); };
 const cur = () => db.projects.find(p => p.id === db.cur) || db.projects[0];
 const tasksOf = x => x.subs ? x.subs.flatMap(s => s.tasks) : x.tasks;
 const stat = ts => { const n = ts.length, d = ts.filter(x => x.done).length; return {n, d, pct: n ? Math.round(d * 100 / n) : 0}; };
@@ -842,9 +845,9 @@ function soon(feature, why) {
   openDlg('Coming soon', el('div', {className: 'soon'}, el('div', {className: 'soonico', textContent: '🚧'}), el('b', {textContent: feature}), el('p', {className: 'mut', textContent: why || SOON_WHY})), null);
 }
 
-/* ---------- Cloud accounts & sync (Firebase) ----------
-   Sign-in, cloud copies of projects, offline-tolerant sync. Inviting members and role enforcement come next. */
-const cloud = {state: 'loading', user: null, role: '', loaded: false, flagged: false, err: '', meta: {}, rj: {}, sj: {}, unsub: null, timer: 0};
+/* ---------- Cloud accounts, sharing & roles (Firebase) ----------
+   Sign-in, cloud copies of projects, offline-tolerant sync, invitations, members and role enforcement. */
+const cloud = {state: 'loading', user: null, role: '', loaded: false, flagged: false, err: '', meta: {}, rj: {}, sj: {}, unsub: null, unsubRoles: null, timer: 0, users: null, loadingUsers: false};
 const projJson = p => JSON.stringify(p, (k, v) => (k === 'open' || k === 'cloudId' || k === 'localOnly') ? undefined : v);
 const saveLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} };
 const info = msg => toast(msg, null, 'OK');
@@ -853,10 +856,11 @@ const CLOUD_ERR = {
   'auth/email-already-in-use': 'An account with this email already exists. Try signing in.', 'auth/weak-password': 'Password must be at least 6 characters.',
   'auth/invalid-email': 'This email address is not valid.', 'auth/too-many-requests': 'Too many attempts. Wait a moment and try again.',
   'auth/network-request-failed': 'No internet connection.', 'auth/operation-not-allowed': 'Email/Password sign-in is not enabled in the Firebase console (Authentication → Sign-in method).',
-  'permission-denied': 'Access denied by the Firestore rules. Publish the rules from firestore.rules in the Firebase console.', 'unavailable': 'The cloud is not reachable right now.'
+  'permission-denied': 'Access denied by the Firestore rules. Publish the latest rules from firestore.rules in the Firebase console.', 'unavailable': 'The cloud is not reachable right now.'
 };
 const cloudErr = e => CLOUD_ERR[e && e.code] || (e && e.message) || 'Something went wrong.';
 const ROLE_NAME = {pm: 'Project Manager', lead: 'Team Lead', contrib: 'Contributor', viewer: 'Viewer'};
+const ORG_ROLES = [['admin', 'Admin'], ['executive', 'Executive'], ['member', 'Member']];
 
 function cloudBoot() {
   const hook = () => { cloud.state = 'out'; FB.onAuth(onAuth); render(); };
@@ -867,7 +871,8 @@ function cloudBoot() {
 
 async function onAuth(u) {
   if (cloud.unsub) { cloud.unsub(); cloud.unsub = null; }
-  Object.assign(cloud, {loaded: false, flagged: false, err: '', meta: {}, rj: {}, sj: {}});
+  if (cloud.unsubRoles) { cloud.unsubRoles(); cloud.unsubRoles = null; }
+  Object.assign(cloud, {loaded: false, flagged: false, err: '', meta: {}, rj: {}, sj: {}, users: null});
   clearTimeout(cloud.timer);
   if (!u) {
     cloud.user = null; cloud.role = '';
@@ -876,9 +881,17 @@ async function onAuth(u) {
     if (view === 'project' || view === 'task') { taskCtx = null; view = 'home'; }
     saveLocal(); render(); return;
   }
-  cloud.user = {uid: u.uid, email: u.email}; render();
+  cloud.user = {uid: u.uid, email: u.email, verified: !!u.emailVerified}; render();
   try { cloud.role = await FB.ensureUser(u.uid, u.email); } catch (e) { cloud.role = ''; }
-  cloud.unsub = FB.watchProjects(u.uid, onSnap, e => { cloud.err = cloudErr(e); info(cloud.err); render(); });
+  const all = cloud.role === 'admin' || cloud.role === 'executive';      // admins and executives can see every project
+  cloud.unsub = FB.watchProjects(u.uid, onSnap, e => { cloud.err = cloudErr(e); info(cloud.err); render(); }, all);
+  cloud.unsubRoles = FB.watchRoles(perms => { if (perms && JSON.stringify(perms) !== JSON.stringify(db.roles || {})) { db.roles = perms; saveLocal(); render(); } }, () => {});
+  if (cloud.user.verified) claimInvites();
+}
+
+async function claimInvites() {
+  try { const n = await FB.claimInvites(cloud.user.uid, cloud.user.email.toLowerCase()); if (n) info(n + ' project invitation' + (n === 1 ? '' : 's') + ' accepted.'); }
+  catch (e) { info(cloudErr(e)); }
 }
 
 function applyRemote(mine, id, o, json) {
@@ -902,7 +915,7 @@ function onSnap(snap) {
       return;
     }
     cloud.meta[id] = {members: d.members || {}, emails: d.memberEmails || {}, owner: d.ownerId || ''};
-    if (ch.doc.metadata.hasPendingWrites || typeof d.json !== 'string' || cloud.rj[id] === d.json) return;
+    if (ch.doc.metadata.hasPendingWrites || typeof d.json !== 'string' || cloud.rj[id] === d.json) { if (mine) changed = true; return; }
     if (mine && projJson(mine) !== cloud.sj[id]) return;           // unsynced local edits win (last writer wins)
     let o; try { o = JSON.parse(d.json); } catch (e) { return; }
     applyRemote(mine, id, o, d.json); changed = true;
@@ -910,8 +923,7 @@ function onSnap(snap) {
   cloud.loaded = true; cloud.err = '';
   if (!cloud.flagged) {
     cloud.flagged = true;
-    const local = db.projects.filter(p => !p.cloudId && p.localOnly === undefined);
-    local.forEach(p => { p.localOnly = true; });
+    db.projects.filter(p => !p.cloudId && p.localOnly === undefined).forEach(p => { p.localOnly = true; });
     if (db.projects.some(p => p.localOnly)) info('You have projects stored only on this device. Open your account to upload them.');
     changed = true;
   }
@@ -920,6 +932,58 @@ function onSnap(snap) {
   scheduleCloud();
 }
 
+/* ---- Who may do what ---- */
+function roleIn(p) {
+  if (!cloud.user || !p.cloudId) return {all: true, role: 'local', perms: new Set(ALL_PERMS)};
+  if (cloud.role === 'admin') return {all: true, role: 'admin', perms: new Set(ALL_PERMS)};
+  const m = cloud.meta[p.cloudId], r = (m && m.members[cloud.user.uid]) || '', def = ROLES.find(x => x.id === r);
+  return {all: false, role: r || (cloud.role === 'executive' ? 'executive' : ''), perms: new Set(def ? rolePerms(def) : [])};
+}
+const canEditProject = p => { const i = roleIn(p); return i.all || ['pm', 'lead', 'contrib'].includes(i.role); };
+const canManage = p => { const i = roleIn(p); return i.all || (['pm'].includes(i.role) && i.perms.has('m_manage')); };
+
+// Finer permissions are checked here: if a change is not allowed, the project snaps back to its last synced state.
+function permViolation(p, i) {
+  let o, n; try { o = JSON.parse(cloud.sj[p.cloudId]); n = JSON.parse(projJson(p)); } catch (e) { return ''; }
+  const has = k => i.all || (['pm', 'lead', 'contrib'].includes(i.role) && i.perms.has(k));
+  const em = cloud.user.email.toLowerCase();
+  const mine = t => { const w = String(t.who || '').trim().toLowerCase(); return !!w && (w === me().toLowerCase() || w === em || w === em.split('@')[0]); };
+  const flat = x => {
+    const e = {}, s = {}, t = {};
+    (x.phases || []).forEach(ph => { e[ph.id] = {name: ph.name, color: ph.color || ''}; (ph.subs || []).forEach(sb => { s[sb.id] = {name: sb.name, ph: ph.id}; (sb.tasks || []).forEach(tk => { t[tk.id] = Object.assign({}, tk, {__s: sb.id}); }); }); });
+    return {e, s, t};
+  };
+  const a = flat(o), b = flat(n), S = JSON.stringify;
+  if ((S(a.e) !== S(b.e) || S(a.s) !== S(b.s)) && !has('e_edit')) return 'edit epics and stories';
+  if (S(o.sprints) !== S(n.sprints) && !has('e_edit')) return 'manage sprints';
+  if ((o.name !== n.name || !!o.archived !== !!n.archived) && !has('p_archive')) return 'rename or archive the project';
+  for (const id in b.t) if (!a.t[id] && !has('t_create')) return 'create work items';
+  for (const id in a.t) if (!b.t[id] && !has('t_delete')) return 'delete work items';
+  for (const id in b.t) if (a.t[id] && S(a.t[id]) !== S(b.t[id]) && !(has('t_edit_any') || (has('t_edit_own') && (mine(a.t[id]) || mine(b.t[id]))))) return 'edit this work item';
+  return '';
+}
+function guardPerms() {
+  if (!cloud.user || !cloud.loaded) return false;
+  let why = '';
+  db.projects.forEach(p => {
+    if (!p.cloudId || !cloud.rj[p.cloudId] || !cloud.sj[p.cloudId]) return;
+    const i = roleIn(p); if (i.all || projJson(p) === cloud.sj[p.cloudId]) return;
+    const v = permViolation(p, i); if (!v) return;
+    try { applyRemote(p, p.cloudId, JSON.parse(cloud.rj[p.cloudId]), cloud.rj[p.cloudId]); why = v; } catch (e) {}
+    if (taskCtx && taskCtx.p === p) { const nt = taskOf(p, taskCtx.t.id); if (nt) taskCtx.t = nt; }
+  });
+  if (why) { info('You do not have permission to ' + why + ' in this project, so the change was not kept.'); saveLocal(); }
+  return !!why;
+}
+function roBanner() {
+  if (!cloud.user || (view !== 'project' && view !== 'task')) return '';
+  const p = view === 'task' && taskCtx ? taskCtx.p : cur(); if (!p || !p.cloudId) return '';
+  const i = roleIn(p); if (i.all) return '';
+  const can = canEditProject(p) && ['t_create', 't_edit_any', 't_edit_own', 'e_edit'].some(k => i.perms.has(k));
+  return can ? '' : el('div', {className: 'sum rob', textContent: '👁 View only: you can look around, but changes here will not be saved.'});
+}
+
+/* ---- Sync ---- */
 function scheduleCloud() {
   if (!cloud.user || !cloud.loaded) return;
   clearTimeout(cloud.timer); cloud.timer = setTimeout(pushCloud, 1500);
@@ -949,6 +1013,7 @@ async function pushCloud() {
       if (p.localOnly) continue;
       try {
         if (!p.cloudId) { await createCloud(p); continue; }
+        if (!canEditProject(p)) continue;                                // view-only projects are never written
         const json = projJson(p); if (json === cloud.sj[p.cloudId]) continue;
         if (json.length > 900000) { info('"' + p.name + '" is too large to sync (limit about 1 MB).'); continue; }
         await FB.updateProject(p.cloudId, {name: p.name, json, updatedAt: FB.ts(), updatedBy: cloud.user.uid});
@@ -976,6 +1041,7 @@ async function sweepDeleted() {
   }
 }
 
+/* ---- Sidebar button and dialogs ---- */
 function accountBtn() {
   const b = el('button', {className: 'nv', on: {click: signInDlg}});
   if (cloud.user) b.append(el('span', {className: 'pn', textContent: '👤 ' + cloud.user.email}), el('i', {className: 'cdot' + (cloud.err ? ' bad' : ''), title: cloud.err || 'Connected to the cloud'}));
@@ -1002,7 +1068,7 @@ function signInDlg(mode) {
       if (pw.value !== pw2.value) { show('The two passwords do not match.', true); pw2.focus(); return; }
     }
     show(up ? 'Creating your account…' : 'Signing in…');
-    try { await (up ? FB.signUp : FB.signIn)(em.value.trim(), pw.value); dlg.close(); info(up ? 'Account created. You are signed in.' : 'Signed in.'); }
+    try { await (up ? FB.signUp : FB.signIn)(em.value.trim(), pw.value); dlg.close(); info(up ? 'Account created. Check your inbox to verify your email address: it is needed to accept project invitations.' : 'Signed in.'); }
     catch (e) { show(cloudErr(e), true); }
   };
   (up ? pw2 : pw).addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
@@ -1021,9 +1087,17 @@ function signInDlg(mode) {
 }
 
 function accountDlg() {
-  const n = db.projects.filter(p => !p.cloudId).length, nc = db.projects.filter(p => p.cloudId).length;
+  const n = db.projects.filter(p => !p.cloudId).length, nc = db.projects.filter(p => p.cloudId).length, v = cloud.user.verified;
+  const msg = el('div', {className: 'form-msg'});
   openDlg('Account', el('div', {className: 'form'},
-    el('div', {className: 'mrow'}, ava(cloud.user.email), el('div', {className: 'mi'}, el('b', {textContent: cloud.user.email}), el('small', {className: 'mut', textContent: 'Role: ' + (cloud.role || 'member')})), el('span', {className: 'chip', textContent: cloud.err ? 'Error' : 'Connected'})),
+    el('div', {className: 'mrow'}, ava(cloud.user.email), el('div', {className: 'mi'}, el('b', {textContent: cloud.user.email}), el('small', {className: 'mut', textContent: 'Role: ' + (cloud.role || 'member') + (v ? ' · email verified' : '')})), el('span', {className: 'chip', textContent: cloud.err ? 'Error' : 'Connected'})),
+    v ? '' : el('div', {className: 'infobar'}, el('b', {textContent: 'Verify your email. '}), el('span', {textContent: 'You need a verified email to accept project invitations.'}),
+      el('div', {className: 'tools'},
+        el('button', {textContent: 'Send verification email', on: {click: async () => { try { await FB.verify(); msg.textContent = 'Verification email sent. Check your inbox.'; msg.className = 'form-msg'; } catch (e) { msg.textContent = cloudErr(e); msg.className = 'form-msg err'; } }}}),
+        el('button', {className: 'pri', textContent: 'I have verified', on: {click: async () => {
+          try { cloud.user.verified = await FB.refresh(); if (cloud.user.verified) { dlg.close(); claimInvites(); render(); info('Email verified.'); } else { msg.textContent = 'Not verified yet. Open the link in the email, then try again.'; msg.className = 'form-msg err'; } }
+          catch (e) { msg.textContent = cloudErr(e); msg.className = 'form-msg err'; } }}}))),
+    msg,
     cloud.err ? el('div', {className: 'form-msg err', textContent: cloud.err}) : el('small', {className: 'mut', textContent: nc + ' cloud project' + (nc === 1 ? '' : 's') + ' · changes are saved automatically'}),
     n ? el('button', {className: 'pri', textContent: '☁ Upload ' + n + ' device-only project' + (n === 1 ? '' : 's') + ' to the cloud', on: {click: () => {
       openDlg('Upload to cloud', el('p', {textContent: 'Your ' + n + ' device-only project' + (n === 1 ? '' : 's') + ' will be copied to your cloud account and then stay in sync across devices. A backup of your current data is saved on this device first.'}), () => { uploadLocal(); });
@@ -1032,21 +1106,85 @@ function accountDlg() {
     el('button', {textContent: 'Sign out', on: {click: async () => { dlg.close(); await FB.signOut(); }}})), null);
 }
 
-function membersDlg(p) {
-  const meta = p.cloudId && cloud.user ? cloud.meta[p.cloudId] : null;
-  const role = el('select', {}, ...ROLES.filter(r => r.scope === 'Project').map(r => el('option', {value: r.id, textContent: r.name})));
-  const em = el('input', {type: 'text', placeholder: 'email@company.com'});
-  const row = (name, sub, r) => el('div', {className: 'mrow'}, ava(name), el('div', {className: 'mi'}, el('b', {textContent: name}), el('small', {className: 'mut', textContent: sub})), el('span', {className: 'chip', textContent: r}));
-  const rows = meta ? Object.entries(meta.members).map(([uid2, r]) => row((meta.emails[uid2] || uid2.slice(0, 8) + '…') + (uid2 === cloud.user.uid ? ' (you)' : ''), uid2 === meta.owner ? 'Owner' : 'Member', ROLE_NAME[r] || r)) : [row('You', 'This device · owner', 'Project Manager')];
+async function membersDlg(p) {
+  const note = (t, ...more) => openDlg('Members · ' + p.name, el('div', {className: 'form'}, el('p', {className: 'mut', textContent: t}), ...more), null);
+  if (!cloud.user) return note('Sign in to share this project with other people.', el('button', {className: 'pri', textContent: 'Sign in', on: {click: () => signInDlg()}}));
+  if (!p.cloudId) return note('This project is only on this device. Upload it to your cloud account to share it.', el('button', {className: 'pri', textContent: '☁ Open account to upload', on: {click: () => accountDlg()}}));
+  const meta = cloud.meta[p.cloudId] || {members: {}, emails: {}, owner: ''}, manage = canManage(p), projRoles = ROLES.filter(r => r.scope === 'Project');
+  let pend = []; if (manage) { try { pend = await FB.listInvites(p.cloudId); } catch (e) { pend = []; } }
+  const again = () => membersDlg(p), fail = e => info(cloudErr(e));
+  const rows = Object.entries(meta.members).map(([uid2, r]) => {
+    const self = uid2 === cloud.user.uid, owner = uid2 === meta.owner;
+    const name = (meta.emails[uid2] || uid2.slice(0, 8) + '…') + (self ? ' (you)' : '');
+    let ctl;
+    if (manage && !owner) {
+      ctl = el('select', {on: {change: e => FB.setMember(p.cloudId, uid2, e.target.value).then(again, fail)}}, ...projRoles.map(x => el('option', {value: x.id, textContent: x.name})));
+      ctl.value = r;
+    } else ctl = el('span', {className: 'chip', textContent: owner ? 'Owner' : (ROLE_NAME[r] || r)});
+    return el('div', {className: 'mrow'}, ava(name), el('div', {className: 'mi'}, el('b', {textContent: name}), el('small', {className: 'mut', textContent: owner ? 'Owner' : ''})), ctl,
+      manage && !owner && !self ? ic('×', 'Remove from project', () => FB.removeMember(p.cloudId, uid2).then(again, fail), 'del') : '');
+  });
+  const pendRows = pend.map(iv => el('div', {className: 'mrow'}, ava(iv.email), el('div', {className: 'mi'}, el('b', {textContent: iv.email}), el('small', {className: 'mut', textContent: 'Invited · waiting for sign-up and email verification'})),
+    el('span', {className: 'chip', textContent: ROLE_NAME[iv.role] || iv.role}), ic('×', 'Cancel invitation', () => FB.revokeInvite(iv.id).then(again, fail), 'del')));
+  const em = el('input', {type: 'text', placeholder: 'email@company.com'}), role = el('select', {}, ...projRoles.map(r => el('option', {value: r.id, textContent: r.name})));
+  role.value = 'contrib';
+  const msg = el('div', {className: 'form-msg'});
+  const send = async () => {
+    const mail = em.value.trim().toLowerCase();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) { msg.textContent = 'Enter a valid email address.'; msg.className = 'form-msg err'; return; }
+    if (Object.values(meta.emails).some(x => String(x).toLowerCase() === mail)) { msg.textContent = 'This person is already a member.'; msg.className = 'form-msg err'; return; }
+    try { await FB.invite(p.cloudId, p.name, mail, role.value, cloud.user.uid); info('Invitation saved for ' + mail + '. The project appears for them once they sign up and verify their email.'); again(); } catch (e) { fail(e); }
+  };
   openDlg('Members · ' + p.name, el('div', {className: 'form'},
-    soonBar(meta ? 'inviting people by email is the next update.' : 'sign in and upload this project to the cloud to share it. Inviting people is the next update.'),
-    ...rows,
-    el('label', {className: 'fld'}, el('span', {textContent: 'Invite by email'}), em), el('label', {className: 'fld'}, el('span', {textContent: 'Project role'}), role),
-    el('button', {className: 'pri', textContent: 'Send invite', on: {click: () => soon('Invite members', 'Inviting people by email is the next update. Accounts and cloud sync are already available.')}})), null);
+    ...rows, pendRows.length ? el('small', {className: 'mut', textContent: 'Pending invitations'}) : '', ...pendRows,
+    manage ? el('div', {className: 'form'}, el('hr'), fld('Invite by email', em), fld('Project role', role), msg, el('button', {className: 'pri', textContent: 'Send invite', on: {click: send}}),
+      el('small', {className: 'mut', textContent: 'The person signs up with this email address, verifies it, and the project shows up in their list.'}))
+      : el('small', {className: 'mut', textContent: 'Only a Project Manager can add or remove people.'})), null);
+}
+
+function inviteUserDlg() {
+  if (!cloud.user) return signInDlg();
+  const ps = db.projects.filter(p => p.cloudId && canManage(p));
+  if (!ps.length) return openDlg('Invite user', el('p', {className: 'mut', textContent: 'You need a cloud project you manage first. Upload one from your account window, then invite people to it.'}), null);
+  if (ps.length === 1) return membersDlg(ps[0]);
+  openDlg('Invite user: choose a project', el('div', {className: 'form'}, ...ps.map(p => el('button', {textContent: p.name, on: {click: () => membersDlg(p)}}))), null);
+}
+
+const saveRolesCloud = () => FB.saveRoles(db.roles || {}).catch(e => info(cloudErr(e)));
+
+function usersBody(r) {
+  const wrap = el('div', {});
+  const invite = el('p', {}, el('button', {className: 'pri', textContent: '+ Invite user', on: {click: inviteUserDlg}}));
+  if (!cloud.user) { wrap.append(el('p', {className: 'mut', textContent: 'Sign in to see and manage people.'}), el('button', {className: 'pri', textContent: 'Sign in', on: {click: () => signInDlg()}})); return wrap; }
+  if (r.scope === 'Organization') {
+    if (cloud.role !== 'admin') {
+      wrap.append(el('p', {className: 'mut', textContent: r.id === (cloud.role || 'member') ? 'This is your organization role (' + cloud.user.email + '). Only admins can see everyone.' : 'Only admins can see everyone in this role.'}), invite);
+      return wrap;
+    }
+    if (!cloud.users && !cloud.loadingUsers) {
+      cloud.loadingUsers = true;
+      FB.listUsers().then(u => { cloud.users = u; }, e => { cloud.users = []; info(cloudErr(e)); }).finally(() => { cloud.loadingUsers = false; render(); });
+    }
+    const list = (cloud.users || []).filter(u => (u.role || 'member') === r.id);
+    const rows = list.map(u => {
+      const sel = el('select', {disabled: u.id === cloud.user.uid, title: u.id === cloud.user.uid ? 'You cannot change your own role' : '', on: {change: e => FB.setUserRole(u.id, e.target.value).then(() => { u.role = e.target.value; render(); }, e2 => info(cloudErr(e2)))}},
+        ...ORG_ROLES.map(([k, l]) => el('option', {value: k, textContent: l})));
+      sel.value = u.role || 'member';
+      return el('tr', {}, el('td', {}, ava(u.email || '?'), ' ' + (u.email || u.id) + (u.id === cloud.user.uid ? ' (you)' : '')), el('td', {}, sel));
+    });
+    wrap.append(el('div', {className: 'tblw'}, el('table', {className: 'tbl'}, el('thead', {}, el('tr', {}, ...['User', 'Organization role'].map(h => el('th', {textContent: h})))), el('tbody', {}, ...rows))),
+      !cloud.users ? el('p', {className: 'mut', textContent: 'Loading users…'}) : list.length ? '' : el('p', {className: 'mut', textContent: 'No users with this role yet.'}), invite);
+    return wrap;
+  }
+  const rows = [];
+  db.projects.filter(p => p.cloudId).forEach(p => { const m = cloud.meta[p.cloudId]; if (m) Object.entries(m.members).forEach(([uid2, role]) => { if (role === r.id) rows.push({p, email: m.emails[uid2] || uid2, you: uid2 === cloud.user.uid}); }); });
+  wrap.append(rows.length ? el('div', {className: 'tblw'}, el('table', {className: 'tbl'}, el('thead', {}, el('tr', {}, ...['User', 'Project'].map(h => el('th', {textContent: h})))),
+    el('tbody', {}, ...rows.map(x => el('tr', {style: 'cursor:pointer', on: {click: () => membersDlg(x.p)}}, el('td', {}, ava(x.email), ' ' + x.email + (x.you ? ' (you)' : '')), el('td', {textContent: x.p.name})))))) : el('p', {className: 'mut', textContent: 'Nobody has this project role yet.'}), invite);
+  return wrap;
 }
 
 function renderRoles() {
-  const r = ROLES.find(x => x.id === roleSel) || ROLES[0];
+  const r = ROLES.find(x => x.id === roleSel) || ROLES[0], admin = !!cloud.user && cloud.role === 'admin', canEditPerms = !cloud.user || admin;
   const item = x => el('button', {className: 'ri' + (x.id === r.id ? ' on' : ''), on: {click: () => { roleSel = x.id; render(); }}},
     el('span', {className: 'pn', textContent: x.name}), x.default ? el('span', {className: 'tagdef', textContent: 'Default'}) : '');
   const list = el('div', {className: 'rl-list'},
@@ -1061,25 +1199,20 @@ function renderRoles() {
     PERM_GROUPS.forEach(([g, items]) => {
       body.append(el('h4', {textContent: g}));
       items.forEach(([k, l]) => {
-        const cb = el('input', {type: 'checkbox', checked: on.has(k), disabled: !!r.locked, on: {change: () => {
-          cb.checked ? on.add(k) : on.delete(k); db.roles = db.roles || {}; db.roles[r.id] = [...on]; save();
+        const cb = el('input', {type: 'checkbox', checked: on.has(k), disabled: !!r.locked || !canEditPerms, on: {change: () => {
+          cb.checked ? on.add(k) : on.delete(k); db.roles = db.roles || {}; db.roles[r.id] = [...on]; save(); if (admin) saveRolesCloud();
         }}});
         body.append(el('label', {className: 'pr'}, cb, el('span', {textContent: l})));
       });
     });
     if (r.locked) body.append(el('p', {className: 'mut', textContent: 'The Admin role is locked and always has every permission.'}));
-    else if (db.roles && db.roles[r.id]) body.append(el('button', {textContent: 'Reset to default', on: {click: () => { delete db.roles[r.id]; save(); render(); }}}));
-  } else {
-    const mine = r.id === 'admin' || r.id === 'pm';
-    body = el('div', {}, el('div', {className: 'tblw'}, el('table', {className: 'tbl'},
-      el('thead', {}, el('tr', {}, ...['User', 'Email', 'Status'].map(h => el('th', {textContent: h})))),
-      el('tbody', {}, mine ? el('tr', {}, el('td', {}, ava('You'), ' You'), el('td', {className: 'mut', textContent: 'This device'}), el('td', {}, el('span', {className: 'chip', textContent: 'Active'}))) : ''))),
-      mine ? '' : el('p', {className: 'mut', textContent: 'No users with this role yet.'}),
-      el('p', {}, el('button', {className: 'pri', textContent: '+ Invite user', on: {click: () => soon('Invite users')}})));
-  }
+    else if (canEditPerms && db.roles && db.roles[r.id]) body.append(el('button', {textContent: 'Reset to default', on: {click: () => { delete db.roles[r.id]; save(); if (admin) saveRolesCloud(); render(); }}}));
+  } else body = usersBody(r);
 
-  const main = el('div', {className: 'rl-main'},
-    soonBar('roles are only enforced once cloud accounts are enabled. Changes here are saved on this device as a preview.'),
+  const bar = !cloud.user ? el('div', {className: 'infobar', textContent: 'Sign in to manage real people and roles. Until then, changes here are only a preview on this device.'})
+    : admin ? el('div', {className: 'infobar', textContent: 'You are an admin. Permission changes apply to everyone. The server decides who can read, edit and delete each project; the finer permissions below are applied by the app when someone edits.'})
+    : el('div', {className: 'infobar', textContent: 'Only an admin can change permissions. Your organization role: ' + (cloud.role || 'member') + '.'});
+  const main = el('div', {className: 'rl-main'}, bar,
     el('h2', {textContent: r.name}), el('p', {className: 'mut', textContent: r.scope + ' role · ' + r.desc}),
     el('div', {className: 'tabs rtabs'}, ...[['perm', 'Permissions'], ['users', 'Users']].map(([k, l]) => el('button', {className: roleTab === k ? 'pri' : '', textContent: l, on: {click: () => { roleTab = k; render(); }}}))),
     body);
@@ -1144,7 +1277,7 @@ function renderHeader() {
       el('h1', {textContent: keyOf(tp, tt)}), el('span', {className: 'sp'}), el('button', {textContent: 'Delete', on: {click: deleteOpenTask}}));
   } else if (view === 'roles') {
     top.append(el('h1', {textContent: 'Members & Roles'}), el('span', {className: 'sp'}),
-      el('button', {className: 'pri', textContent: '+ Invite user', on: {click: () => soon('Invite users')}}));
+      el('button', {className: 'pri', textContent: '+ Invite user', on: {click: inviteUserDlg}}));
   } else {
     const p = cur(), s = projStat(p);
     top.append(el('button', {className: 'crumb', textContent: 'Projects', on: {click: home}}), el('span', {className: 'sep', textContent: '/'}),
@@ -1841,6 +1974,7 @@ function renderInner() {
   db.projects.forEach(ensureProj);
   renderSidebar(); renderHeader();
   app.append(urgentBox());
+  app.append(roBanner());
   if (view === 'home') return renderHome();
   if (view === 'roles') return renderRoles();
   if (view === 'me') return renderMe();
@@ -1947,9 +2081,9 @@ cloudBoot();
 /* Firebase (loaded from Google's CDN, no build step). The web config below is public by design;
    access is protected by Firebase Authentication and the Firestore security rules (see firestore.rules). */
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail }
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, sendEmailVerification }
   from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, query, where, serverTimestamp }
+import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, onSnapshot, query, where, serverTimestamp, deleteField, arrayUnion, arrayRemove }
   from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 
 const app = initializeApp({
@@ -1966,11 +2100,18 @@ try { fs = initializeFirestore(app, {localCache: persistentLocalCache({tabManage
 catch (e) { fs = getFirestore(app); }
 
 window.FB = {
+  // --- accounts ---
   onAuth: cb => onAuthStateChanged(auth, cb),
   signIn: (email, pw) => signInWithEmailAndPassword(auth, email, pw),
-  signUp: (email, pw) => createUserWithEmailAndPassword(auth, email, pw),
+  async signUp(email, pw) {
+    const c = await createUserWithEmailAndPassword(auth, email, pw);
+    try { await sendEmailVerification(c.user); } catch (e) {}
+    return c;
+  },
   signOut: () => signOut(auth),
   reset: email => sendPasswordResetEmail(auth, email),
+  verify: () => sendEmailVerification(auth.currentUser),
+  async refresh() { await auth.currentUser.reload(); await auth.currentUser.getIdToken(true); return auth.currentUser.emailVerified; },
   ts: () => serverTimestamp(),
   newId: () => doc(collection(fs, 'projects')).id,
   async ensureUser(uid, email) {
@@ -1979,10 +2120,32 @@ window.FB = {
     await setDoc(ref, {email, role: 'member', createdAt: serverTimestamp()});
     return 'member';
   },
-  watchProjects: (uid, next, err) => onSnapshot(query(collection(fs, 'projects'), where('memberIds', 'array-contains', uid)), next, err),
+  // --- projects ---
+  watchProjects: (uid, next, err, all) => onSnapshot(all ? collection(fs, 'projects') : query(collection(fs, 'projects'), where('memberIds', 'array-contains', uid)), next, err),
   createProject: (id, data) => setDoc(doc(fs, 'projects', id), data),
   updateProject: (id, data) => updateDoc(doc(fs, 'projects', id), data),
-  deleteProject: id => deleteDoc(doc(fs, 'projects', id))
+  deleteProject: id => deleteDoc(doc(fs, 'projects', id)),
+  // --- members and invitations ---
+  setMember: (pid, uid, role) => updateDoc(doc(fs, 'projects', pid), {['members.' + uid]: role}),
+  removeMember: (pid, uid) => updateDoc(doc(fs, 'projects', pid), {['members.' + uid]: deleteField(), ['memberEmails.' + uid]: deleteField(), memberIds: arrayRemove(uid)}),
+  invite: (pid, projectName, email, role, byUid) => setDoc(doc(fs, 'invites', pid + '_' + email), {pid, projectName, email, role, invitedBy: byUid, createdAt: serverTimestamp()}),
+  async listInvites(pid) { const s = await getDocs(query(collection(fs, 'invites'), where('pid', '==', pid))); return s.docs.map(d => Object.assign({id: d.id}, d.data())); },
+  revokeInvite: id => deleteDoc(doc(fs, 'invites', id)),
+  async claimInvites(uid, email) {
+    const s = await getDocs(query(collection(fs, 'invites'), where('email', '==', email)));
+    let n = 0;
+    for (const d of s.docs) {
+      const iv = d.data();
+      await updateDoc(doc(fs, 'projects', iv.pid), {['members.' + uid]: iv.role, ['memberEmails.' + uid]: email, memberIds: arrayUnion(uid)});
+      await deleteDoc(d.ref); n++;
+    }
+    return n;
+  },
+  // --- people and role permissions (admin) ---
+  async listUsers() { const s = await getDocs(collection(fs, 'users')); return s.docs.map(d => Object.assign({id: d.id}, d.data())); },
+  setUserRole: (uid, role) => updateDoc(doc(fs, 'users', uid), {role}),
+  watchRoles: (cb, err) => onSnapshot(doc(fs, 'config', 'roles'), s => cb(s.exists() ? s.data().perms || null : null), err),
+  saveRoles: perms => setDoc(doc(fs, 'config', 'roles'), {perms, updatedAt: serverTimestamp()})
 };
 window.dispatchEvent(new Event('fb-ready'));
 </script>
