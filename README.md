@@ -36,7 +36,10 @@ Projeleri **Başlık → Alt başlık → Görev** hiyerarşisiyle planlar ve il
 - Cihazda kalan projeler otomatik yüklenmez: hesap penceresindeki **Upload** düğmesiyle (önce yerel yedek alınır) buluta taşınır.
 - Güvenlik kuralları `firestore.rules` dosyasındadır; Firebase konsolunda Firestore → Rules bölümüne yapıştırıp Publish edin.
 - Yapılandırma (`firebaseConfig`) herkese açık bilgidir; erişimi Authentication ve kurallar korur.
-- Henüz yok: e-posta ile davet ve rol yetkilerinin uygulanması (sonraki aşama).
+- **Davet:** Projede **Members** → e-posta ve proje rolü yazıp davet edin. Kişi aynı e-postayla kayıt olur, e-postasını doğrular, proje listesinde görünür. Bekleyen davetler Members penceresinde görünür ve iptal edilebilir.
+- **Roller:** Members & Roles sayfasında Admin gerçek kullanıcıları listeler, şirket rolünü (Admin / Executive / Member) değiştirir ve rol yetkilerini düzenler. Yetkiler herkes için ortaktır (Firestore `config/roles`).
+- **Yetki uygulaması:** Sunucu (Firestore kuralları) kimin projeyi okuyup düzenleyip sileceğini, uygulama ise ince yetkileri (görev oluştur/sil/düzenle, epic düzenle) uygular. Yetkisiz bir değişiklik geri alınır ve uyarı çıkar. Salt okunur projelerde üstte "View only" uyarısı görünür.
+- Davetin kabulü için e-posta doğrulaması şarttır (hesap penceresinden tekrar gönderilebilir).
 
 ### Durumlar ve renkleri (Jira mantığı)
 Renk, durumun bağlı olduğu **kategoriden** gelir.

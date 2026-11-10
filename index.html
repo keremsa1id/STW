@@ -411,6 +411,8 @@ kbd{font:11px/1 ui-monospace,monospace;padding:2px 5px;border:1px solid var(--li
 .infobar{border:1px solid var(--line);background:var(--sub);border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:13px}
 .rob{border-color:color-mix(in srgb,var(--c4) 60%,var(--line));background:color-mix(in srgb,var(--c4) 10%,var(--card));font-size:13px;padding:10px 14px}
 
+.mrow select{max-width:190px}
+
 /* --- Pencere, bildirim --- */
 dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(600px,92vw);box-shadow:0 12px 40px #0004}
 dialog::backdrop{background:#0006}
@@ -1117,7 +1119,7 @@ async function membersDlg(p) {
     const self = uid2 === cloud.user.uid, owner = uid2 === meta.owner;
     const name = (meta.emails[uid2] || uid2.slice(0, 8) + '…') + (self ? ' (you)' : '');
     let ctl;
-    if (manage && !owner) {
+    if (manage && !owner && !self) {
       ctl = el('select', {on: {change: e => FB.setMember(p.cloudId, uid2, e.target.value).then(again, fail)}}, ...projRoles.map(x => el('option', {value: x.id, textContent: x.name})));
       ctl.value = r;
     } else ctl = el('span', {className: 'chip', textContent: owner ? 'Owner' : (ROLE_NAME[r] || r)});
