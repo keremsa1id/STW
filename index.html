@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#d71920">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest?v=3">
+<link rel="icon" href="icon.svg?v=3" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png?v=3">
 <title>Project Tracker</title>
 <style>
 :root{--bg:#fff;--card:#fff;--ink:#1f2430;--mut:#667085;--line:#e4e7ec;--acc:#d71920;--ok:#16a34a;--sub:#f7f8fa;--hov:#eef0f4;--c1:#d71920;--c2:#8b5cf6;--c3:#0ea5a4;--c4:#f59e0b;--c5:#ec4899;--bad:#e5484d}
@@ -889,7 +889,7 @@ function renderSidebar() {
   const L = {auto: '🌓 Theme: auto', light: '☀ Theme: light', dark: '🌙 Theme: dark'}, th = db.theme || 'auto';
   const nv = (txt, on, fn) => el('button', {className: 'nv' + (on ? ' on' : ''), textContent: txt, on: {click: fn}});
   const na = db.projects.filter(p => p.archived).length;
-  sb.append(el('div', {className: 'brand'}, el('img', {className: 'logo', src: 'logo.svg', alt: 'Project Tracker'}), el('b', {textContent: 'Project Tracker'})),
+  sb.append(el('div', {className: 'brand'}, el('img', {className: 'logo', src: 'logo.svg?v=3', alt: 'Project Tracker'}), el('b', {textContent: 'Project Tracker'})),
     el('button', {className: 'pri newb', textContent: '+ Create project', on: {click: newProject}}),
     el('button', {className: 'nv', on: {click: searchDlg}}, el('span', {className: 'pn', textContent: '🔍 Search'}), el('kbd', {textContent: 'Ctrl K'})),
     nv('🏠 Dashboard', view === 'home' && !showArch, () => { showArch = false; view = 'home'; render(); }),
@@ -959,7 +959,7 @@ function notifyUrgent() {
   if (!s || s.h !== hk || !Array.isArray(s.ids)) s = {h: hk, ids: []};
   urgent().filter(({t}) => !s.ids.includes(t.id)).forEach(({t, p}) => {
     s.ids.push(t.id);
-    showNote((t.due < today() ? 'Overdue: ' : 'Due today: ') + t.t, {body: p.name + (t.who ? ' · ' + t.who : '') + ' · mark as done to stop reminders', tag: t.id, renotify: true, icon: 'icon-192.png'});
+    showNote((t.due < today() ? 'Overdue: ' : 'Due today: ') + t.t, {body: p.name + (t.who ? ' · ' + t.who : '') + ' · mark as done to stop reminders', tag: t.id, renotify: true, icon: 'icon-192.png?v=3'});
   });
   try { localStorage.setItem(NKEY, JSON.stringify(s)); } catch (e) {}
 }
@@ -1601,7 +1601,20 @@ function renderCal(p) {
       ...undated.map(t => el('div', {className: 'up', on: {click: () => taskDlg(t)}}, el('span', {className: 'ut', textContent: t.t}), chipsOf(t)))) : '');
 }
 
+// Re-rendering rebuilds the page; keep the scroll position (page and inner scrollers) when the view did not change
+const SCROLLERS = ['.kan', '.side', '.tl-r', '.tblw', '.calw'];
+let lastKey = '';
 function render() {
+  const key = view + '|' + mode + '|' + ptab + '|' + (view === 'task' && taskCtx ? taskCtx.t.id : '');
+  const same = key === lastKey, sx = scrollX, sy = scrollY;
+  const inner = SCROLLERS.map(q => { const n = document.querySelector(q); return n ? [q, n.scrollLeft, n.scrollTop] : null; }).filter(Boolean);
+  renderInner();
+  lastKey = key;
+  if (!same) return;
+  const restore = () => { scrollTo(sx, sy); inner.forEach(([q, l, t]) => { const n = document.querySelector(q); if (n) { n.scrollLeft = l; n.scrollTop = t; } }); };
+  restore(); setTimeout(restore, 0);
+}
+function renderInner() {
   const app = $('#app'); app.replaceChildren();
   document.body.classList.remove('nav');
   db.projects.forEach(ensureProj);

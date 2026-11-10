@@ -1,7 +1,7 @@
 // Minimal service worker: offline shell + notification support.
 // Data stays in localStorage; this only caches the app files.
-const CACHE = 'project-tracker-v1';
-const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png'];
+const CACHE = 'project-tracker-v3';
+const FILES = ['./', 'index.html', 'manifest.webmanifest?v=3', 'icon.svg?v=3', 'logo.svg?v=3', 'icon-192.png?v=3', 'icon-512.png?v=3'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
