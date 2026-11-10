@@ -408,6 +408,8 @@ kbd{font:11px/1 ui-monospace,monospace;padding:2px 5px;border:1px solid var(--li
 .chk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);cursor:pointer}.chk input{width:auto!important}
 .form .link{border:0;background:none;color:var(--acc);padding:2px 0}.form .link:hover:not(:disabled){background:none;text-decoration:underline}
 
+.savebar{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:5;border:1px solid var(--acc);background:var(--card);border-radius:8px;padding:8px 12px;margin:0 0 12px;font-size:13px;font-weight:600}.savebar .sp{flex:1}
+.tbl tr.chg td{background:var(--sub)}
 .infobar{border:1px solid var(--line);background:var(--sub);border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:13px}
 .rob{border-color:color-mix(in srgb,var(--c4) 60%,var(--line));background:color-mix(in srgb,var(--c4) 10%,var(--card));font-size:13px;padding:10px 14px}
 
@@ -856,6 +858,28 @@ const ROLES = [
   {id: 'viewer', name: 'Viewer', scope: 'Project', desc: 'Read-only access to a project.', perms: []}];
 const rolePerms = r => r.locked ? ALL_PERMS : (db.roles && db.roles[r.id]) || r.perms;
 let roleSel = 'admin', roleTab = 'perm';
+let permDraft = null, userDraft = {};   // staged (unsaved) permission and user-role changes
+const permKey = a => a ? JSON.stringify([...a].sort()) : '';
+const permDirty = () => { if (!permDraft) return 0; const o = db.roles || {}; return [...new Set([...Object.keys(o), ...Object.keys(permDraft)])].filter(id => permKey(o[id]) !== permKey(permDraft[id])).length; };
+const saveBar = (n, what, onSave, onDiscard) => n ? el('div', {className: 'savebar'}, el('span', {textContent: n + ' unsaved ' + what + (n > 1 ? 's' : '')}), el('span', {className: 'sp'}),
+  el('button', {textContent: 'Discard', on: {click: onDiscard}}), el('button', {className: 'pri', textContent: 'Save', on: {click: onSave}})) : '';
+async function savePerms() {
+  if (!permDraft) return;
+  const prev = db.roles;
+  db.roles = permDraft;
+  if (cloud.user) { try { await FB.saveRoles(db.roles); } catch (e) { db.roles = prev; info(cloudErr(e)); render(); return; } }
+  permDraft = null; saveLocal(); render(); info('Permissions saved.');
+}
+async function saveUserRoles() {
+  const ids = Object.keys(userDraft); if (!ids.length) return;
+  const bad = [];
+  for (const id of ids) {
+    const u = (cloud.users || []).find(x => x.id === id);
+    try { await FB.setUserRole(id, userDraft[id]); if (u) u.role = userDraft[id]; delete userDraft[id]; }
+    catch (e) { bad.push(((u && u.email) || id) + ': ' + cloudErr(e)); }
+  }
+  render(); info(bad.length ? 'Not saved — ' + bad.join('; ') : ids.length + ' role' + (ids.length > 1 ? 's' : '') + ' saved.');
+}
 const SOON_WHY = 'This feature is coming in an upcoming update. Everything else works already and your data stays safe.';
 const soonBar = txt => el('div', {className: 'soonbar'}, el('b', {textContent: '🚧 Coming soon'}), el('span', {textContent: ' — ' + txt}));
 
@@ -893,6 +917,7 @@ async function onAuth(u) {
   if (cloud.unsub) { cloud.unsub(); cloud.unsub = null; }
   if (cloud.unsubRoles) { cloud.unsubRoles(); cloud.unsubRoles = null; }
   Object.assign(cloud, {loaded: false, flagged: false, err: '', meta: {}, rj: {}, sj: {}, users: null, allow: null});
+  permDraft = null; userDraft = {};
   clearTimeout(cloud.timer);
   if (!u) {
     cloud.user = null; cloud.role = ''; cloud.access = 'out';
@@ -1256,15 +1281,25 @@ function usersBody(r) {
       cloud.loadingUsers = true;
       FB.listUsers().then(u => { cloud.users = u; }, e => { cloud.users = []; info(cloudErr(e)); }).finally(() => { cloud.loadingUsers = false; render(); });
     }
-    const list = (cloud.users || []).filter(u => (u.role || 'member') === r.id);
-    const rows = list.map(u => {
-      const sel = el('select', {disabled: u.id === cloud.user.uid, title: u.id === cloud.user.uid ? 'You cannot change your own role' : '', on: {change: e => FB.setUserRole(u.id, e.target.value).then(() => { u.role = e.target.value; render(); }, e2 => info(cloudErr(e2)))}},
-        ...ORG_ROLES.map(([k, l]) => el('option', {value: k, textContent: l})));
-      sel.value = u.role || 'member';
-      return el('tr', {}, el('td', {}, ava(u.email || '?'), ' ' + (u.email || u.id) + (u.id === cloud.user.uid ? ' (you)' : '')), el('td', {}, sel));
+    // One table with everyone. Role changes are staged and only applied when Save is pressed.
+    const all = (cloud.users || []).slice().sort((a, b) => String(a.email || a.id).localeCompare(String(b.email || b.id)));
+    const roleName = k => (ORG_ROLES.find(x => x[0] === k) || [k, k])[1];
+    const barBox = el('div', {});
+    const upd = () => barBox.replaceChildren(saveBar(Object.keys(userDraft).length, 'role change', saveUserRoles, () => { userDraft = {}; render(); }));
+    const rows = all.map(u => {
+      const self = u.id === cloud.user.uid, saved = u.role || 'member';
+      const tr = el('tr', {className: userDraft[u.id] ? 'chg' : ''});
+      const sel = el('select', {disabled: self, title: self ? 'You cannot change your own role' : '', on: {change: e => {
+        if (e.target.value === saved) delete userDraft[u.id]; else userDraft[u.id] = e.target.value;
+        tr.className = userDraft[u.id] ? 'chg' : ''; upd();
+      }}}, ...ORG_ROLES.map(([k, l]) => el('option', {value: k, textContent: l})));
+      sel.value = userDraft[u.id] || saved;
+      tr.append(el('td', {}, ava(u.email || '?'), ' ' + (u.email || u.id) + (self ? ' (you)' : '')), el('td', {textContent: roleName(saved)}), el('td', {}, sel));
+      return tr;
     });
-    wrap.append(el('div', {className: 'tblw'}, el('table', {className: 'tbl'}, el('thead', {}, el('tr', {}, ...['User', 'Organization role'].map(h => el('th', {textContent: h})))), el('tbody', {}, ...rows))),
-      !cloud.users ? el('p', {className: 'mut', textContent: 'Loading users…'}) : list.length ? '' : el('p', {className: 'mut', textContent: 'No users with this role yet.'}), invite, allowSection());
+    upd();
+    wrap.append(barBox, el('div', {className: 'tblw'}, el('table', {className: 'tbl'}, el('thead', {}, el('tr', {}, ...['User', 'Current role', 'New role'].map(h => el('th', {textContent: h})))), el('tbody', {}, ...rows))),
+      !cloud.users ? el('p', {className: 'mut', textContent: 'Loading users…'}) : all.length ? '' : el('p', {className: 'mut', textContent: 'No users have signed in yet.'}), invite, allowSection());
     return wrap;
   }
   const rows = [];
@@ -1285,23 +1320,28 @@ function renderRoles() {
 
   let body;
   if (roleTab === 'perm') {
-    const on = new Set(rolePerms(r));
-    body = el('div', {});
+    // Checkbox changes are staged in permDraft and only applied (and sent to everyone) when Save is pressed.
+    const on = new Set(r.locked ? ALL_PERMS : (permDraft || db.roles || {})[r.id] || r.perms);
+    const barBox = el('div', {});
+    const upd = () => barBox.replaceChildren(saveBar(permDirty(), 'role change', savePerms, () => { permDraft = null; render(); }));
+    body = el('div', {}, barBox);
+    if (r.locked) body.append(el('p', {className: 'mut', textContent: 'The Admin role is locked: it always has every permission and cannot be edited. Choose another role on the left to change its permissions.'}));
     PERM_GROUPS.forEach(([g, items]) => {
       body.append(el('h4', {textContent: g}));
       items.forEach(([k, l]) => {
         const cb = el('input', {type: 'checkbox', checked: on.has(k), disabled: !!r.locked || !canEditPerms, on: {change: () => {
-          cb.checked ? on.add(k) : on.delete(k); db.roles = db.roles || {}; db.roles[r.id] = [...on]; save(); if (admin) saveRolesCloud();
+          permDraft = permDraft || JSON.parse(JSON.stringify(db.roles || {}));
+          cb.checked ? on.add(k) : on.delete(k); permDraft[r.id] = [...on]; upd();
         }}});
         body.append(el('label', {className: 'pr'}, cb, el('span', {textContent: l})));
       });
     });
-    if (r.locked) body.append(el('p', {className: 'mut', textContent: 'The Admin role is locked and always has every permission.'}));
-    else if (canEditPerms && db.roles && db.roles[r.id]) body.append(el('button', {textContent: 'Reset to default', on: {click: () => { delete db.roles[r.id]; save(); if (admin) saveRolesCloud(); render(); }}}));
+    if (!r.locked && canEditPerms && (permDraft || db.roles || {})[r.id]) body.append(el('button', {textContent: 'Reset to default', on: {click: () => { permDraft = permDraft || JSON.parse(JSON.stringify(db.roles || {})); delete permDraft[r.id]; render(); }}}));
+    upd();
   } else body = usersBody(r);
 
   const bar = !cloud.user ? el('div', {className: 'infobar', textContent: 'Sign in to manage real people and roles. Until then, changes here are only a preview on this device.'})
-    : admin ? el('div', {className: 'infobar', textContent: 'You are an admin. Permission changes apply to everyone. The server decides who can read, edit and delete each project; the finer permissions below are applied by the app when someone edits.'})
+    : admin ? el('div', {className: 'infobar', textContent: 'You are an admin. Change roles or permissions, then press Save: nothing is applied until you do, and saved permission changes apply to everyone. The server decides who can read, edit and delete each project; the finer permissions below are applied by the app when someone edits.'})
     : el('div', {className: 'infobar', textContent: 'Only an admin can change permissions. Your organization role: ' + (cloud.role || 'member') + '.'});
   const main = el('div', {className: 'rl-main'}, bar,
     el('h2', {textContent: r.name}), el('p', {className: 'mut', textContent: r.scope + ' role · ' + r.desc}),
