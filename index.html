@@ -405,6 +405,9 @@ kbd{font:11px/1 ui-monospace,monospace;padding:2px 5px;border:1px solid var(--li
 .cl{opacity:.75;margin-right:4px}
 .form-msg{min-height:18px;font-size:13px;color:var(--mut)}.form-msg.err{color:var(--bad)}
 
+.chk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);cursor:pointer}.chk input{width:auto!important}
+.form .link{border:0;background:none;color:var(--acc);padding:2px 0}.form .link:hover:not(:disabled){background:none;text-decoration:underline}
+
 /* --- Pencere, bildirim --- */
 dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(600px,92vw);box-shadow:0 12px 40px #0004}
 dialog::backdrop{background:#0006}
@@ -980,28 +983,40 @@ function accountBtn() {
   return b;
 }
 
-function signInDlg() {
+function signInDlg(mode) {
   if (cloud.user) return accountDlg();
   if (cloud.state !== 'out') {
     openDlg('Sign in', el('p', {className: 'mut', textContent: cloud.state === 'loading' ? 'Connecting to the cloud… try again in a moment.' : 'Cloud services could not be loaded (you may be offline). The app keeps working on this device.'}), null); return;
   }
-  const em = el('input', {type: 'text', placeholder: 'name@company.com'}), pw = el('input', {type: 'password', placeholder: 'Password'}), msg = el('div', {className: 'form-msg'});
+  const up = mode === 'up';
+  const em = el('input', {type: 'text', placeholder: 'name@company.com', autocomplete: 'email'});
+  const pw = el('input', {type: 'password', placeholder: up ? 'At least 6 characters' : 'Password', autocomplete: up ? 'new-password' : 'current-password'});
+  const pw2 = up ? el('input', {type: 'password', placeholder: 'Repeat the password', autocomplete: 'new-password'}) : null;
+  const msg = el('div', {className: 'form-msg'});
   const show = (t, bad) => { msg.textContent = t; msg.className = 'form-msg' + (bad ? ' err' : ''); };
-  const go = async fn => {
-    if (!em.value.trim() || !pw.value) return show('Enter your email and password.', true);
-    show('Please wait…');
-    try { await fn(em.value.trim(), pw.value); dlg.close(); } catch (e) { show(cloudErr(e), true); }
+  const submit = async () => {
+    if (!em.value.trim()) { show('Enter your email address.', true); em.focus(); return; }
+    if (!pw.value) { show('Enter your password.', true); pw.focus(); return; }
+    if (up) {
+      if (pw.value.length < 6) { show('The password must be at least 6 characters.', true); pw.focus(); return; }
+      if (pw.value !== pw2.value) { show('The two passwords do not match.', true); pw2.focus(); return; }
+    }
+    show(up ? 'Creating your account…' : 'Signing in…');
+    try { await (up ? FB.signUp : FB.signIn)(em.value.trim(), pw.value); dlg.close(); info(up ? 'Account created. You are signed in.' : 'Signed in.'); }
+    catch (e) { show(cloudErr(e), true); }
   };
-  pw.addEventListener('keydown', e => { if (e.key === 'Enter') go(FB.signIn); });
-  openDlg('Sign in', el('div', {className: 'form'},
-    fld('Email', em), fld('Password', pw), msg,
-    el('button', {className: 'pri', textContent: 'Sign in', on: {click: () => go(FB.signIn)}}),
-    el('button', {textContent: 'Create account', on: {click: () => go(FB.signUp)}}),
-    el('button', {textContent: 'Forgot password?', on: {click: async () => {
-      if (!em.value.trim()) return show('Enter your email first.', true);
-      try { await FB.reset(em.value.trim()); show('Password reset email sent.'); } catch (e) { show(cloudErr(e), true); }
+  (up ? pw2 : pw).addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+  const show2 = el('label', {className: 'chk'}, el('input', {type: 'checkbox', on: {change: e => { pw.type = e.target.checked ? 'text' : 'password'; if (pw2) pw2.type = pw.type; }}}), el('span', {textContent: 'Show password'}));
+  openDlg(up ? 'Create account' : 'Sign in', el('div', {className: 'form'},
+    up ? el('small', {className: 'mut', textContent: 'Use your work email. After signing up you only see the projects you are added to.'}) : '',
+    fld('Email', em), fld('Password', pw), up ? fld('Repeat password', pw2) : '', show2, msg,
+    el('button', {className: 'pri', textContent: up ? 'Create account' : 'Sign in', on: {click: submit}}),
+    up ? '' : el('button', {textContent: 'Forgot password?', on: {click: async () => {
+      if (!em.value.trim()) { show('Enter your email first, then press this again.', true); em.focus(); return; }
+      try { await FB.reset(em.value.trim()); show('Password reset email sent. Check your inbox.'); } catch (e) { show(cloudErr(e), true); }
     }}}),
-    el('small', {className: 'mut', textContent: 'You only see the projects you have been added to. Your projects stay on this device until you upload them.'})), null);
+    el('button', {className: 'link', textContent: up ? 'Already have an account? Sign in' : 'New here? Create an account', on: {click: () => signInDlg(up ? 'in' : 'up')}}),
+    el('small', {className: 'mut', textContent: 'Your projects stay on this device until you upload them from the Account window.'})), null);
   em.focus();
 }
 
