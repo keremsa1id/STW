@@ -31,11 +31,20 @@ Projeleri **Başlık → Alt başlık → Görev** hiyerarşisiyle planlar ve il
 - **Ana sayfa:** "Bu hafta ve geciken işler" listesi.
 - **Görünümler:** Liste, Board (Jira tarzı 10 durum; kartı sürükleyip başka sütuna bırak ya da ◀ ▶ ile taşı; yeni görevler Backlog'da başlar, sütundan + ile yeni görev, Columns ile sütun seç), aylık takvim ve Tablo. Görünüm simgeleri ve Filtreler (durum, öncelik, etiket, kişi) sağ üstte.
 
+### Hesap ve bulut (Firebase)
+- Sol alttaki **Sign in** ile e-posta/şifre girişi. Girişten sonra projeler Firestore'da saklanır ve cihazlar arasında eşitlenir.
+- Cihazda kalan projeler otomatik yüklenmez: hesap penceresindeki **Upload** düğmesiyle (önce yerel yedek alınır) buluta taşınır.
+- Güvenlik kuralları `firestore.rules` dosyasındadır; Firebase konsolunda Firestore → Rules bölümüne yapıştırıp Publish edin.
+- Yapılandırma (`firebaseConfig`) herkese açık bilgidir; erişimi Authentication ve kurallar korur.
+- Henüz yok: e-posta ile davet ve rol yetkilerinin uygulanması (sonraki aşama).
+
 ### Durumlar ve renkleri (Jira mantığı)
 Renk, durumun bağlı olduğu **kategoriden** gelir.
 - **Gri (To Do kategorisi):** Backlog, Defined, Selected for Development, To Do
 - **Mavi (In Progress kategorisi):** In Progress, In Review, Blocked, Ready for QA
 - **Yeşil (Done kategorisi):** Done, Cancelled (iptal edilen iş "tamamlandı" sayılmaz, haftalık tamamlanma grafiğine girmez)
+
+Durum ve öncelik renkleri **sabittir**, tema (vurgu) rengi değişse de değişmez. Epic ve görev renkleri değiştirilebilir: epic başlığındaki 🎨 düğmesi, görev sayfasındaki Colour alanı.
 
 ### Çalışma öğesi özellikleri (yerel, bulut gerektirmez)
 - **Görev sayfası:** Görevin ✎ düğmesi artık tam sayfa açar: açıklama, alt görevler (checklist), bağlı görevler (blocks / is blocked by / relates to), bağlantılar, yorumlar, etkinlik geçmişi, başlangıç ve bitiş tarihi, tahmini ve harcanan süre.
