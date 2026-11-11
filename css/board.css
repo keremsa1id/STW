@@ -19,38 +19,4 @@
 .kp{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
 .knew{border:0;background:none;color:var(--mut);width:100%;text-align:left;padding:8px 6px;border-radius:6px}
 .knew:hover{background:var(--hov);color:var(--ink)}
-.si{width:14px;height:14px;border-radius:50%;border:1.8px solid var(--st-todo);display:inline-block;flex:none;vertical-align:-2px;box-sizing:border-box}
-/* STATUS COLOURS ARE FIXED: gray = To Do category, blue = In Progress category, green = Done category. They do not follow the theme colour. */
-.si-backlog{border-style:dotted}
-.si-defined{background:radial-gradient(circle,var(--st-todo) 30%,transparent 34%)}
-.si-selected{background:conic-gradient(var(--st-todo) 0 25%,transparent 0)}
-.si-doing{border-color:var(--st-prog);background:conic-gradient(var(--st-prog) 0 50%,transparent 0)}
-.si-review{border-color:var(--st-prog);background:conic-gradient(var(--st-prog) 0 75%,transparent 0)}
-.si-blocked{border-color:var(--st-prog);background:linear-gradient(var(--card),var(--card)) center/6px 2px no-repeat,var(--st-prog)}
-.si-qa{border-color:var(--st-prog);background:radial-gradient(circle,var(--st-prog) 30%,transparent 34%)}
-.si-done{border-color:var(--st-done);background:var(--st-done)}
-.si-cancelled{border-color:var(--st-done);background:linear-gradient(135deg,transparent 42%,var(--st-done) 42% 58%,transparent 58%)}
-.chip.st{display:inline-flex;align-items:center;gap:5px;padding:1px 8px}
-.pb{display:inline-flex;align-items:flex-end;gap:2px;height:22px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--card)}
-.pb i{width:3px;border-radius:1px;background:var(--line)}
-.pb i:nth-child(1){height:5px}.pb i:nth-child(2){height:8px}.pb i:nth-child(3){height:11px}
-.pb.p-high i{background:var(--pri-high)}
-.pb.p-mid i:nth-child(-n+2){background:var(--pri-mid)}
-.pb.p-low i:nth-child(1){background:var(--pri-low)}
-.ava{width:22px;height:22px;border-radius:50%;color:#fff;font-size:10px;font-weight:700;display:inline-grid;place-items:center;flex:none}
-.fwrap{position:relative}
-.fbtn.on{border-color:var(--acc);color:var(--acc)}
-.pop{position:absolute;right:0;top:calc(100% + 6px);z-index:20;width:240px;display:grid;gap:10px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px #0003}
-.pop .fld{display:grid;gap:3px;font-size:12px;color:var(--mut)}.pop select{width:100%}
-.tabs button{display:grid;place-items:center;padding:5px 8px}
-.tabs svg{display:block}
-.t.s-backlog input{border-style:dotted}
-.t.s-cancelled input:checked{background-color:var(--card);border-color:var(--st-done);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 3l6 6M9 3l-6 6' fill='none' stroke='%2316a34a' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E")}
-.tblw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
-.tbl{width:100%;border-collapse:collapse;font-size:13px}
-.tbl th{text-align:left;font-weight:600;color:var(--mut);padding:8px 10px;background:var(--sub);border-bottom:1px solid var(--line);white-space:nowrap}
-.tbl td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
-.tbl tbody tr{cursor:pointer}.tbl tbody tr:hover{background:var(--hov)}
-.tbl .tt{font-weight:500;min-width:240px}.tbl tr.d .tt{color:var(--mut);text-decoration:line-through}
-.tbl .late{color:var(--bad)}
-
+.kt{cursor:pointer}.kt:hover{color:var(--acc)}

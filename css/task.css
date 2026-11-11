@@ -1,0 +1,26 @@
+/* --- Task page --- */
+.tk{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+.tk-top{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.tk-title{font-size:22px;font-weight:600;border-color:transparent!important;background:transparent!important;padding:4px 6px!important;margin-bottom:6px}
+.tk-title:hover{border-color:var(--line)!important}
+.tk-sec{margin:18px 0}
+.tk-sec>h3{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}
+.tk-desc{min-height:90px;resize:vertical;font-family:inherit}
+.tk-sub{display:flex;align-items:center;gap:8px;padding:5px 2px;border-bottom:1px solid var(--line)}
+.tk-sub input{width:16px;height:16px;accent-color:var(--ok)}
+.tk-sub .tk-st{flex:1}.tk-sub.d .tk-st{color:var(--mut);text-decoration:line-through}
+.tk-link{display:flex;align-items:center;gap:8px;padding:5px 2px;border-bottom:1px solid var(--line)}
+.tk-link a{flex:1;color:var(--acc);text-decoration:none;word-break:break-all}.tk-link a:hover{text-decoration:underline}
+.tk-link .rl{white-space:nowrap;font-size:12px}
+.tk-sec .add select{max-width:50%}
+.tk-cin{display:grid;gap:6px;justify-items:end;margin-bottom:10px}
+.tk-cm{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.tk-cb{flex:1;min-width:0}.tk-ct{white-space:pre-wrap;word-break:break-word}
+.tk-lg{display:flex;gap:10px;padding:4px 0;font-size:13px}.tk-lg small{min-width:110px}
+.tk-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.tk-card h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}
+.tk-meta{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:13px}
+.tk-meta span:last-child{text-align:right}
+.tk-q{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 8px}
+.tk-side{position:static}
+@media(max-width:900px){.tk{grid-template-columns:minmax(0,1fr)}.tk-side{position:static}}

@@ -1,10 +1,18 @@
 // Minimal service worker: offline shell + notification support.
 // Data stays in localStorage; this only caches the app files.
-const CACHE = 'project-tracker-v7';
-const FILES = ['./', 'index.html', 'css/base.css?v=6', 'css/layout.css?v=6', 'css/common.css?v=6', 'css/list.css?v=6', 'css/board.css?v=6', 'css/calendar.css?v=6', 'css/responsive.css?v=6', 'css/roles.css?v=6', 'css/tasks.css?v=6', 'css/colors.css?v=6', 'css/lock.css?v=6', 'css/dialogs.css?v=6', 'css/home.css?v=6', 'js/templates.js?v=5', 'js/data.js?v=7', 'js/ui.js?v=5', 'js/list.js?v=5', 'js/roles.js?v=5', 'js/cloud.js?v=5', 'js/account.js?v=5', 'js/shell.js?v=5', 'js/notifications.js?v=5', 'js/home.js?v=5', 'js/board.js?v=7', 'js/task.js?v=5', 'js/timeline.js?v=5', 'js/sprints.js?v=5', 'js/reports.js?v=5', 'js/me.js?v=5', 'js/search.js?v=5', 'js/calendar.js?v=5', 'js/render.js?v=5', 'js/main.js?v=5', 'firebase.js?v=5', 'manifest.webmanifest?v=3', 'icon.svg?v=3', 'logo.svg?v=3', 'icon-192.png?v=3', 'icon-512.png?v=3'];
+// The file list is read from index.html when the worker installs, so adding, renaming or removing a script or
+// stylesheet there is enough: there is no second list to keep in sync. Bump CACHE only to force a clean cache.
+const CACHE = 'project-tracker-v8';
+const EXTRA = ['./', 'index.html', 'logo.svg?v=3', 'icon-512.png?v=3'];   // files that index.html does not name (loaded from scripts or the manifest)
+
+async function appFiles() {
+  const html = await (await fetch('index.html', {cache: 'no-cache'})).text();
+  const found = [...html.matchAll(/(?:src|href)="([^":]+?\.(?:css|js|svg|png|webmanifest)(?:\?[^"]*)?)"/g)].map(m => m[1]);
+  return [...new Set([...EXTRA, ...found])];
+}
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+  e.waitUntil(appFiles().then(files => caches.open(CACHE).then(c => c.addAll(files))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {

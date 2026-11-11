@@ -9,19 +9,26 @@
 <link rel="icon" href="icon.svg?v=3" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png?v=3">
 <title>Project Tracker</title>
-<link rel="stylesheet" href="css/base.css?v=6">
-<link rel="stylesheet" href="css/layout.css?v=6">
-<link rel="stylesheet" href="css/common.css?v=6">
-<link rel="stylesheet" href="css/list.css?v=6">
-<link rel="stylesheet" href="css/board.css?v=6">
-<link rel="stylesheet" href="css/calendar.css?v=6">
-<link rel="stylesheet" href="css/responsive.css?v=6">
-<link rel="stylesheet" href="css/roles.css?v=6">
-<link rel="stylesheet" href="css/tasks.css?v=6">
-<link rel="stylesheet" href="css/colors.css?v=6">
-<link rel="stylesheet" href="css/lock.css?v=6">
-<link rel="stylesheet" href="css/dialogs.css?v=6">
-<link rel="stylesheet" href="css/home.css?v=6">
+<link rel="stylesheet" href="css/base.css?v=8">
+<link rel="stylesheet" href="css/layout.css?v=8">
+<link rel="stylesheet" href="css/common.css?v=8">
+<link rel="stylesheet" href="css/list.css?v=8">
+<link rel="stylesheet" href="css/components.css?v=8">
+<link rel="stylesheet" href="css/board.css?v=8">
+<link rel="stylesheet" href="css/controls.css?v=8">
+<link rel="stylesheet" href="css/table.css?v=8">
+<link rel="stylesheet" href="css/calendar.css?v=8">
+<link rel="stylesheet" href="css/responsive.css?v=8">
+<link rel="stylesheet" href="css/roles.css?v=8">
+<link rel="stylesheet" href="css/task.css?v=8">
+<link rel="stylesheet" href="css/timeline.css?v=8">
+<link rel="stylesheet" href="css/sprints.css?v=8">
+<link rel="stylesheet" href="css/reports.css?v=8">
+<link rel="stylesheet" href="css/search.css?v=8">
+<link rel="stylesheet" href="css/colors.css?v=8">
+<link rel="stylesheet" href="css/lock.css?v=8">
+<link rel="stylesheet" href="css/dialogs.css?v=8">
+<link rel="stylesheet" href="css/home.css?v=8">
 
 </head>
 <body>
@@ -41,26 +48,43 @@
 </dialog>
 <div id="toast" hidden></div>
 
-<script src="js/templates.js?v=5"></script>
-<script src="js/data.js?v=7"></script>
-<script src="js/ui.js?v=5"></script>
-<script src="js/list.js?v=5"></script>
-<script src="js/roles.js?v=5"></script>
-<script src="js/cloud.js?v=5"></script>
-<script src="js/account.js?v=5"></script>
-<script src="js/shell.js?v=5"></script>
-<script src="js/notifications.js?v=5"></script>
-<script src="js/home.js?v=5"></script>
-<script src="js/board.js?v=7"></script>
-<script src="js/task.js?v=5"></script>
-<script src="js/timeline.js?v=5"></script>
-<script src="js/sprints.js?v=5"></script>
-<script src="js/reports.js?v=5"></script>
-<script src="js/me.js?v=5"></script>
-<script src="js/search.js?v=5"></script>
-<script src="js/calendar.js?v=5"></script>
-<script src="js/render.js?v=5"></script>
-<script src="js/main.js?v=5"></script>
+<script src="js/core/templates.js?v=8"></script>
+<script src="js/core/dates.js?v=8"></script>
+<script src="js/core/data.js?v=8"></script>
+<script src="js/core/helpers.js?v=8"></script>
+<script src="js/core/ui.js?v=8"></script>
+<script src="js/core/dialogs.js?v=8"></script>
+<script src="js/core/state.js?v=8"></script>
+<script src="js/core/dnd.js?v=8"></script>
+<script src="js/core/projects.js?v=8"></script>
+<script src="js/shared/components.js?v=8"></script>
+<script src="js/shared/colors.js?v=8"></script>
+<script src="js/cloud/cloud.js?v=8"></script>
+<script src="js/cloud/permissions.js?v=8"></script>
+<script src="js/cloud/audit.js?v=8"></script>
+<script src="js/admin/roles.js?v=8"></script>
+<script src="js/admin/account.js?v=8"></script>
+<script src="js/admin/members.js?v=8"></script>
+<script src="js/admin/roles-screen.js?v=8"></script>
+<script src="js/admin/audit-screen.js?v=8"></script>
+<script src="js/views/controls.js?v=8"></script>
+<script src="js/views/list.js?v=8"></script>
+<script src="js/views/board.js?v=8"></script>
+<script src="js/views/table.js?v=8"></script>
+<script src="js/views/calendar.js?v=8"></script>
+<script src="js/views/timeline.js?v=8"></script>
+<script src="js/views/backlog.js?v=8"></script>
+<script src="js/views/sprints.js?v=8"></script>
+<script src="js/views/reports.js?v=8"></script>
+<script src="js/views/home.js?v=8"></script>
+<script src="js/views/me.js?v=8"></script>
+<script src="js/views/search.js?v=8"></script>
+<script src="js/task/links.js?v=8"></script>
+<script src="js/task/task.js?v=8"></script>
+<script src="js/app/shell.js?v=8"></script>
+<script src="js/app/notifications.js?v=8"></script>
+<script src="js/app/render.js?v=8"></script>
+<script src="js/app/main.js?v=8"></script>
 
 <script type="module" src="firebase.js?v=5"></script>
 

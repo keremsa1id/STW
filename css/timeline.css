@@ -1,0 +1,30 @@
+/* --- Timeline and roadmap --- */
+.tlbar{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.tl{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.tl-l{width:280px;flex:none;border-right:1px solid var(--line);background:var(--card);z-index:1}
+.tl-lh{height:48px;display:flex;align-items:flex-end;padding:0 12px 6px;color:var(--mut);font-size:12px;border-bottom:1px solid var(--line);background:var(--sub)}
+.tl-lr,.tl-row{height:34px}
+.tl-lr{display:flex;align-items:center;gap:6px;padding:0 12px;border-bottom:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
+.tl-lr.epic{background:var(--sub)}
+.tl-lr.task{padding-left:26px}
+.tl-lr .dot{width:9px;height:9px;border-radius:3px;background:var(--pc);flex:none}
+.tl-lr span:last-child,.tl-lr b{overflow:hidden;text-overflow:ellipsis}
+.tl-r{flex:1;min-width:0;overflow-x:auto}
+.tl-in{position:relative;min-width:100%}
+.tl-head{height:48px;position:relative;border-bottom:1px solid var(--line);background:var(--sub)}
+.tl-mh{display:flex;height:24px}
+.tl-m{flex:none;font-size:12px;font-weight:600;padding:3px 8px;border-left:1px solid var(--line);overflow:hidden;white-space:nowrap}
+.tl-dh{position:relative;height:24px}
+.tl-d{position:absolute;top:0;font-size:11px;color:var(--mut);text-align:center;padding-top:3px;border-left:1px solid var(--line);height:24px;overflow:hidden}
+.tl-body{position:relative}
+.tl-row{position:relative;border-bottom:1px solid var(--line)}
+.tl-we{position:absolute;top:0;bottom:0;background:color-mix(in srgb,var(--mut) 8%,transparent);pointer-events:none}
+.tl-today{position:absolute;top:0;bottom:0;width:2px;background:var(--bad);z-index:2;pointer-events:none}
+.tlb{position:absolute;top:6px;height:22px;border-radius:5px;background:color-mix(in srgb,var(--pc) 22%,var(--card));border:1px solid var(--pc);overflow:hidden;font-size:12px;line-height:20px;padding:0 6px;white-space:nowrap;cursor:pointer;z-index:1}
+.tlb.task:hover{background:color-mix(in srgb,var(--pc) 38%,var(--card))}
+.tlb.epic{cursor:default;background:color-mix(in srgb,var(--pc) 16%,var(--card))}
+.tlb.epic i{position:absolute;left:0;top:0;bottom:0;background:color-mix(in srgb,var(--pc) 55%,transparent)}
+.tlb span{position:relative;font-weight:500}
+.tlb-out{position:absolute;top:6px;line-height:22px;font-size:12px;font-weight:600;white-space:nowrap;color:var(--text,inherit);pointer-events:none;z-index:1}
+.tlb.d{opacity:.55;text-decoration:line-through}
+@media(max-width:900px){.tl-l{width:150px}.tl-lr{padding:0 8px}.tl-lr.task{padding-left:12px}}

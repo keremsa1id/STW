@@ -217,20 +217,20 @@ Finans şablonu 7 aşamadan oluşur: hedef ve çerçeve → ajan / skill altyap�
 | `firebase.js` | Firebase SDK'sı, yapılandırma, Auth ve Firestore çağrıları (`window.FB`), denetim kaydı yazımı. |
 | `firestore.rules` | Firestore güvenlik kuralları. Konsola yapıştırılıp yayınlanır. |
 | `sw.js`, `manifest.webmanifest` | Service worker (dosya önbelleği, bildirimler) ve PWA tanımı. |
-| `js/data.js` | Veri modeli, `localStorage`, durumlar, eski biçimlerin normalleştirilmesi. |
-| `js/cloud.js` | Oturum, giriş kapısı, eşitleme, yetki denetimi, denetim farkı (`auditDiff`). |
-| `js/account.js`, `js/roles.js` | Giriş ve hesap pencereleri, Members penceresi, Members & Roles ekranı, Audit log. |
-| `js/shell.js`, `js/render.js`, `js/main.js` | Kenar çubuğu, üst çubuk, ana çizim döngüsü, kilitli ekranlar, pencereler, içe / dışa aktarma. |
-| `js/list.js`, `js/board.js`, `js/calendar.js`, `js/timeline.js` | List, Board ve Table, Calendar, Timeline ve Roadmap görünümleri, sürükle-bırak. |
-| `js/task.js`, `js/sprints.js`, `js/reports.js` | Görev sayfası, Backlog ve Sprints, Insights ve Reports. |
-| `js/home.js`, `js/me.js`, `js/search.js`, `js/notifications.js` | Dashboard, For you, arama, acil iş bildirimleri. |
-| `js/templates.js`, `js/ui.js` | Hazır şablonlar, DOM yardımcıları ve Undo. |
-| `css/` | Konuya göre bölünmüş stiller (`base`, `layout`, `list`, `board`, `tasks`, `roles`, `responsive` vb.). |
+| `js/core/` | Temel katman: `data.js` (veri modeli, `localStorage`, durumlar, eski biçimlerin normalleştirilmesi), `dates.js`, `helpers.js`, `ui.js` (DOM yardımcısı, Undo), `dialogs.js` (pencereler), `state.js` (açık ekran, filtre), `dnd.js` (sürükle-bırak), `projects.js` (proje açma, oluşturma, içe/dışa aktarma, arşiv, silme), `templates.js` (hazır şablonlar). |
+| `js/shared/` | Birden çok ekranın kullandığı küçük parçalar: `components.js` (simgeler, çipler, avatar), `colors.js` (renk paleti ve seçici). |
+| `js/cloud/` | `cloud.js` (oturum, giriş kapısı, Firestore eşitleme), `permissions.js` (rol ve yetki denetimi, kilitli ekranlar), `audit.js` (`auditDiff`: denetim kaydı için fark çıkarma). |
+| `js/admin/` | `account.js` (giriş ve hesap pencereleri), `members.js` (proje üyeleri ve davet), `roles.js` (rol ve yetki tanımları, Save / Discard), `roles-screen.js` (Members & Roles ekranı), `audit-screen.js` (Audit log sekmesi). |
+| `js/views/` | Ekranlar: `home.js`, `me.js`, `search.js`, `list.js`, `board.js`, `table.js`, `calendar.js`, `timeline.js` (Timeline ve Roadmap), `backlog.js`, `sprints.js`, `reports.js` ve ortak denetimler `controls.js` (proje sekmeleri, görünüm seçici, filtreler, görev oluşturma). |
+| `js/task/` | `task.js` (görev sayfası), `links.js` (görevler arası bağlantılar). |
+| `js/app/` | `shell.js` (kenar çubuğu, üst çubuk), `render.js` (çizim döngüsü), `notifications.js` (acil iş bildirimleri), `main.js` (başlatma, en son çalışır). |
+| `css/` | Konuya göre bölünmüş stiller: `base`, `layout`, `common`, `components`, `list`, `board`, `controls`, `table`, `calendar`, `responsive`, `roles`, `task`, `timeline`, `sprints`, `reports`, `search`, `colors`, `lock`, `dialogs`, `home`. |
 | `docs/`, `proje-diyagrami.drawio` | Diyagram görselleri ve kaynakları. |
 
 ### Notlar
 - **Bağımlılık:** Yalnızca Firebase JavaScript SDK'sı (`gstatic.com` üzerinden, sabit sürüm 10.14.1). Başka kütüphane ve derleme adımı yoktur.
-- **Sürüm etiketleri:** `index.html` dosyaları `?v=N` ile yükler, `sw.js` aynı listeyi önbelleğe alır. Bir dosya değişince `index.html` içindeki numarası, `sw.js` içindeki `FILES` listesi ve `CACHE` adı birlikte güncellenmelidir. Aksi hâlde tarayıcı eski dosyayı gösterebilir.
+- **Betik ve stil sırası:** Betikler modül değil, klasik `<script>` etiketleridir ve ortak bir kapsamı paylaşır. Bu yüzden `index.html` içindeki **sıra önemlidir**: önce `core/`, sonra `shared/`, `cloud/`, `admin/`, `views/`, `task/`, en son `app/main.js` (başlatma). CSS sırası da önemlidir: `responsive.css` bazı kuralları ezmek için `board.css` ve `controls.css`'ten sonra gelmelidir.
+- **Sürüm etiketleri ve önbellek:** `index.html` dosyaları `?v=N` ile yükler. `sw.js` önbelleğe alınacak dosya listesini **`index.html`'den kendisi okur**, ikinci bir liste tutulmaz. Dosya eklemek, adını değiştirmek ya da silmek için `index.html`'i güncellemek yeterlidir. Dosya içeriği değişince ilgili `?v=` numarasını artırın (tarayıcı önbelleğini aşmak için). `sw.js` içindeki `CACHE` adı yalnızca önbelleği baştan kurmak istediğinizde değiştirilir.
 - **Veri modeli (özet):** `{ cur, theme, me, roles, savedFilters, cols, colSort, projects: [{ id, name, archived, seq, phases: [{ id, name, color, open, subs: [{ id, name, open, tasks: [Task] }] }], sprints: [{ id, name, goal, start, end, state }] }] }`
   - `Task`: `id, t, done, st, pri, who, due, start, note, tags, color, sprint, est, spent, num, rank, subs, comments, log, links, urls, doneAt, stAt`
   - Durum (`st`): `backlog, defined, selected, todo, doing, review, blocked, qa, cancelled` (`done` ayrı alan). Öncelik: `high | mid | low`. Sprint durumu: `planned | active | closed`.
