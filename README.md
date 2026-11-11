@@ -151,7 +151,13 @@ Sınır: Kayıt tarayıcıdan yazıldığı için bir işlemin kayıt atılmadan
 4. **Davet ve Giriş Akışı:** davetten projenin listede görünmesine kadar adımlar, izin listesi ve e-posta doğrulaması, ilk admin.
 5. **Kayıt ve Denetim Akışı:** değişikliğin yetki kontrolünden buluta ve Audit log'a gidişi.
 
-Kod veya Firestore kuralları değiştiğinde diyagramın da güncellenmesi gerekir.
+### Sistem mimarisi (sayfa 1)
+
+![Proje Takip sistem mimarisi](docs/mimari-diyagram.png)
+
+Diğer sayfaların görselleri henüz eklenmedi; tamamı `.drawio` dosyasında bulunur.
+
+Kod veya Firestore kuralları değiştiğinde diyagramın ve `docs/` altındaki görsellerin de güncellenmesi gerekir (diagrams.net'te **File → Export as → PNG**, zoom 200%).
 
 ## Hazır şablonlar
 Mobil Oyun, Mobil Uygulama, Web Sitesi / Web Uygulaması, Yazılım Ürünü (MVP), Kurumsal Proje Yönetimi, Pazarlama Kampanyası, Finans: Ajan Destekli Piyasa Analizi ve İşlem.
