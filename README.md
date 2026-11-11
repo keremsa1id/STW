@@ -143,7 +143,9 @@ Sınır: Kayıt tarayıcıdan yazıldığı için bir işlemin kayıt atılmadan
 
 ## Diyagramlar
 
-[`proje-diyagrami.drawio`](proje-diyagrami.drawio) dosyası [diagrams.net](https://app.diagrams.net) (draw.io) ile açılır (**Open Existing Diagram**, ya da dosyayı sayfaya sürükleyin). PNG/PDF için **File → Export as**. Beş sayfa içerir:
+[`proje-diyagrami.drawio`](proje-diyagrami.drawio) dosyası [diagrams.net](https://app.diagrams.net) (draw.io) ile açılır (**Open Existing Diagram**, ya da dosyayı sayfaya sürükleyin). PNG/PDF için **File → Export as**. Altı sayfa içerir:
+
+- **Genel Bakış (ilk sayfa):** projeyi tek bakışta anlatan sade şema: kullanıcı → web uygulaması → güvenlik kuralları → Firestore, Authentication, yönetici ekranı, Audit log ve cihaz kopyası.
 
 1. **Sistem Mimarisi:** tarayıcı/PWA, cihaz kopyası (localStorage), Firebase (Authentication, Firestore, güvenlik kuralları) ve statik yayın.
 2. **Veri Modeli:** Proje → Epic → Story → Görev alanları, Sprint ilişkisi, durum kategorileri ve Firestore belgeleri.
@@ -151,11 +153,31 @@ Sınır: Kayıt tarayıcıdan yazıldığı için bir işlemin kayıt atılmadan
 4. **Davet ve Giriş Akışı:** davetten projenin listede görünmesine kadar adımlar, izin listesi ve e-posta doğrulaması, ilk admin.
 5. **Kayıt ve Denetim Akışı:** değişikliğin yetki kontrolünden buluta ve Audit log'a gidişi.
 
+### Genel bakış
+
+![Proje Takip genel mimari](docs/genel-bakis-diyagram.png)
+
 ### Sistem mimarisi (sayfa 1)
 
 ![Proje Takip sistem mimarisi](docs/mimari-diyagram.png)
 
-Diğer sayfaların görselleri henüz eklenmedi; tamamı `.drawio` dosyasında bulunur.
+### Veri modeli (sayfa 2)
+
+![Veri modeli](docs/veri-modeli-diyagram.png)
+
+### Roller ve yetkiler (sayfa 3)
+
+![Roller ve yetkiler](docs/roller-diyagram.png)
+
+### Davet ve giriş akışı (sayfa 4)
+
+![Davet ve giriş akışı](docs/davet-akisi-diyagram.png)
+
+### Kayıt, eşitleme ve denetim akışı (sayfa 5)
+
+![Kayıt, eşitleme ve denetim akışı](docs/kayit-denetim-diyagram.png)
+
+Her diyagramın tek sayfalık kaynak dosyası `docs/` klasöründedir: `veri-modeli-diyagram.drawio`, `roller-diyagram.drawio`, `davet-akisi-diyagram.drawio`, `kayit-denetim-diyagram.drawio`.
 
 Kod veya Firestore kuralları değiştiğinde diyagramın ve `docs/` altındaki görsellerin de güncellenmesi gerekir (diagrams.net'te **File → Export as → PNG**, zoom 200%).
 

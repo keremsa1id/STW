@@ -7,7 +7,7 @@ const safeUrl0 = u => { try { return /^https?:$/.test(new URL(u).protocol); } ca
 const arr0 = (v, f) => Array.isArray(v) ? v.map(f) : [];
 const mk = (t, done, x = {}) => ({id: typeof x.id === 'string' && x.id ? x.id : uid(), t, done: !!done || x.st === 'cancelled', color: /^#[0-9a-f]{6}$/i.test(x.color || '') ? x.color : '', note: String(x.note || ''), due: String(x.due || ''), who: String(x.who || ''),
   pri: ['high', 'mid', 'low'].includes(x.pri) ? x.pri : '', tags: Array.isArray(x.tags) ? x.tags.map(String) : [], st: ['backlog', 'defined', 'selected', 'todo', 'doing', 'review', 'blocked', 'qa', 'cancelled'].includes(x.st) ? x.st : 'backlog',
-  start: String(x.start || ''), est: +x.est > 0 ? +x.est : 0, spent: +x.spent > 0 ? +x.spent : 0, num: +x.num || 0, sprint: String(x.sprint || ''), doneAt: String(x.doneAt || ''), rank: +x.rank || 0,
+  start: String(x.start || ''), est: +x.est > 0 ? +x.est : 0, spent: +x.spent > 0 ? +x.spent : 0, num: +x.num || 0, sprint: String(x.sprint || ''), doneAt: String(x.doneAt || ''), stAt: String(x.stAt || ''), rank: +x.rank || 0,
   subs: arr0(x.subs, s => ({id: String(s.id || uid()), t: String(s.t || ''), done: !!s.done})),
   comments: arr0(x.comments, c => ({id: String(c.id || uid()), at: String(c.at || ''), text: String(c.text || ''), by: String(c.by || '')})),
   log: arr0(x.log, l => ({at: String(l.at || ''), text: String(l.text || '')})).slice(0, 200),
@@ -64,16 +64,18 @@ const CATNAME = {todo: 'To Do', prog: 'In Progress', done: 'Done'};
 const DEFCOLS = ['backlog', 'todo', 'doing', 'review', 'blocked', 'done'];
 const ST_ORDER = Object.keys(COLS);
 const colOf = t => t.done ? (t.st === 'cancelled' ? 'cancelled' : 'done') : COLS[t.st] && CAT[t.st] !== 'done' ? t.st : 'backlog';
+// When the task last changed status (older data: taken from the activity log)
+const movedAt = t => t.stAt || ((t.log || []).find(l => /^Status:/.test(l.text)) || {}).at || '';
 const logT = (t, text) => { (t.log = t.log || []).unshift({at: new Date().toISOString(), text}); if (t.log.length > 200) t.log.length = 200; };
 const setStatus = (t, s) => {
   const old = colOf(t), closing = CAT[s] === 'done';
   if (closing && CAT[old] !== 'done') t.pst = old;
   t.done = closing; t.st = s;
-  if (old !== s) { logT(t, 'Status: ' + COLS[old] + ' → ' + COLS[s]); t.doneAt = s === 'done' ? new Date().toISOString() : ''; }
+  if (old !== s) { t.stAt = new Date().toISOString(); logT(t, 'Status: ' + COLS[old] + ' → ' + COLS[s]); t.doneAt = s === 'done' ? new Date().toISOString() : ''; }
 };
 // Older saved data lacks the newer fields; fill defaults and give every task a stable number (key = PREFIX-number)
 const ensureTask = t => { t.subs = t.subs || []; t.comments = t.comments || []; t.log = t.log || []; t.links = t.links || []; t.urls = t.urls || [];
-  t.color = t.color || ''; t.start = t.start || ''; t.est = +t.est || 0; t.spent = +t.spent || 0; t.sprint = t.sprint || ''; t.doneAt = t.doneAt || ''; t.rank = +t.rank || 0; return t; };
+  t.color = t.color || ''; t.start = t.start || ''; t.est = +t.est || 0; t.spent = +t.spent || 0; t.sprint = t.sprint || ''; t.doneAt = t.doneAt || ''; t.stAt = t.stAt || ''; t.rank = +t.rank || 0; return t; };
 const ensureProj = p => {
   p.sprints = p.sprints || [];
   const ts = allTasks(p).map(x => ensureTask(x.t));

@@ -88,9 +88,13 @@ function renderKanban(p) {
   wrap.addEventListener('dragover', e => { const r = wrap.getBoundingClientRect(); if (e.clientX > r.right - 70) wrap.scrollLeft += 20; else if (e.clientX < r.left + 70) wrap.scrollLeft -= 20; });
   const go = (t, k) => { setStatus(t, k); save(); render(); };
   vis.forEach((k, ci) => {
-    const list = items.filter(x => colOf(x.t) === k), shut = kcl.has(k), col = el('div', {className: 'kcol k-' + k});
+    const byMove = (db.colSort || {})[k] !== 'project';
+    let list = items.filter(x => colOf(x.t) === k);
+    if (byMove) list = list.map((x, i) => [x, i]).sort((a, b) => (movedAt(b[0].t) > movedAt(a[0].t) ? 1 : movedAt(b[0].t) < movedAt(a[0].t) ? -1 : a[1] - b[1])).map(x => x[0]);
+    const shut = kcl.has(k), col = el('div', {className: 'kcol k-' + k});
     bindDz(col, {ok: () => drag && drag.kind === 'card' && colOf(drag.t) !== k, go: () => { const t = drag.t; drag = null; setStatus(t, k); save(); render(); }});
     col.append(el('div', {className: 'kh'}, stIcon(k), el('b', {textContent: COLS[k]}), el('span', {className: 'kn', textContent: list.length}), el('span', {className: 'sp'}),
+      ic(byMove ? '🕘' : '☰', byMove ? 'Sorted by latest move (click: project order)' : 'Sorted by project order (click: latest move first)', () => { (db.colSort = db.colSort || {})[k] = byMove ? 'project' : 'recent'; save(); render(); }),
       ic(shut ? '⤢' : '⤡', shut ? 'Expand' : 'Collapse', () => { shut ? kcl.delete(k) : kcl.add(k); render(); }), ic('+', 'Create', () => newTask(p, k))));
     if (!shut) {
       list.forEach(({t, ph, sb}) => col.append(cardDnd(t, el('div', {className: 'kc' + (t.color ? ' hasc' : '') + (t.done ? ' d' : ''), style: '--pc:' + epicColor(ph, p.phases.indexOf(ph)) + (t.color ? ';--tcol:' + t.color : ''), title: ph.name + ' › ' + sb.name + (t.note ? '\n\n' + t.note : '')},
