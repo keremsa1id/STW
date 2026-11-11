@@ -24,7 +24,7 @@ function notifyUrgent() {
   if (!s || s.h !== hk || !Array.isArray(s.ids)) s = {h: hk, ids: []};
   urgent().filter(({t}) => !s.ids.includes(t.id)).forEach(({t, p}) => {
     s.ids.push(t.id);
-    showNote((t.due < today() ? 'Overdue: ' : 'Due today: ') + t.t, {body: p.name + (t.who ? ' · ' + t.who : '') + ' · mark as done to stop reminders', tag: t.id, renotify: true, icon: 'icon-192.png?v=3'});
+    showNote((t.due < today() ? 'Overdue: ' : 'Due today: ') + t.t, {body: p.name + (t.who ? ' · ' + t.who : '') + ' · mark as done to stop reminders', tag: t.id, data: {tid: t.id}, renotify: true, icon: 'icon-192.png?v=3'});
   });
   try { localStorage.setItem(NKEY, JSON.stringify(s)); } catch (e) {}
 }
@@ -39,7 +39,7 @@ function askNotify() {
 function urgentBox() {
   const ug = urgent(); if (!ug.length) return '';
   const box = el('div', {className: 'sum urg'}, el('b', {textContent: '🔔 Urgent tasks (' + ug.length + ')', style: 'font-size:16px;color:var(--bad)'}));
-  ug.slice(0, 6).forEach(({t, p}) => box.append(el('div', {className: 'up', on: {click: () => open(p.id)}},
+  ug.slice(0, 6).forEach(({t, p}) => box.append(el('div', {className: 'up', on: {click: () => openInList(p, t)}},
     el('span', {className: 'chip late', textContent: '📅 ' + fmt(t.due) + (t.due < today() ? ' · Overdue' : ' · Due today')}),
     el('span', {className: 'ut', textContent: t.t}), el('small', {className: 'mut', textContent: p.name}))));
   if (ug.length > 6) box.append(el('small', {className: 'mut', textContent: '+ ' + (ug.length - 6) + ' more urgent tasks'}));
