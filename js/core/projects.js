@@ -5,6 +5,17 @@ const open = id => {
   collapse(cur()); // open the project collapsed
   save(); render();
 };
+// Open a project in the Work items list with the epic and story of one task expanded, and scroll to that task
+const openInList = (p, t) => {
+  open(p.id);
+  const x = allTasks(p).find(y => y.t === t);
+  if (x) { x.ph.open = true; x.sb.open = true; save(); render(); }
+  setTimeout(() => { const c = document.getElementById(t.id), r = c && c.closest('.t'); if (r) { r.scrollIntoView({block: 'center'}); r.classList.add('flash'); } }, 50);
+};
+const openTaskById = id => {
+  for (const p of db.projects) { const x = allTasks(p).find(y => y.t.id === id); if (x) { openInList(p, x.t); return true; } }
+  return false;
+};
 const home = () => { view = 'home'; render(); };
 const projStat = p => stat(p.phases.flatMap(tasksOf));
 const delProject = p => {

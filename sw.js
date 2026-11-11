@@ -33,5 +33,9 @@ self.addEventListener('fetch', e => {
 
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  e.waitUntil(self.clients.matchAll({type: 'window'}).then(cs => cs.length ? cs[0].focus() : self.clients.openWindow('./')));
+  const tid = e.notification.data && e.notification.data.tid;
+  e.waitUntil(self.clients.matchAll({type: 'window'}).then(cs => {
+    if (cs.length) { cs[0].postMessage({openTask: tid}); return cs[0].focus(); }
+    return self.clients.openWindow(tid ? './?task=' + encodeURIComponent(tid) : './');
+  }));
 });
