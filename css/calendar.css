@@ -1,0 +1,19 @@
+/* --- Takvim --- */
+.calnav{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.calnav b{flex:1;text-align:center;text-transform:capitalize}
+.calw{overflow-x:auto}
+.calg{display:grid;grid-template-columns:repeat(7,minmax(78px,1fr));gap:0;min-width:560px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.cwd{text-align:center;color:var(--mut);font-size:12px;padding:6px 0;background:var(--sub);border-bottom:1px solid var(--line)}
+.cd{background:var(--card);border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-height:92px;padding:4px}
+.calg>div:not([class]){background:var(--sub);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.cd.today{background:color-mix(in srgb,var(--acc) 8%,var(--card))}
+.cd.today .dn{background:var(--acc);color:#fff;border-radius:99px;padding:0 6px}
+.cd .dn{font-size:12px;color:var(--mut);display:inline-block}
+.ct{--tc:var(--acc);font-size:12px;border:1px solid var(--line);border-left:3px solid var(--tc);background:var(--card);border-radius:5px;padding:2px 6px;margin-top:3px;cursor:pointer;word-break:break-word;box-shadow:0 1px 1px #0000000a}
+.ct:hover{background:var(--hov)}
+.ct small{display:block;color:var(--mut);font-size:11px;line-height:1.3}
+.ct.p-high{--tc:var(--pri-high)}.ct.p-mid{--tc:var(--pri-mid)}.ct.p-low{--tc:var(--pri-low)}
+.ct.d{text-decoration:line-through;color:var(--mut)}
+.ct.late{color:var(--bad)}
+
+

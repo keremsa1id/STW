@@ -1,0 +1,17 @@
+:root{--bg:#fff;--card:#fff;--ink:#1f2430;--mut:#667085;--line:#e4e7ec;--acc:#d71920;--ok:#16a34a;--sub:#f7f8fa;--hov:#eef0f4;--c1:#d71920;--c2:#8b5cf6;--c3:#0ea5a4;--c4:#f59e0b;--c5:#ec4899;--bad:#e5484d;--st-todo:#667085;--st-prog:#2f6fed;--st-done:#16a34a;--pri-high:#e5484d;--pri-mid:#f59e0b;--pri-low:#2f6fed}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#15171c;--card:#1b1e25;--ink:#e6e8ec;--mut:#8c94a5;--line:#2a2f3a;--acc:#ff5a60;--ok:#3ec48c;--sub:#191c22;--hov:#242832;--c1:#ff5a60;--c2:#a78bfa;--c3:#2dd4bf;--c4:#fbbf24;--c5:#f472b6;--st-todo:#8c94a5;--st-prog:#5b8def;--st-done:#3ec48c;--pri-high:#ff6b70;--pri-mid:#fbbf24;--pri-low:#5b8def;color-scheme:dark}}
+:root[data-theme=dark]{--bg:#15171c;--card:#1b1e25;--ink:#e6e8ec;--mut:#8c94a5;--line:#2a2f3a;--acc:#ff5a60;--ok:#3ec48c;--sub:#191c22;--hov:#242832;--c1:#ff5a60;--c2:#a78bfa;--c3:#2dd4bf;--c4:#fbbf24;--c5:#f472b6;--st-todo:#8c94a5;--st-prog:#5b8def;--st-done:#3ec48c;--pri-high:#ff6b70;--pri-mid:#fbbf24;--pri-low:#5b8def;color-scheme:dark}
+:root[data-theme=light]{color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,select,input,textarea{font:inherit;color:inherit}
+button,select{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:13px;cursor:pointer}
+button:hover:not(:disabled),select:hover{background:var(--hov)}
+button:disabled{opacity:.3;cursor:default}
+button.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:500}
+button.pri:hover:not(:disabled){background:color-mix(in srgb,var(--acc) 85%,#000)}
+input[type=text],textarea{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:5px 10px;width:100%}
+input[type=text]:focus,textarea:focus,select:focus{outline:2px solid color-mix(in srgb,var(--acc) 45%,transparent);outline-offset:0;border-color:var(--acc)}
+.mut,.sum small{color:var(--mut)}
+.sp{flex:1}
+

@@ -1,6 +1,6 @@
 # Proje Takip
 
-Tek dosyadan (`index.html`) oluşan, derleme adımı gerektirmeyen bir proje ve görev takip aracı. Tarayıcıda açılır, PWA olarak kurulabilir. Giriş, bulut eşitleme, roller ve denetim kaydı için **Firebase** (Authentication + Firestore) kullanır. Uygulama arayüzü İngilizcedir.
+`index.html`, `css/` klasörü, `js/` klasörü ve `firebase.js` dosyalarından oluşan, derleme adımı gerektirmeyen bir proje ve görev takip aracı. Tarayıcıda açılır, PWA olarak kurulabilir. Giriş, bulut eşitleme, roller ve denetim kaydı için **Firebase** (Authentication + Firestore) kullanır. Uygulama arayüzü İngilizcedir.
 
 Çalışma öğeleri **Epic → Story → Görev** hiyerarşisiyle planlanır; Jira mantığında durumlar, sprint, Board, Timeline ve raporlar vardır. Erişim **yalnızca davetle** verilir.
 
@@ -19,7 +19,7 @@ Tek dosyadan (`index.html`) oluşan, derleme adımı gerektirmeyen bir proje ve 
 ## Hızlı kurulum
 
 1. **Yayın:** Dosyalar statik olduğu için herhangi bir statik barındırma yeterlidir. GitHub Pages için: **Settings → Pages → Deploy from a branch → `main` / `(root)`**. Ücretsiz hesapta Pages için depo herkese açık olmalıdır. Adres: `https://KULLANICIADI.github.io/DEPOADI/`.
-2. **Firebase projesi:** Firebase konsolunda proje açın, `index.html` içindeki `firebaseConfig` değerlerini kendi projenizle değiştirin.
+2. **Firebase projesi:** Firebase konsolunda proje açın, `firebase.js` içindeki Firebase yapılandırma değerlerini kendi projenizle değiştirin.
 3. **Authentication:** Sign-in method → **Email/Password** açın. **Settings → Authorized domains** listesine yayın alan adınızı ekleyin (ör. `kullaniciadi.github.io`).
 4. **Firestore:** Veritabanını oluşturun. `firestore.rules` dosyasının içeriğini **Firestore → Rules** bölümüne yapıştırıp **Publish** edin. Yayınlanmazsa veya test modu kalırsa giriş ekranı veriyi korumaz.
 5. **İlk admin:** Kimse kendini admin yapamaz. Önce `allowlist` koleksiyonuna e-posta belgesi ekleyin (belge kimliği küçük harfli e-posta; alanlar: `email`, `invitedBy`, `createdAt`), uygulamada o adresle hesap açıp e-postayı doğrulayın ve bir kez giriş yapın. Sonra **Firestore → `users` → kendi UID'li belge → `role` = `admin`** yapın ve yeniden giriş yapın.
@@ -159,7 +159,7 @@ Mobil Oyun, Mobil Uygulama, Web Sitesi / Web Uygulaması, Yazılım Ürünü (MV
 Finans şablonu 7 aşamadan oluşur: hedef ve çerçeve → ajan/skill altyapısı → veri kaynakları → piyasa analizi (ABD hisse, kripto, merdiven işlemler) → strateji ve test (geriye dönük + kâğıt üzerinde) → canlı işlem ve takip → operasyon ve iyileştirme. Yatırım tavsiyesi değildir; yalnızca bir iş planı iskeletidir.
 
 ## Teknik notlar
-- **Dosyalar:** `index.html` (CSS + JavaScript bir arada), `firestore.rules`, `manifest.webmanifest`, `sw.js` (önbellek, bildirimler), `logo.svg`, `icon.svg`, `icon-192.png`, `icon-512.png`, `proje-diyagrami.drawio`.
+- **Dosyalar:** `index.html` (sayfa iskeleti), `css/` klasörü (stiller, konuya göre bölünmüş), `js/` klasörü (uygulama mantığı, konuya göre bölünmüş betikler: `data.js`, `cloud.js`, `board.js`, `task.js`, `timeline.js`, `sprints.js`, `reports.js` vb.), `firebase.js` (Firebase girişi ve bulut eşitleme), `firestore.rules`, `manifest.webmanifest`, `sw.js` (önbellek, bildirimler), `logo.svg`, `icon.svg`, `icon-192.png`, `icon-512.png`, `proje-diyagrami.drawio`.
 - **Bağımlılık:** Yalnızca Firebase JavaScript SDK'sı (`gstatic.com` üzerinden, sabit sürüm). Başka kütüphane ve derleme adımı yoktur.
 - **Veri modeli (özet):** `{ cur, theme, roles, savedFilters, projects: [{ id, name, archived, phases: [{ id, name, color, open, subs: [{ id, name, open, tasks: [Task] }] }], sprints: [{ id, name, goal, start, end, state }] }] }`
   - `Task`: `id, t, done, st, pri, who, due, start, note, tags, color, sprint, est, spent, num, rank, subs, comments, log, links, urls, doneAt`

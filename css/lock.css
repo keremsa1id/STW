@@ -1,0 +1,9 @@
+/* --- Locked (view-only / missing permissions) --- */
+input:disabled,textarea:disabled,select:disabled{opacity:.6;cursor:not-allowed}
+.ro .grip,.ro .add,.ro .knew,.ro .tk-cin,.ro .side>button.pri,.ro .dp .tools,.ro .hd .ic:not([title="Collapse"]):not([title="Expand"]),.ro .t>.ic.del,.ro .kk .ka .ic:not([title="Edit"]),.ro .pj{display:none}
+.ro .t input:disabled{cursor:not-allowed}
+.no-t_create .sb>.add,.no-t_create .knew,.no-t_create .kh .ic[title="Create"]{display:none}
+.no-t_delete .t .ic.del,.no-t_delete .bulk button:nth-last-child(2){display:none}
+.no-e_edit .ph .grip,.no-e_edit .sb .grip,.no-e_edit .hd .ic:not([title="Collapse"]):not([title="Expand"]),.no-e_edit .side>button.pri,.no-e_edit .dp .tools{display:none}
+.no-p_archive .pj{display:none}
+

@@ -1,0 +1,25 @@
+/* --- Accounts / roles --- */
+.badge{font-size:10px;font-weight:700;letter-spacing:.03em;padding:0 7px;border-radius:99px;background:color-mix(in srgb,var(--c4) 22%,transparent);color:color-mix(in srgb,var(--c4) 70%,var(--ink));border:1px solid color-mix(in srgb,var(--c4) 50%,transparent)}
+.soonbar{border:1px dashed color-mix(in srgb,var(--c4) 70%,var(--line));background:color-mix(in srgb,var(--c4) 10%,var(--card));border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:13px}
+.soon{text-align:center;padding:10px 6px}.soonico{font-size:34px}
+.soon p{margin:6px 0 0}
+.rl{display:grid;grid-template-columns:260px minmax(0,1fr);gap:20px;align-items:start}
+.rl-list{background:var(--sub);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:2px}
+.rl-list .newb{margin-bottom:6px}
+.rl-list .sec{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);padding:10px 6px 4px}
+.ri{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:0;background:none;border-radius:6px;padding:7px 8px}
+.ri:hover{background:var(--hov)}
+.ri.on{background:color-mix(in srgb,var(--acc) 13%,transparent);color:var(--acc);font-weight:600}
+.ri .pn{flex:1}
+.tagdef{font-size:11px;padding:0 7px;border-radius:6px;background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok);font-weight:600}
+.rl-main{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.rl-main h2{margin:0 0 2px;font-size:18px}
+.rl-main h4{margin:16px 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}
+.rtabs{display:inline-flex;margin:8px 0 6px}
+.pr{display:flex;align-items:center;gap:10px;padding:7px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.pr input{width:16px;height:16px;accent-color:var(--acc)}
+.mrow{display:flex;align-items:center;gap:10px;padding:6px 0}.mrow .mi{flex:1;display:grid}
+.form hr{width:100%;border:0;border-top:1px solid var(--line);margin:2px 0}
+@media(max-width:900px){.rl{grid-template-columns:minmax(0,1fr)}}
+
+

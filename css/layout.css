@@ -1,0 +1,29 @@
+/* --- Shell: sidebar + top bar + content --- */
+#shell{display:flex;min-height:100vh}
+#sbar{width:248px;flex:none;background:var(--sub);border-right:1px solid var(--line);padding:12px 10px;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:100vh;overflow:auto}
+#sbar .brand{display:flex;align-items:center;gap:8px;padding:4px 6px 12px;font-size:15px}
+#sbar .logo{width:30px;height:30px;border-radius:8px;display:block}
+#sbar .newb{margin:0 0 8px;padding:6px 10px}
+#sbar .sec{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);padding:12px 8px 4px}
+#sbar .grow{flex:1;min-height:12px}
+.nv{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:0;background:none;border-radius:6px;padding:6px 8px;color:var(--ink)}
+.nv:hover:not(:disabled){background:var(--hov)}
+.nv.on{background:color-mix(in srgb,var(--acc) 13%,transparent);color:var(--acc);font-weight:600}
+.nv .pn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nv small{color:var(--mut);font-size:11px}
+.av{--pc:var(--c1);flex:none;width:20px;height:20px;border-radius:5px;background:var(--pc);color:#fff;display:inline-grid;place-items:center;font-size:11px;font-weight:700}
+#mw{flex:1;min-width:0;display:flex;flex-direction:column}
+#top{display:flex;align-items:center;gap:8px;height:52px;padding:0 20px;border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:0;z-index:5}
+#top h1{font-size:15px;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#top .crumb{border:0;background:none;color:var(--mut);padding:2px 4px}
+#top .crumb:hover{color:var(--ink);background:var(--hov)}
+#top .sep{color:var(--mut)}
+#top .mini{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mut);white-space:nowrap}
+#top .mini .bar{width:90px}
+main{padding:16px 20px 80px}
+.bartool{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.tabs{display:flex;gap:2px;background:var(--sub);border:1px solid var(--line);border-radius:8px;padding:2px}
+.tabs button{border:0;background:none;border-radius:6px;color:var(--mut)}
+.tabs button.pri{background:var(--card);color:var(--acc);font-weight:600;box-shadow:0 1px 2px #0003}
+.flt{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+

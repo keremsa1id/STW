@@ -1,0 +1,33 @@
+/* --- Colour picker, task colour accents --- */
+.sw-grid{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.swc{width:26px;height:26px;min-height:0;border-radius:50%;border:2px solid var(--card);box-shadow:0 0 0 1px var(--line);padding:0;cursor:pointer}
+.swc:hover{transform:scale(1.1)}
+.swc.on{box-shadow:0 0 0 2px var(--ink)}
+.swc.def{width:auto;border-radius:99px;padding:0 10px;font-size:12px;color:var(--mut);background:var(--card)}
+.sw-grid .swc-in,.form .sw-grid .swc-in{width:26px;height:26px;min-height:0;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;overflow:hidden}
+.swc-in::-webkit-color-swatch-wrapper{padding:0}.swc-in::-webkit-color-swatch{border:0;border-radius:50%}
+.t.hasc{border-left:4px solid var(--tcol);padding-left:6px}
+.kc.hasc{border-left:4px solid var(--tcol)}
+.tbl tr.hasc td:nth-child(2){box-shadow:inset 4px 0 0 var(--tcol)}
+
+.cdot{width:8px;height:8px;border-radius:50%;background:var(--st-done);flex:none}.cdot.bad{background:var(--bad)}
+.cl{opacity:.75;margin-right:4px}
+.form-msg{min-height:18px;font-size:13px;color:var(--mut)}.form-msg.err{color:var(--bad)}
+
+.chk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);cursor:pointer}.chk input{width:auto!important}
+.form .link{border:0;background:none;color:var(--acc);padding:2px 0}.form .link:hover:not(:disabled){background:none;text-decoration:underline}
+
+.savebar{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:5;border:1px solid var(--acc);background:var(--card);border-radius:8px;padding:8px 12px;margin:0 0 12px;font-size:13px;font-weight:600}.savebar .sp{flex:1}
+.tbl tr.chg td{background:var(--sub)}
+.infobar{border:1px solid var(--line);background:var(--sub);border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:13px}
+.rob{border-color:color-mix(in srgb,var(--c4) 60%,var(--line));background:color-mix(in srgb,var(--c4) 10%,var(--card));font-size:13px;padding:10px 14px}
+
+.mrow select{max-width:190px}
+
+.gated #sbar,.gated #top{display:none}
+.gate{max-width:440px;margin:12vh auto 0;text-align:center;display:grid;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 24px}
+.gate-logo{width:56px;height:56px;margin:0 auto;border-radius:14px}
+.gate h2{margin:0 0 4px}
+.allow{margin-top:20px;border-top:1px solid var(--line);padding-top:6px}
+
+

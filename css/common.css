@@ -1,0 +1,17 @@
+/* --- Ortak --- */
+.bar{height:4px;background:color-mix(in srgb,var(--pc,var(--acc)) 18%,var(--line));border-radius:4px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--pc,var(--acc));width:0;transition:width .25s}
+.sum{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.urg{border-color:color-mix(in srgb,var(--bad) 55%,var(--line));background:color-mix(in srgb,var(--bad) 6%,var(--card))}
+.tools{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.hd{display:flex;gap:2px;align-items:center}
+.hd .nm{flex:1;cursor:pointer;font-weight:600;word-break:break-word;padding:2px 4px}
+.hd em{font-style:normal;color:var(--mut);font-size:12px;margin:0 6px;white-space:nowrap}
+.hd .rng{font-size:12px;color:var(--mut);border:1px solid var(--line);border-radius:6px;padding:0 6px;white-space:nowrap;background:var(--card)}
+.ic{border:0;background:none;color:var(--pc,var(--mut));padding:2px 6px;font-size:14px;line-height:1.3;border-radius:5px}
+.ic:hover:not(:disabled){color:var(--ink);background:var(--hov)}
+.ic.del:hover:not(:disabled){color:#fff;background:var(--bad)}
+.grip{cursor:grab;user-select:none;touch-action:none;padding:2px 4px;color:var(--mut);font-size:14px;line-height:1;flex:none;opacity:.6}
+.grip:hover{opacity:1}.grip:active{cursor:grabbing}
+.over{outline:2px dashed var(--acc);outline-offset:1px;border-radius:6px}
+
