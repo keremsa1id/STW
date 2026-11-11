@@ -1,0 +1,12 @@
+/* --- Table view and bulk edit --- */
+.tblw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;font-weight:600;color:var(--mut);padding:8px 10px;background:var(--sub);border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tbody tr{cursor:pointer}.tbl tbody tr:hover{background:var(--hov)}
+.tbl .tt{font-weight:500;min-width:240px}.tbl tr.d .tt{color:var(--mut);text-decoration:line-through}
+.tbl .late{color:var(--bad)}
+.bulk{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 12px;margin-bottom:10px;background:color-mix(in srgb,var(--acc) 10%,var(--card));border:1px solid color-mix(in srgb,var(--acc) 40%,var(--line));border-radius:10px}
+.bulk input[type=text]{width:150px}
+.tbl .cb{width:34px;text-align:center}.tbl .cb input{width:16px;height:16px;accent-color:var(--acc)}
+.tbl tr.sel{background:color-mix(in srgb,var(--acc) 10%,transparent)}

@@ -1,0 +1,21 @@
+/* --- Shared components: keyboard hint, status icons, priority bars, avatars --- */
+kbd{font:11px/1 ui-monospace,monospace;padding:2px 5px;border:1px solid var(--line);border-radius:4px;color:var(--mut);background:var(--card)}
+.si{width:14px;height:14px;border-radius:50%;border:1.8px solid var(--st-todo);display:inline-block;flex:none;vertical-align:-2px;box-sizing:border-box}
+/* STATUS COLOURS ARE FIXED: gray = To Do category, blue = In Progress category, green = Done category. They do not follow the theme colour. */
+.si-backlog{border-style:dotted}
+.si-defined{background:radial-gradient(circle,var(--st-todo) 30%,transparent 34%)}
+.si-selected{background:conic-gradient(var(--st-todo) 0 25%,transparent 0)}
+.si-doing{border-color:var(--st-prog);background:conic-gradient(var(--st-prog) 0 50%,transparent 0)}
+.si-review{border-color:var(--st-prog);background:conic-gradient(var(--st-prog) 0 75%,transparent 0)}
+.si-blocked{border-color:var(--st-prog);background:linear-gradient(var(--card),var(--card)) center/6px 2px no-repeat,var(--st-prog)}
+.si-qa{border-color:var(--st-prog);background:radial-gradient(circle,var(--st-prog) 30%,transparent 34%)}
+.si-done{border-color:var(--st-done);background:var(--st-done)}
+.si-cancelled{border-color:var(--st-done);background:linear-gradient(135deg,transparent 42%,var(--st-done) 42% 58%,transparent 58%)}
+.chip.st{display:inline-flex;align-items:center;gap:5px;padding:1px 8px}
+.pb{display:inline-flex;align-items:flex-end;gap:2px;height:22px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--card)}
+.pb i{width:3px;border-radius:1px;background:var(--line)}
+.pb i:nth-child(1){height:5px}.pb i:nth-child(2){height:8px}.pb i:nth-child(3){height:11px}
+.pb.p-high i{background:var(--pri-high)}
+.pb.p-mid i:nth-child(-n+2){background:var(--pri-mid)}
+.pb.p-low i:nth-child(1){background:var(--pri-low)}
+.ava{width:22px;height:22px;border-radius:50%;color:#fff;font-size:10px;font-weight:700;display:inline-grid;place-items:center;flex:none}

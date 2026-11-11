@@ -1,0 +1,15 @@
+/* --- Backlog and sprints --- */
+.bl{border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.bl-r{display:flex;align-items:center;gap:10px;padding:6px 10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.bl-r:last-child{border-bottom:0}.bl-r:hover{background:var(--hov)}
+.bl-mv{display:flex;flex-direction:column;line-height:1}
+.bl-mv .ic{padding:0 6px;min-height:16px;font-size:10px}
+.bl-k{min-width:64px;font-size:12px}
+.bl-t{flex:1;min-width:160px;cursor:pointer;font-weight:500}.bl-t:hover{color:var(--acc)}
+.bl-e{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.sp-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.sp-h h2{margin:0}
+.st-active{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.st-planned{background:color-mix(in srgb,var(--c1) 14%,transparent);color:var(--c1)}
+.st-closed{background:var(--hov);color:var(--mut)}
+.rl-main h4{margin:18px 0 8px}

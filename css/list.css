@@ -43,3 +43,6 @@ dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
 .up:hover .ut{color:var(--acc)}
 .up .ut{flex:1;min-width:120px}
 
+/* --- Status styles of list rows --- */
+.t.s-backlog input{border-style:dotted}
+.t.s-cancelled input:checked{background-color:var(--card);border-color:var(--st-done);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 3l6 6M9 3l-6 6' fill='none' stroke='%2316a34a' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E")}

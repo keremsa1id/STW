@@ -1,0 +1,5 @@
+/* --- Search dialog --- */
+.sr-list{margin-top:10px;max-height:50vh;overflow:auto;display:grid;gap:2px}
+.sr-it{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:6px;cursor:pointer}
+.sr-it.on,.sr-it:hover{background:color-mix(in srgb,var(--acc) 13%,transparent)}
+.sr-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
