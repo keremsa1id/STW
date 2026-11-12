@@ -102,7 +102,7 @@ async function claimInvites() {
 function applyRemote(mine, id, o, json) {
   const open = {}; if (mine) mine.phases.forEach(ph => { open[ph.id] = ph.open; ph.subs.forEach(sb => { open[sb.id] = sb.open; }); });
   const p = mine || {id, cloudId: id};
-  p.name = String(o.name || 'Untitled project'); p.archived = !!o.archived; p.sprints = normSprints(o.sprints); p.seq = +o.seq || 0;
+  p.name = String(o.name || 'Untitled project'); p.archived = !!o.archived; p.sprints = normSprints(o.sprints); p.seq = +o.seq || 0; p.key = cleanKey(o.key) || p.key;
   p.phases = (Array.isArray(o.phases) ? o.phases : []).map(ph => ({id: String(ph.id || uid()), name: String(ph.name || 'Epic'), open: !!open[ph.id], color: isHex(ph.color) ? ph.color : '',
     subs: (Array.isArray(ph.subs) ? ph.subs : []).map(sb => ({id: String(sb.id || uid()), name: String(sb.name || 'Story'), open: !!open[sb.id],
       tasks: (Array.isArray(sb.tasks) ? sb.tasks : []).map(t => ensureTask(mk(String(t.t || ''), t.done, t)))}))}));

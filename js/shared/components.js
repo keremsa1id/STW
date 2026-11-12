@@ -19,7 +19,17 @@ const ava = name => {
   return el('span', {className: 'ava', title: name, style: 'background:hsl(' + h + ' 55% 45%)', textContent: name.trim().split(/\s+/).slice(0, 2).map(w => [...w][0]).join('').toLocaleUpperCase('en')});
 };
 const avatar = p => el('span', {className: 'av', style: '--pc:var(--c' + (db.projects.indexOf(p) % 5 + 1) + ')', textContent: ([...p.name.trim()][0] || '?').toLocaleUpperCase('en')});
-const prefix = p => ([...p.name].filter(c => /\p{L}/u.test(c)).slice(0, 3).join('') || 'PRJ').toLocaleUpperCase('en');
+// Project key (Jira style): made once when the project is created and stored in p.key, so renaming the project never changes task keys.
+const cleanKey = k => String(k || '').toLocaleUpperCase('en').replace(/[^\p{L}\p{N}]/gu, '').slice(0, 10);
+const keyBase = name => ([...String(name || '')].filter(c => /\p{L}/u.test(c)).slice(0, 3).join('') || 'PRJ').toLocaleUpperCase('en');
+// A key that no other project uses: FIN, then FIN2, FIN3 ... `seed` is a name or an old key; `skip` is the project being keyed
+const newKey = (seed, skip) => {
+  const used = new Set((typeof db !== 'undefined' && db && db.projects ? db.projects : []).filter(x => x !== skip && x.key).map(x => x.key));
+  const base = keyBase(seed); let k = base, n = 2;
+  while (used.has(k)) k = base + n++;
+  return k;
+};
+const prefix = p => p.key || keyBase(p.name);   // the stored key; the name-derived fallback only covers a project that has none yet
 const tagStyle = g => { const h = [...g].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 7); return 'background:hsl(' + h + ' 70% 50% / .2);border-color:hsl(' + h + ' 70% 50% / .55)'; };
 function chipsOf(t) {
   const c = [];
