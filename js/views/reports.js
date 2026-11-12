@@ -29,8 +29,8 @@ function insights(pairs, title) {
   for (let i = 7; i >= 0; i--) { const s = new Date(w0); s.setDate(s.getDate() - 7 * i); weeks.push({s, n: 0}); }
   pairs.forEach(x => { if (x.t.done && x.t.doneAt) { const k = wkStart(new Date(x.t.doneAt)).getTime(), w = weeks.find(y => y.s.getTime() === k); if (w) w.n++; } });
   const wmax = Math.max(...weeks.map(w => w.n), 1);
-  const trend = card('Completed per week', el('div', {className: 'wk'}, ...weeks.map(w => el('div', {className: 'wk-c', title: 'Week of ' + w.s.toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) + ': ' + w.n + ' completed'},
-      el('b', {textContent: w.n || ''}), el('i', {style: 'height:' + (w.n ? Math.max(4, w.n * 100 / wmax) : 0) + '%'}), el('small', {className: 'mut', textContent: w.s.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})})))),
+  const trend = card('Completed per week', el('div', {className: 'wk'}, ...weeks.map(w => el('div', {className: 'wk-c', title: 'Week of ' + w.s.toLocaleDateString('tr-TR', {month: 'short', day: 'numeric'}) + ': ' + w.n + ' completed'},
+      el('b', {textContent: w.n || ''}), el('i', {style: 'height:' + (w.n ? Math.max(4, w.n * 100 / wmax) : 0) + '%'}), el('small', {className: 'mut', textContent: w.s.toLocaleDateString('tr-TR', {month: 'short', day: 'numeric'})})))),
     weeks.every(w => !w.n) ? el('p', {className: 'mut', textContent: 'Completion history is recorded from now on, so this fills in as you finish work.'}) : '');
 
   const late = card('Overdue (' + overdue.length + ')', overdue.length ? el('div', {}, ...overdue.slice(0, 8).map(({t, p}) => el('div', {className: 'up', on: {click: () => openInList(p, t)}},
