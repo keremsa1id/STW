@@ -15,12 +15,12 @@ function showNote(title, opts) {
   if (!('serviceWorker' in navigator)) return fallback();
   navigator.serviceWorker.getRegistration().then(r => r ? r.showNotification(title, opts) : fallback()).catch(fallback);
 }
-// Hourly system notification for every unfinished urgent task (if permitted; only while the page is open)
+// System notification every 15 minutes for every unfinished urgent task (if permitted; only while the page is open)
 function notifyUrgent() {
   if (cloud.access !== 'ok') return;
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
   let s = null; try { s = JSON.parse(localStorage.getItem(NKEY)); } catch (e) {}
-  const hk = today() + 'T' + pad(new Date().getHours());
+  const now = new Date(), hk = today() + 'T' + pad(now.getHours()) + ':' + Math.floor(now.getMinutes() / 15);   // one reminder per urgent task every 15 minutes
   if (!s || s.h !== hk || !Array.isArray(s.ids)) s = {h: hk, ids: []};
   urgent().filter(({t}) => !s.ids.includes(t.id)).forEach(({t, p}) => {
     s.ids.push(t.id);
