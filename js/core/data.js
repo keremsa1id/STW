@@ -17,7 +17,8 @@ const mk = (t, done, x = {}) => ({id: typeof x.id === 'string' && x.id ? x.id : 
 const normSprints = v => arr0(v, s => ({id: String(s.id || uid()), name: String(s.name || 'Sprint'), start: String(s.start || ''), end: String(s.end || ''), goal: String(s.goal || ''),
   state: ['planned', 'active', 'closed'].includes(s.state) ? s.state : 'planned'}));
 function fromTemplate(tpl, name) {
-  return {id: uid(), name: name || tpl.name, phases: tpl.data.map(([pn, subs]) => ({
+  const nm = name || tpl.name;
+  return {id: uid(), name: nm, key: newKey(nm), phases: tpl.data.map(([pn, subs]) => ({
     id: uid(), name: pn, open: true,
     subs: subs.map(([sn, ts]) => ({id: uid(), name: sn, open: true, tasks: ts.map(t => mk(t))}))
   }))};
@@ -27,7 +28,9 @@ function fromTemplate(tpl, name) {
 function normalize(o) {
   const ph = Array.isArray(o.phases) ? o.phases : Array.isArray(o.asamalar) ? o.asamalar : [];
   const task = t => typeof t === 'string' ? mk(t) : mk(String(t.t || t.gorev || t.name || ''), t.done || t.bitti, t);
-  return {id: uid(), name: String(o.name || o.ad || 'Untitled project'), sprints: normSprints(o.sprints), seq: +o.seq || 0, phases: ph.map(p => {
+  const pname = String(o.name || o.ad || 'Untitled project'), ok = cleanKey(o.key);
+  const taken = ok && typeof db !== 'undefined' && db && db.projects && db.projects.some(x => x.key === ok);   // an imported or copied key must stay unique
+  return {id: uid(), name: pname, key: ok && !taken ? ok : newKey(ok || pname), sprints: normSprints(o.sprints), seq: +o.seq || 0, phases: ph.map(p => {
     const subs = p.subs || p.altbasliklar;
     return {id: uid(), name: String(p.name || p.ad || 'Epic'), open: true, color: /^#[0-9a-f]{6}$/i.test(p.color || '') ? p.color : '',
       subs: Array.isArray(subs)
@@ -71,6 +74,7 @@ const ensureTask = t => { t.subs = t.subs || []; t.comments = t.comments || []; 
   t.color = t.color || ''; t.start = t.start || ''; t.est = +t.est || 0; t.spent = +t.spent || 0; t.sprint = t.sprint || ''; t.doneAt = t.doneAt || ''; t.stAt = t.stAt || ''; t.rank = +t.rank || 0; return t; };
 const ensureProj = p => {
   p.sprints = p.sprints || [];
+  if (!p.key) p.key = newKey(p.name, p);   // projects from before keys were stored: freeze the key they show now
   const ts = allTasks(p).map(x => ensureTask(x.t));
   p.seq = Math.max(p.seq || 0, ...ts.map(t => t.num || 0));
   ts.forEach(t => { if (!t.num) t.num = ++p.seq; });
