@@ -12,7 +12,7 @@ function renderHome() {
     const up = upcoming();
     if (up.length) {
       const box = el('div', {className: 'sum'}, el('b', {textContent: 'Due this week & overdue', style: 'font-size:16px;color:var(--ink)'}));
-      up.slice(0, 12).forEach(({t, p}) => box.append(el('div', {className: 'up', on: {click: () => open(p.id)}},
+      up.slice(0, 12).forEach(({t, p}) => box.append(el('div', {className: 'up', on: {click: () => openInList(p, t)}},
         el('span', {className: 'chip' + (isLate(t) ? ' late' : ''), textContent: '📅 ' + fmt(t.due) + (isLate(t) ? ' · Overdue' : '')}),
         el('span', {className: 'ut', textContent: t.t}), el('small', {className: 'mut', textContent: p.name}))));
       if (up.length > 12) box.append(el('small', {className: 'mut', textContent: '+ ' + (up.length - 12) + ' more tasks'}));
