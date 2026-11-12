@@ -1,5 +1,7 @@
 /* js/core/helpers.js: Lookups and small helpers shared by several screens */
 
+// "1 task" / "2 tasks": adds an s unless the count is exactly 1
+const plural = (n, word) => n + ' ' + word + (n === 1 ? '' : 's');
 const keyOf = (p, t) => prefix(p) + '-' + t.num;
 const findProj = t => db.projects.find(pr => allTasks(pr).some(x => x.t === t));
 const me = () => (db.me || '').trim();

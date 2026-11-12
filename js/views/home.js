@@ -7,7 +7,7 @@ function renderHome() {
   const done = act.filter(p => { const s = projStat(p); return s.n && s.d === s.n; }).length;
   if (!showArch) {
     app.append(el('div', {className: 'stats'},
-      ...[[act.length, 'projects'], [done, 'completed projects'], [t.d + ' / ' + t.n, 'tasks completed'], [t.pct + '%', 'overall progress']]
+      ...[[act.length, act.length === 1 ? 'project' : 'projects'], [done, done === 1 ? 'completed project' : 'completed projects'], [t.d + ' / ' + t.n, (t.n === 1 ? 'task' : 'tasks') + ' completed'], [t.pct + '%', 'overall progress']]
         .map(([v, l]) => el('div', {}, el('b', {textContent: v}), el('span', {textContent: l})))));
     const up = upcoming();
     if (up.length) {
@@ -15,7 +15,7 @@ function renderHome() {
       up.slice(0, 12).forEach(({t, p}) => box.append(el('div', {className: 'up', on: {click: () => openInList(p, t)}},
         el('span', {className: 'chip' + (isLate(t) ? ' late' : ''), textContent: '📅 ' + fmt(t.due) + (isLate(t) ? ' · Overdue' : '')}),
         el('span', {className: 'ut', textContent: t.t}), el('small', {className: 'mut', textContent: p.name}))));
-      if (up.length > 12) box.append(el('small', {className: 'mut', textContent: '+ ' + (up.length - 12) + ' more tasks'}));
+      if (up.length > 12) box.append(el('small', {className: 'mut', textContent: '+ ' + (up.length - 12) + ' more ' + (up.length - 12 === 1 ? 'task' : 'tasks')}));
       app.append(box);
     }
   }
@@ -30,7 +30,7 @@ function renderHome() {
         ic('⧉', 'Duplicate', e => { e.stopPropagation(); const c = normalize(p); c.name = p.name + ' (copy)'; db.projects.splice(i + 1, 0, c); save(); render(); }),
         ic('📦', p.archived ? 'Unarchive' : 'Archive', e => { e.stopPropagation(); toggleArchive(p); }),
         ic('×', 'Delete', e => { e.stopPropagation(); delProject(p); }, 'del')] : [])),
-      el('div', {}, el('span', {className: 'pct', textContent: s.pct + '%'}), el('small', {textContent: '  ' + s.d + '/' + s.n + ' tasks · ' + p.phases.length + ' epics'})),
+      el('div', {}, el('span', {className: 'pct', textContent: s.pct + '%'}), el('small', {textContent: '  ' + s.d + '/' + plural(s.n, 'task') + ' · ' + plural(p.phases.length, 'epic')})),
       bar(s.pct));
     card.prepend(grip(db.projects, i, () => card));
     card.firstChild.style.alignSelf = 'flex-start';
