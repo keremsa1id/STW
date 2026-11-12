@@ -6,7 +6,7 @@ function renderCal(p) {
   const items = allTasks(p).map(x => x.t).filter(pass), by = {};
   items.filter(t => t.due).forEach(t => (by[t.due] = by[t.due] || []).push(t));
   const g = el('div', {className: 'calg'});
-  ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(w => g.append(el('div', {className: 'cwd', textContent: w})));
+  ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].forEach(w => g.append(el('div', {className: 'cwd', textContent: w})));
   const off = (new Date(cal.y, cal.m, 1).getDay() + 6) % 7, days = new Date(cal.y, cal.m + 1, 0).getDate();
   for (let i = 0; i < off; i++) g.append(el('div'));
   for (let d = 1; d <= days; d++) {
@@ -22,7 +22,7 @@ function renderCal(p) {
   const undated = items.filter(t => !t.due && !t.done);
   $('#app').append(el('div', {className: 'calnav'},
     ic('◀', 'Previous month', () => shift(-1)),
-    el('b', {textContent: new Date(cal.y, cal.m, 1).toLocaleDateString('en-US', {month: 'long', year: 'numeric'})}),
+    el('b', {textContent: new Date(cal.y, cal.m, 1).toLocaleDateString('tr-TR', {month: 'long', year: 'numeric'})}),
     el('button', {textContent: 'Today', on: {click: () => { const n = new Date(); cal.y = n.getFullYear(); cal.m = n.getMonth(); render(); }}}),
     ic('▶', 'Next month', () => shift(1))),
     el('div', {className: 'calw'}, g),
