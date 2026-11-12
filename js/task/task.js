@@ -62,7 +62,7 @@ function renderTaskPage() {
   // comments
   const cIn = el('textarea', {className: 'tk-desc', placeholder: 'Add a comment…'});
   const comments = sec('Comments · ' + t.comments.length,
-    el('div', {className: 'tk-cin'}, cIn, el('button', {className: 'pri', textContent: 'Comment', on: {click: () => { const v = cIn.value.trim(); if (!v) return; t.comments.unshift({id: uid(), at: nowIso(), text: v, by: me() || 'You'}); save(); render(); }}})),
+    el('div', {className: 'tk-cin'}, cIn, el('button', {className: 'pri', textContent: 'Comment', on: {click: () => { const v = cIn.value.trim(); if (!v) return; t.comments.unshift({id: uid(), at: nowIso(), text: v, by: me() || (cloud.user && cloud.user.email ? cloud.user.email.split('@')[0] : 'You'), uid: cloud.user ? cloud.user.uid : ''}); save(); render(); }}})),
     ...t.comments.map((c, i) => el('div', {className: 'tk-cm'}, ava(c.by || 'You'),
       el('div', {className: 'tk-cb'}, el('div', {}, el('b', {textContent: c.by || 'You'}), el('small', {className: 'mut', textContent: ' · ' + fmtDT(c.at)})), el('div', {className: 'tk-ct', textContent: c.text})),
       ic('×', 'Delete', () => { t.comments.splice(i, 1); save(); render(); }, 'del'))));
