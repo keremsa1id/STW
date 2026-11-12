@@ -33,7 +33,7 @@ function insights(pairs, title) {
       el('b', {textContent: w.n || ''}), el('i', {style: 'height:' + (w.n ? Math.max(4, w.n * 100 / wmax) : 0) + '%'}), el('small', {className: 'mut', textContent: w.s.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})})))),
     weeks.every(w => !w.n) ? el('p', {className: 'mut', textContent: 'Completion history is recorded from now on, so this fills in as you finish work.'}) : '');
 
-  const late = card('Overdue (' + overdue.length + ')', overdue.length ? el('div', {}, ...overdue.slice(0, 8).map(({t, p}) => el('div', {className: 'up', on: {click: () => openTask(t)}},
+  const late = card('Overdue (' + overdue.length + ')', overdue.length ? el('div', {}, ...overdue.slice(0, 8).map(({t, p}) => el('div', {className: 'up', on: {click: () => openInList(p, t)}},
     el('span', {className: 'chip late', textContent: '📅 ' + fmt(t.due)}), el('span', {className: 'ut', textContent: keyOf(p, t) + ' · ' + t.t}), el('small', {className: 'mut', textContent: p.name})),
     ), overdue.length > 8 ? el('small', {className: 'mut', textContent: '+ ' + (overdue.length - 8) + ' more'}) : '') : el('p', {className: 'mut', textContent: 'Nothing overdue. 🎉'}));
 

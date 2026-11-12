@@ -15,7 +15,7 @@ function renderMe() {
   if (!mine.length) { app.append(el('div', {className: 'empty', textContent: 'Nothing assigned to "' + name + '". Enjoy the quiet.'})); return; }
   groups.forEach(([label, fn]) => {
     const g = mine.filter(fn); if (!g.length) return;
-    app.append(el('section', {className: 'sum'}, el('b', {textContent: label + ' · ' + g.length, style: 'font-size:15px'}), ...g.map(({t, p}) => el('div', {className: 'up', on: {click: () => openTask(t)}},
+    app.append(el('section', {className: 'sum'}, el('b', {textContent: label + ' · ' + g.length, style: 'font-size:15px'}), ...g.map(({t, p}) => el('div', {className: 'up', on: {click: () => openInList(p, t)}},
       avatar(p), el('span', {className: 'mut', textContent: keyOf(p, t)}), el('span', {className: 'ut', textContent: t.t}), pbar(t.pri), stIconOf(t),
       t.due ? el('span', {className: 'chip' + (t.due < t0 ? ' late' : ''), textContent: '📅 ' + fmt(t.due)}) : ''))));
   });

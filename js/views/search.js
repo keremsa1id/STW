@@ -6,7 +6,7 @@ function searchDlg() {
   const all = []; db.projects.filter(p => !p.archived).forEach(p => allTasks(p).forEach(({t, ph, sb}) => all.push({t, p,
     hay: (keyOf(p, t) + ' ' + t.t + ' ' + (t.note || '') + ' ' + (t.who || '') + ' ' + t.tags.join(' ') + ' ' + p.name + ' ' + ph.name + ' ' + sb.name).toLowerCase()})));
   let items = [], idx = 0;
-  const go = x => { dlg.close(); openTask(x.t); };
+  const go = x => { dlg.close(); openInList(findProj(x.t), x.t); };
   const draw = () => {
     const words = inp.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
     items = (words.length ? all.filter(x => words.every(w => x.hay.includes(w))) : all.slice().sort((a, b) => ((b.t.log[0] || {}).at || '').localeCompare((a.t.log[0] || {}).at || '')).slice(0, 8)).slice(0, 30);
