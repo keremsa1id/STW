@@ -10,7 +10,7 @@ function auditBody() {
     FB.listAudit().then(l => { cloud.audit = l; }, e => { cloud.audit = []; info(cloudErr(e)); }).finally(() => { cloud.loadingAudit = false; render(); });
   }
   const rows = (cloud.audit || []).map(a => el('tr', {},
-    el('td', {textContent: a.at ? new Date(a.at).toLocaleString() : 'just now'}), el('td', {textContent: a.email || a.uid}),
+    el('td', {textContent: a.at ? fmtDTY(a.at) : 'just now'}), el('td', {textContent: a.email || a.uid}),
     el('td', {textContent: AUDIT_LABEL[a.action] || a.action}), el('td', {textContent: a.target || ''}), el('td', {className: 'mut', textContent: a.detail || ''})));
   return el('div', {},
     el('p', {className: 'mut', textContent: 'Who did what, newest first (last 300 entries). Entries are added when the action succeeds and cannot be edited or deleted. Only admins can read this list.'}),

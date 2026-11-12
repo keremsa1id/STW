@@ -93,7 +93,7 @@ function importProject() {
     if (!ta.value.trim()) { info.textContent = ''; return; }
     if (isJson()) { info.textContent = 'Detected: JSON'; return; }
     const o = parseOutline(ta.value);
-    info.textContent = 'Detected: outline · ' + o.phases.length + ' epics, ' + o.phases.reduce((a, p) => a + p.subs.length, 0) + ' stories, ' + o.count + ' tasks';
+    info.textContent = 'Detected: outline · ' + plural(o.phases.length, 'epic') + ', ' + plural(o.phases.reduce((a, p) => a + p.subs.length, 0), 'story').replace('storys', 'stories') + ', ' + plural(o.count, 'task');
   };
   ta.addEventListener('input', upd);
   const sample = el('button', {className: 'btn', type: 'button', textContent: 'Insert example', on: {click: () => { ta.value = OUTLINE_SAMPLE; upd(); ta.focus(); }}});

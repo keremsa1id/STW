@@ -27,3 +27,5 @@ main{padding:16px 20px 80px}
 .tabs button.pri{background:var(--card);color:var(--acc);font-weight:600;box-shadow:0 1px 2px #0003}
 .flt{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 
+#top .theme-btn{margin-left:auto;font-size:16px;line-height:1;padding:6px 10px}
+#top .sp~.theme-btn{margin-left:0}

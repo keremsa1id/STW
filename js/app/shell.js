@@ -2,7 +2,6 @@
 
 function renderSidebar() {
   const sb = $('#sbar'); sb.replaceChildren();
-  const L = {auto: '🌓 Theme: auto', light: '☀ Theme: light', dark: '🌙 Theme: dark'}, th = db.theme || 'auto';
   const nv = (txt, on, fn) => el('button', {className: 'nv' + (on ? ' on' : ''), textContent: txt, on: {click: fn}});
   const na = db.projects.filter(p => p.archived).length;
   sb.append(el('div', {className: 'brand'}, el('img', {className: 'logo', src: 'logo.svg?v=3', alt: 'Project Tracker'}), el('b', {textContent: 'Project Tracker'})),
@@ -21,8 +20,12 @@ function renderSidebar() {
   sb.append(el('div', {className: 'grow'}),
     'Notification' in window && Notification.permission === 'granted' ? '' : nv('🔔 Enable notifications', false, askNotify),
     nv('⬆ Import', false, importProject),
-    accountBtn(),
-    nv(L[th], false, () => { const o = ['auto', 'light', 'dark']; db.theme = o[(o.indexOf(th) + 1) % 3]; applyTheme(); save(); render(); }));
+    accountBtn());
+}
+// Theme switch: one icon button at the right end of the top bar, cycles auto, light, dark
+function themeBtn() {
+  const L = {auto: '🌓', light: '☀', dark: '🌙'}, th = db.theme || 'auto';
+  return el('button', {className: 'theme-btn', textContent: L[th], title: 'Theme: ' + th + ' (click to change)', on: {click: () => { const o = ['auto', 'light', 'dark']; db.theme = o[(o.indexOf(th) + 1) % 3]; applyTheme(); save(); render(); }}});
 }
 function renderHeader() {
   const top = $('#top'); top.replaceChildren();
@@ -44,9 +47,10 @@ function renderHeader() {
     const p = cur(), s = projStat(p);
     top.append(el('button', {className: 'crumb', textContent: 'Projects', on: {click: home}}), el('span', {className: 'sep', textContent: '/'}),
       avatar(p), el('h1', {textContent: p.name}), ic('✎', 'Rename project', () => rename(p, 'name', 'Project name')), el('span', {className: 'sp'}),
-      el('div', {className: 'mini'}, el('span', {textContent: s.pct + '% · ' + s.d + '/' + s.n + ' tasks'}), bar(s.pct)),
+      el('div', {className: 'mini'}, el('span', {textContent: s.pct + '% · ' + s.d + '/' + plural(s.n, 'task')}), bar(s.pct)),
       ...(ptab === 'items' ? [viewSwitch(), filterBar(p)] : []),
       el('button', {className: 'mbtn', textContent: '👥 Members', on: {click: () => membersDlg(p)}}),
       el('button', {textContent: 'Export', on: {click: exportProject}}));
   }
+  top.append(themeBtn());
 }
