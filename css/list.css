@@ -48,3 +48,6 @@ dialog .form textarea{height:70px;font-family:inherit;font-size:14px}
 .t.s-cancelled input:checked{background-color:var(--card);border-color:var(--st-done);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 3l6 6M9 3l-6 6' fill='none' stroke='%2316a34a' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E")}
 @keyframes tflash{from{background:color-mix(in srgb,var(--acc) 30%,transparent)}to{background:transparent}}
 .t.flash{animation:tflash 2s ease-out}
+
+.up .snz{display:flex;gap:6px;align-items:center;margin-left:auto}
+.up .snz select,.up .snz button{font-size:12px;padding:2px 6px}
